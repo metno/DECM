@@ -3,9 +3,9 @@ import(zoo)
 import(esd)
 
 # Exports - in alphabetic order
-export(calc.rms.cmip)
-export(calc.stats.cmip)
-export(calc.mon.weights)
+export(calculate.rmse.cmip)
+export(calculate.statistics.cmip)
+export(calculate.mon.weights)
 export(cdo.mean)
 export(cdo.timeSd)
 export(cdo.spatSd)

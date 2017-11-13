@@ -1,10 +1,10 @@
 ## Functions to calculate basic statistics
 
 ## Calculate the mean annual cycle and spatial correlation for CMIP models
-calc.stats.cmip <- function(reference="era", period=c(1981,2010), variable="tas", 
+calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), variable="tas", 
                                        nfiles=5, continue=TRUE, mask="coords.txt", 
                                        verbose=FALSE) {
-  if(verbose) print("calc.stats.cmip")
+  if(verbose) print("calculate.statistics.cmip")
   shape <- get.shapefile("referenceRegions.shp")
   srex.regions <- as.character(shape$LAB)
   if(max(period)>2015) reference <- NULL
@@ -120,7 +120,7 @@ calc.stats.cmip <- function(reference="era", period=c(1981,2010), variable="tas"
 }
 
 ## Calculate weights for the weighted average of rms, assuming monthly time step.
-calc.mon.weights <- function(lon,lat) {
+calculate.mon.weights <- function(lon,lat) {
   
   weights <- array(NA,dim=c(12,length(lon),length(lat)))
   time.weights <- c(31,28,31,30,31,30,31,31,30,31,30,31)/365
@@ -140,9 +140,9 @@ calc.mon.weights <- function(lon,lat) {
 }
 
 ## Calculate the root mean square error (rms) and relative rms (e)
-calc.rms.cmip <- function(reference="era", period=c(1981,2010), variable="tas", nfiles=4,
+calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="tas", nfiles=4,
                            continue=TRUE, verbose=FALSE, path=NULL) {
-  if(verbose) print("calc.rms.cmip")
+  if(verbose) print("calculate.rmse.cmip")
   shfile <- find.file("referenceRegions.shp")[1]
   shape <-  get.shapefile(shfile, with.path = TRUE)
 
@@ -185,7 +185,7 @@ calc.rms.cmip <- function(reference="era", period=c(1981,2010), variable="tas", 
   #lat <- yFromRow(r)
   lon <- longitude(ref)
   lat <- latitude(ref)
-  weights <- calc.mon.weights(lon,lat)
+  weights <- calculate.mon.weights(lon,lat)
  
   ## Check which files are processed
   ngcm <- length(cmip5.urls(varid=variable))
@@ -244,17 +244,17 @@ calc.rms.cmip <- function(reference="era", period=c(1981,2010), variable="tas", 
 # for (varid in c("tas","pr")) {
 #   print(paste("Statistics of CMIP5",varid))
 #   print(paste("Calculate weighted RMSE for the period",paste(opt$it,collapse="-")))
-#   calc.rms.cmip(reference=opt$reference, period=opt$it, variable=varid,
-#                 nfiles=nfiles, continue=opt$continue, verbose=opt$verbose)
+#   calculate.rmse.cmip(reference=opt$reference, period=opt$it, variable=varid,
+#                       nfiles=nfiles, continue=opt$continue, verbose=opt$verbose)
 #   print("Calculate annual cycle statistics")
 #   print(paste("period:",paste(opt$it,collapse="-")))
-#   calc.stats.cmip(reference=opt$reference, period=opt$it, variable=varid,
-#                   nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose,
-#                   mask=opt$mask)
+#   calculate.statistics.cmip(reference=opt$reference, period=opt$it, variable=varid,
+#                             nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose,
+#                             mask=opt$mask)
 #   for (it in list(c(2021,2050),c(2071,2100))) {
 #     print(paste("period:",paste(it,collapse="-")))
-#     calc.stats.cmip(reference=NULL, period=it, variable=varid,
-#                     nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose,
-#                     mask=opt$mask)
+#     calculate.statistics.cmip(reference=NULL, period=it, variable=varid,
+#                               nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose,
+#                               mask=opt$mask)
 #   }
 # }

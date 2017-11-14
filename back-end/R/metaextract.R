@@ -62,6 +62,7 @@ metaextract <- function(x=NULL, verbose=FALSE) {
       Y <- Y.new
     }
   }
+  Y <- as.data.frame(Y)
   Y -> meta
   save(meta,file='metaextract.rda')
   return(Y)

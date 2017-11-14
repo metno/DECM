@@ -1,7 +1,5 @@
 ## ABC4CDE/DEMC - R-script for prototype tool WP4
 ## Rasmus.Benestad@met.no  Oslo, Norway, 2017-02-14
-##
-
 
 getatt <- function(fname) {
   ## Reads and extracts the attribute information in a netCDF files and stores this in a list object## 

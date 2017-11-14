@@ -11,7 +11,7 @@ x <- c(getGCMs(select=1:30,varid="tas",verbose=verbose),
        getGCMs(select=1:30,varid="pr",verbose=verbose),
        getRCMs(select=1:20,varid="tas",verbose=verbose),
        getRCMs(select=1:20,varid="pr",verbose=verbose))
-metaextract(x,verbose=verbose)
+Y <- metaextract(x,verbose=verbose)
 
 ## Calculate statistics for CMIP5 data
 opt <- list(verbose=TRUE,reference="era",it=c(1981,2010),variable="tas",

@@ -27,10 +27,10 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
   if(!is.null(reference)) {
     reference.raster <- raster(ref.file)
     store.name <- paste(reference,variable,sep=".")
-    store[[store.name]]$spatial.sd <- c(cdo.spatSd(ref.file,period), cdo.spatSd(ref.file,period,monthly=TRUE))
-    store[[store.name]]$mean <- c(cdo.mean(ref.file,period), cdo.mean(ref.file,period,monthly=TRUE))
+    store[[store.name]]$global$spatial.sd <- c(cdo.spatSd(ref.file,period), cdo.spatSd(ref.file,period,monthly=TRUE))
+    store[[store.name]]$global$mean <- c(cdo.mean(ref.file,period), cdo.mean(ref.file,period,monthly=TRUE))
     if (variable=="tas") {
-      if(max(abs(store[[store.name]]$mean),na.rm=TRUE)>273) {
+      if(max(abs(store[[store.name]]$global$mean),na.rm=TRUE)>273) {
         units <- "K"
       } else {
         units <- "degrees~Celsius"
@@ -75,14 +75,14 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
     X <- getGCMs(select=i,varid=variable)
     gcm.file <- X[[1]]$filename
     store.name <- paste("gcm",i,sep=".")
-    store[[store.name]]$spatial.sd <- c(cdo.spatSd(gcm.file,period),
-                                        cdo.spatSd(gcm.file,period,monthly=TRUE))
-    store[[store.name]]$mean <- c(cdo.mean(gcm.file,period),
-                                  cdo.mean(gcm.file,period,monthly=TRUE))
+    store[[store.name]]$global$spatial.sd <- c(cdo.spatSd(gcm.file,period),
+                                               cdo.spatSd(gcm.file,period,monthly=TRUE))
+    store[[store.name]]$global$mean <- c(cdo.mean(gcm.file,period),
+                                         cdo.mean(gcm.file,period,monthly=TRUE))
     if(!is.null(reference)) {
-      store[[store.name]]$corr <- 
-        c(cdo.gridcor(gcm.file,ref.file,period),
-          cdo.gridcor(gcm.file,ref.file,period,monthly=TRUE))
+      store[[store.name]]$global$corr <- 
+          c(cdo.gridcor(gcm.file,ref.file,period),
+            cdo.gridcor(gcm.file,ref.file,period,monthly=TRUE))
     }
     for(j in 1:length(srex.regions)) {
       getPolCoords(j,shape=shape,destfile=mask)
@@ -100,7 +100,7 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
     }
     save(file=store.file,store)
     if (variable=="tas") {
-      if(max(abs(store[[store.name]]$mean),na.rm=TRUE)>273) {
+      if(max(abs(store[[store.name]]$global$mean),na.rm=TRUE)>273) {
         units <- c(units,"K")
       } else {
         units <- c(units,"degrees~Celsius")
@@ -195,7 +195,7 @@ calculate.mon.weights <- function(lon,lat) {
 
 ## Calculate the root mean square error (rms) and relative rms (e)
 calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="tas", nfiles=4,
-                           continue=TRUE, verbose=FALSE, path=NULL) {
+                                continue=TRUE, verbose=FALSE, path=NULL) {
   if(verbose) print("calculate.rmse.cmip")
   shfile <- find.file("referenceRegions.shp")[1]
   shape <-  get.shapefile(shfile, with.path = TRUE)
@@ -203,7 +203,7 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   store <- list()
   store.file <- paste("statistics.cmip", reference, variable, paste(period, collapse="-"),
                       "rda", sep=".")
-  if(is.character(find.file(store.file)[1])) store.file <- find.file(store.file)[1]
+  #if(is.character(find.file(store.file)[1])) store.file <- find.file(store.file)[1]
   if(file.exists(store.file)) load(store.file)
 
   ## Pre-process reference file if necessary
@@ -262,7 +262,7 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
                 infile=gcm.file,outfile=gcm.mon.file)
     gcm <- coredata(retrieve(gcm.mon.file))
     dim(gcm) <- dim(ref) <- c(12,length(longitude(gcm)),length(latitude(gcm)))
-    store[[store.name]]$rms <- sqrt(sum(weights*(gcm-ref)^2)/sum(weights))
+    store[[store.name]]$global$rms <- sqrt(sum(weights*(gcm-ref)^2)/sum(weights))
     for(region in levels(shape$LAB)) {
       polygon <- shape[which(levels(shape$LAB)==region),]
       mask <- gen.mask.srex(destfile=gcm.file,mask.polygon=polygon)
@@ -278,10 +278,10 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
     file.remove(gcm.mon.file)
   }
   
-  median.rms <- median(unlist(lapply(store, "[","rms")))  
+  median.rms <- median(unlist(lapply(store, function(x) x$global$rms)))
   for(i in start:end){
     store.name <- paste("gcm",i,sep=".")
-    store[[store.name]]$e <- (store[[store.name]]$rms-median.rms)/median.rms
+    store[[store.name]]$global$e <- (store[[store.name]]$global$rms-median.rms)/median.rms
     for(region in levels(shape$LAB)){
       median.rms <- median(unlist(lapply(lapply(store, "[",region),function(x) x[[region]]$rms)))
       store[[store.name]][[region]]$e <- (store[[store.name]][[region]]$rms-median.rms)/median.rms
@@ -299,7 +299,7 @@ calculate.rmse.cordex <- function(reference="era", period=c(1981,2010), variable
   store <- list()
   store.file <- paste("statistics.cordex", reference, variable, paste(period, collapse="-"),
                       "rda", sep=".")
-  if(is.character(find.file(store.file)[1])) store.file <- find.file(store.file)[1]
+  #if(is.character(find.file(store.file)[1])) store.file <- find.file(store.file)[1]
   if(file.exists(store.file)) load(store.file)
   
   ## Pre-process reference file if necessary

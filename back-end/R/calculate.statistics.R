@@ -119,8 +119,8 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
   return(store)
 }
 
-calculate.statistics.cordex <- function(reference="era", period=c(1981,2010), variable="tas", 
-                                        nfiles=5, continue=TRUE, verbose=FALSE, mask="coords.txt"){
+calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), variable="tas", 
+                                        nfiles=5, continue=TRUE, verbose=FALSE) {
   
   region <- read.csv(find.file("RegionSpecifications.csv"))
   region.id <- as.character(region$Code)
@@ -292,7 +292,7 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   invisible(store)
 }
 
-calculate.rmse.cordex <- function(reference="era", period=c(1981,2010), variable="tas", nfiles=4,
+calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variable="tas", nfiles=4,
                                   continue=TRUE, verbose=FALSE, path=NULL) {
   if(verbose) print("calculate.rmse.cordex")
 
@@ -357,6 +357,8 @@ calculate.rmse.cordex <- function(reference="era", period=c(1981,2010), variable
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
                 infile=gcm.file,outfile=gcm.mon.file)
     gcm <- coredata(retrieve(gcm.mon.file))
+    browser()
+    ref.i <- subset(ref,is=gcm)
     dim(gcm) <- dim(ref) <- c(12,length(longitude(gcm)),length(latitude(gcm)))
     store[[store.name]]$rms <- sqrt(sum(weights*(gcm-ref)^2)/sum(weights))
     file.remove(gcm.mon.file)

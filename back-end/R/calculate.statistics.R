@@ -375,24 +375,3 @@ calculate.rmse.cordex <- function(reference="era", period=c(1981,2010), variable
   file.remove(ref.mon.file)
   invisible(store)
 }
-
-# setwd("/home/kajsamp/git/DECM/R-scripts")
-# opt <- list(verbose=TRUE,reference="era",it=c(1981,2010),variable="tas",
-#             nfiles=30,continue=FALSE,mask="coords.txt",help=FALSE)
-# for (varid in c("tas","pr")) {
-#   print(paste("Statistics of CMIP5",varid))
-#   print(paste("Calculate weighted RMSE for the period",paste(opt$it,collapse="-")))
-#   calculate.rmse.cmip(reference=opt$reference, period=opt$it, variable=varid,
-#                       nfiles=nfiles, continue=opt$continue, verbose=opt$verbose)
-#   print("Calculate annual cycle statistics")
-#   print(paste("period:",paste(opt$it,collapse="-")))
-#   calculate.statistics.cmip(reference=opt$reference, period=opt$it, variable=varid,
-#                             nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose,
-#                             mask=opt$mask)
-#   for (it in list(c(2021,2050),c(2071,2100))) {
-#     print(paste("period:",paste(it,collapse="-")))
-#     calculate.statistics.cmip(reference=NULL, period=it, variable=varid,
-#                               nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose,
-#                               mask=opt$mask)
-#   }
-# }

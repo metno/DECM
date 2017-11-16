@@ -31,7 +31,7 @@ for (varid in c("tas","pr")) {
                       nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose)
 }
 
-for (varid in c("tas","pr")) {
+for (varid in c("pr","tas")) {
   print(paste("Calculate annual cycle statistics for",varid))
   print(paste("period:",paste(opt$it,collapse="-")))
   calculate.statistics.cmip(reference=opt$reference, period=opt$it, variable=varid,

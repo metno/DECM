@@ -83,8 +83,13 @@ scatterplot <- function(x,y,ix=NULL,xlim=NULL,ylim=NULL,xlab=NULL,ylab=NULL,im=N
     cex[ix] <- cex[1]*1.5
   }
   if(new) dev.new()
-  plot(unlist(x),unlist(y),col=col,pch=pch,cex=cex,lwd=lwd,new=FALSE,
-       bg=bg,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main)
+  if(is.numeric(pch)) {
+    plot(unlist(x),unlist(y),type="n",new=FALSE,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main)
+    text(unlist(x),unlist(y),labels=as.character(pch),col=col,cex=cex,lwd=lwd)
+  } else {
+    plot(unlist(x),unlist(y),col=col,pch=pch,cex=cex,lwd=lwd,new=FALSE,
+         bg=bg,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main)
+  }
   lines(xlim*1.5,rep(0,2),lwd=0.2)
   lines(rep(0,2),ylim*1.5,lwd=0.2)
   grid()

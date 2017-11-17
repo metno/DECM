@@ -62,6 +62,7 @@ metaextract <- function(x=NULL, verbose=FALSE) {
       Y <- Y.new
     }
   }
+  Y <- as.data.frame(Y)
   Y -> meta
   save(meta,file='metaextract.rda')
   return(Y)
@@ -70,12 +71,12 @@ metaextract <- function(x=NULL, verbose=FALSE) {
 metaextract.cmip5 <- function(x=NULL, verbose=FALSE) {
   if(verbose) print("metaextract.cmip")
   ## argument 'x' is input from getGCMs, getRCMs, testGCM, etc
-  if (is.null(x)) x <- c(getGCMs(verbose=verbose),getRCMs(verbose=verbose))
+  if (is.null(x)) x <- getGCMs(verbose=verbose)
   
   if(!inherits(x,"list")) x <- list(gcm.1=x)
   gcms <- names(x)
   n <- length(gcms)
-  
+
   for (i in 1:n) {
     xx <- x[[gcms[i]]]
     project_id <- NA; url <- NA; filename <- NA; dim <- NA; dates <- NA
@@ -136,7 +137,7 @@ metaextract.cmip5 <- function(x=NULL, verbose=FALSE) {
 metaextract.cordex <- function(x=NULL, verbose=FALSE) {
   if(verbose) print("metaextract.cordex")
   ## argument 'x' is input from getGCMs, getRCMs, testGCM, etc
-  if (is.null(x)) x <- c(getGCMs(),getRCMs())
+  if (is.null(x)) x <- getRCMs(verbose=verbose)
   
   if(!inherits(x,"list")) x <- list(gcm.1=x)
   gcms <- names(x)

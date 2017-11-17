@@ -1,202 +1,66 @@
 #!/usr/bin/env Rscript
-setwd(system("find $HOME -name download_tests.R -exec dirname {} \\;",intern=TRUE))
+setwd(system("find $HOME -name calculate_statistics.R -exec dirname {} \\;",intern=TRUE))
 ## To install DECM package: 
 ## R CMD INSTALL abc4cde_wp4/back-end 
 ## Requires rgdal, raster, esd (zoo, ncdf4), PCICt 
 library(DECM)
 
-#Function to calculate basic statistics
-calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), variable="tas", 
-                                      nfiles=5, continue=TRUE, verbose=FALSE, mask="coords.txt") {
-  shape <- get.shapefile("referenceRegions.shp")
-  srex.regions <- as.character(shape$LAB)
-  if(max(period)>2015) reference <- NULL
-  if(!is.null(reference)) {
-    ref.file <- getReference(reference,variable)
-    if(!is.character(ref.file)) {
-      reference <- NULL
-      print("Warning! Reference file not found. Continuing without reference data.")
-    }
-  }
-  if(!is.null(reference)) {
-    store.file <- paste("statistics.cmip", reference, variable, paste(period, collapse="-"), "rda", sep=".")
-  } else {
-    store.file <- paste("statistics.cmip", variable, paste(period, collapse="-"), "rda", sep=".")
-  }
-  store <- list()
-  if(file.exists(store.file)) load(store.file)
-  
-  units <- NULL
-  if(!is.null(reference)) {
-    reference.raster <- raster(ref.file)
-    store.name <- paste(reference,variable,sep=".")
-    store[[store.name]]$spatial.sd <- c(cdo.spatSd(ref.file,period), cdo.spatSd(ref.file,period,monthly=TRUE))
-    store[[store.name]]$mean <- c(cdo.mean(ref.file,period), cdo.mean(ref.file,period,monthly=TRUE))
-    if (variable=="tas") {
-      if(max(abs(store[[store.name]]$mean),na.rm=TRUE)>273) {
-        units <- "K"
-      } else {
-        units <- "degrees~Celsius"
-      }
-    } else if(variable=="pr") {
-      if(!is.null(ref.file)) {
-        ncid <- nc_open(ref.file)
-        units <- ncid$var[[1]]$units
-        nc_close(ncid)
-      } else {
-        if(max(abs(store[[store.name]]$mean),na.rm=TRUE)<0.001) {
-          units <- "kg m-2 s-1"
-        } else {
-          units <- "mm/day"
-        }
-      }
-    }
-    
-    for(i in 1:length(srex.regions)){
-      getPolCoords(i,shape=shape,destfile=mask)
-      store[[ store.name ]][[ srex.regions[i] ]]$spatial.sd <- c(cdo.spatSd(ref.file,period,mask=mask), cdo.spatSd(ref.file,period,mask=mask,monthly=TRUE))
-      store[[ store.name ]][[ srex.regions[i] ]]$mean <- c(cdo.mean(ref.file,period,mask=mask), cdo.mean(ref.file,period,mask=mask,monthly=TRUE))
-    }
-  }
-  
-  ngcm <- length(cmip5.urls(varid=variable))
-  start <- 1
-  if(continue && file.exists(store.file))
-    start <- as.numeric(tail(sub('.*\\.', '', names(store), perl=TRUE),n=1))+1
-  if(nfiles=="all"){
-    end <- ngcm
-  } else {
-    end <- min(start+nfiles-1,ngcm) 
-  }
-  
-  for(i in start:end){
-    X <- getGCMs(select=i,varid=variable)
-    gcm.file <- X[[1]]$filename
-    store.name <- paste("gcm",i,sep=".")
-    store[[store.name]]$spatial.sd <- c(cdo.spatSd(gcm.file,period),cdo.spatSd(gcm.file,period,monthly=T))
-    store[[store.name]]$mean <- c(cdo.mean(gcm.file,period),cdo.mean(gcm.file,period,monthly=T))
-    if(!is.null(reference)) store[[store.name]]$corr <- c(cdo.gridcor(gcm.file,ref.file,period),cdo.gridcor(gcm.file,ref.file,period,monthly=T))
-    for(j in 1:length(srex.regions)){
-      getPolCoords(j,shape=shape,destfile=mask)
-      store[[store.name]][[srex.regions[j]]]$spatial.sd <- c(cdo.spatSd(gcm.file,period,mask=mask), cdo.spatSd(gcm.file,period,mask=mask,monthly=T))
-      store[[store.name]][[srex.regions[j]]]$mean <- c(cdo.mean(gcm.file,period,mask=mask), cdo.mean(gcm.file,period,mask=mask,monthly=T))
-      if(!is.null(reference)) store[[store.name]][[srex.regions[j]]]$corr <- c(cdo.gridcor(gcm.file,ref.file,period,mask=mask), cdo.gridcor(gcm.file,ref.file,period,mask=mask,monthly=T))
-    }
-    save(file=store.file,store)
-    if (variable=="tas") {
-      if(max(abs(store[[store.name]]$mean),na.rm=TRUE)>273) {
-        units <- c(units,"K")
-      } else {
-        units <- c(units,"degrees~Celsius")
-      }
-    } else if(variable=="pr") {
-      if(!is.null(gcm.file)) {
-        ncid <- nc_open(gcm.file)
-        units <- c(units,ncid$var[[1]]$units)
-        nc_close(ncid)
-      }# else {
-      #  if(max(abs(store[[1]]$mean),na.rm=TRUE)<0.001) {
-      #    units <- c(units,"kg m-2 s-1")
-      #  } else {
-      #    units <- c(units,"mm/day")
-      #  }
-      #}
-    }
-    gc()
-    if(i==ngcm) return(store)
-  }
-  attr(store,"variable") <- variable
-  #if(variable=="pr") {
-  #  if(max(abs(store[[1]]$mean),na.rm=TRUE)<0.001) {
-  #    attr(store,"unit") <- "kg m-2 s-1"
-  #  } else {
-  #    attr(store,"unit") <- "mm/day"
-  #  }
-  #} else if (variable=="tas") {
-  #  if(max(abs(store[[1]]$mean),na.rm=TRUE)>273) {
-  #    attr(store,"unit") <- "K"
-  #  } else {
-  #    attr(store,"unit") <- "degrees~Celsius"
-  #  }
-  #}
-  save(file=store.file,store)
-  return(store)
-}
+## Extract metadata for CMIP5 and CORDEX data
+verbose <- FALSE
+x <- c(getGCMs(select=1:30,varid="tas",verbose=verbose),
+       getGCMs(select=1:30,varid="pr",verbose=verbose),
+       getRCMs(select=1:20,varid="tas",verbose=verbose),
+       getRCMs(select=1:20,varid="pr",verbose=verbose))
+Y <- metaextract(x,verbose=verbose)
 
-calculate.statistics.cordex <- function(reference="era", period=c(1981,2010), variable="tas", 
-                                        nfiles=5, continue=TRUE, verbose=FALSE, mask="coords.txt"){
-  
-  region <- read.csv(find.file("RegionSpecifications.csv"))
-  region.id <- as.character(region$Code)
-  if(max(period)>2015) reference <- NULL
-  if(!is.null(reference)) {
-    store.file <- paste("statistics.cordex", reference, variable, paste(period, collapse="-"), "rda", sep=".")
-  } else {
-    store.file <- paste("statistics.cordex", variable, paste(period, collapse="-"), "rda", sep=".")
-  }
-  
-  store <- list()
-  if(file.exists(store.file)) load(store.file)
-  
-  if(!is.null(reference)) {
-    ref.file <- getReference(reference,variable)
-    reference.raster <- raster(ref.file)
-  
-    store.name <- paste(reference,variable,sep=".")
-    store[[store.name]]$spatial.sd <- c(cdo.spatSd(ref.file,period), cdo.spatSd(ref.file,period,monthly=T))
-    store[[store.name]]$mean <- c(cdo.mean(ref.file,period), cdo.mean(ref.file,period,monthly=T))
-  
-    #for(i in 1:length(region.id)) {
-    #  getPolCoords(i,shape=shape,destfile=mask)
-    #  store[[ store.name ]][[ srex.regions[i] ]]$spatial.sd <- c(cdo.spatSd(ref.file,period,mask=mask), cdo.spatSd(ref.file,period,mask=mask,monthly=T))
-    #  store[[ store.name ]][[ srex.regions[i] ]]$mean <- c(cdo.mean(ref.file,period,mask=mask), cdo.mean(ref.file,period,mask=mask,monthly=T))
-    #}
-  }
-  
-  ngcm <- length(cordex.urls(varid=variable))
-  start <- 1
-  if(continue && file.exists(store.file))
-    start <- as.numeric(tail(sub('.*\\.', '', names(store), perl=T),n=1))+1
-  if(nfiles=="all") {
-    end <- ngcm
-  } else {
-    end <- min(start+nfiles-1,ngcm) 
-  }
-  
-  for(i in start:end){
-    X <- getRCMs(select=i,varid=variable)
-    gcm.file <- X[[1]]$filename
-    store.name <- paste("gcm",i,sep=".")
-    store[[store.name]]$spatial.sd <- c(cdo.spatSd(gcm.file,period),cdo.spatSd(gcm.file,period,monthly=T))
-    store[[store.name]]$mean <- c(cdo.mean(gcm.file,period),cdo.mean(gcm.file,period,monthly=T))
-    if(!is.null(reference)) store[[store.name]]$corr <- c(cdo.gridcor(gcm.file,ref.file,period),cdo.gridcor(gcm.file,ref.file,period,monthly=T))
-    #for(j in 1:length(srex.regions)){
-    #  getPolCoords(j,shape=shape,destfile=mask)
-    #  store[[store.name]][[srex.regions[j]]]$spatial.sd <- c(cdo.spatSd(gcm.file,period,mask=mask), cdo.spatSd(gcm.file,period,mask=mask,monthly=T))
-    #  store[[store.name]][[srex.regions[j]]]$mean <- c(cdo.mean(gcm.file,period,mask=mask), cdo.mean(gcm.file,period,mask=mask,monthly=T))
-    #  if(!is.null(reference)) store[[store.name]][[srex.regions[j]]]$corr <- c(cdo.gridcor(gcm.file,ref.file,period,mask=mask), cdo.gridcor(gcm.file,ref.file,period,mask=mask,monthly=T))
-    #}
-    save(file=store.file,store)
-    gc()
-    if(i==ngcm) return(store)
-  }
-  return(store)
-}
+## Calculate statistics for CMIP5 data
+opt <- list(reference="era",verbose=TRUE,it=c(1981,2010),variable="tas",
+            nfiles=30,continue=FALSE,mask="coords.txt",help=FALSE)
 
-opt <- list(verbose=TRUE,reference="era",it=c(1981,2010),variable="tas",
-            nfiles=9,continue=FALSE,mask="coords.txt",help=FALSE)
 for (varid in c("tas","pr")) {
-  calculate.statistics.cmip(reference=opt$reference, period=opt$it, variable=varid, 
-                            nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose, 
+  ref <- getReference(opt$reference,varid)
+  if(!file.exists(ref)) {
+    if(opt$verbose) print("Download reference data")
+    if(opt$reference=="era") getERA(variable=varid,verbose=opt$verbose)
+  }
+}
+
+for (varid in c("tas","pr")) {
+  print(paste("Calculate weighted RMSE of",varid))
+  calculate.rmse.cmip(reference=opt$reference, period=opt$it, variable=varid,
+                      nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose)
+}
+
+for (varid in c("pr","tas")) {
+  print(paste("Calculate annual cycle statistics for",varid))
+  print(paste("period:",paste(opt$it,collapse="-")))
+  calculate.statistics.cmip(reference=opt$reference, period=opt$it, variable=varid,
+                            nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose,
                             mask=opt$mask)
   for (it in list(c(2021,2050),c(2071,2100))) {
-    calculate.statistics.cmip(reference=NULL, period=it, variable=varid, 
-                              nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose, 
+    print(paste("period:",paste(it,collapse="-")))
+    calculate.statistics.cmip(reference=NULL, period=it, variable=varid,
+                              nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose,
                               mask=opt$mask)
   }
 }
 
-#calculate.statistics.cordex(reference=opt$reference, period=opt$it, variable=opt$variable, 
-#                          nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose, 
-#                          mask=opt$mask)
-
+## Calculate statistics for CORDEX data
+# for (varid in c("tas","pr")) {
+#   ref <- getReference("eobs",varid)
+#   if(!file.exists(ref)) {
+#     if(opt$verbose) print("Download reference data")
+#     getEOBS(variable=varid,verbose=opt$verbose)
+#   }
+#   calculate.rmse.cordex(reference="eobs", period=opt$it, variable=varid,
+#                         nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose)
+#   calculate.statistics.cordex(reference=opt$reference, period=opt$it, variable=opt$variable, 
+#                               nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose, 
+#                               mask=opt$mask)
+#   for (it in list(c(2021,2050),c(2071,2100))) {
+#     print(paste("period:",paste(it,collapse="-")))
+#     calculate.statistics.cordex(reference=opt$reference, period=opt$it, variable=opt$variable, 
+#                                 nfiles=opt$nfiles, continue=opt$continue, verbose=opt$verbose, 
+#                                 mask=opt$mask)
+#   }
+# }

@@ -1,7 +1,5 @@
 ## ABC4CDE/DEMC - R-script for prototype tool WP4
 ## Rasmus.Benestad@met.no  Oslo, Norway, 2017-02-14
-##
-
 
 getatt <- function(fname) {
   ## Reads and extracts the attribute information in a netCDF files and stores this in a list object## 
@@ -53,8 +51,12 @@ getGCMs <- function(select=1:9,varid='tas',destfile=NULL,verbose=FALSE) {
   X <- list()
   for (i in seq_along(select)) {
     if(verbose) print(paste("Get gcm.",select[i],sep=''))
-    X[[paste('gcm',varid,select[i],sep='.')]] <-
-      getCM(url=url[i],destfile=destfile[i],verbose=verbose)
+    xi <- getCM(url=url[i],destfile=destfile[i],verbose=verbose)
+    if(!is.null(xi)) {
+      X[[paste('gcm',varid,select[i],sep='.')]] <- xi
+    } else{
+      if(verbose) print(paste("Failed to download gcm.",select[i]))
+    }
   }
   invisible(X)
 }
@@ -88,7 +90,12 @@ getRCMs <- function(select=1:9,varid='tas',destfile=NULL,verbose=FALSE) {
   X <- list()
   for (i in seq_along(select)) {
     if(verbose) print(paste("Get rcm.",select[i],sep=""))
-    X[[paste('rcm',varid,select[i],sep='.')]] <- getCM(url=url[i],destfile=destfile[i],verbose=verbose)
+    xi <- getCM(url=url[i],destfile=destfile[i],verbose=verbose)
+    if(!is.null(xi)) {
+      X[[paste('rcm',varid,select[i],sep='.')]] <- xi
+    } else{
+      if(verbose) print(paste("Failed to download rcm.",select[i]))
+    }
   }
   invisible(X)
 }

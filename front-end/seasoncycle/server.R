@@ -38,18 +38,16 @@ shinyServer(function(input, output) {
     gcms <- names(stats$tas$ff)
     ref <- NULL
     if(tolower(input$region)=="global") {
-      coord <- list(lon=c(-180,180),lat=c(-90,90))
-      x <- lapply(gcms, function(gcm) stats[[var]][[period]][[gcm]][["mean"]][2:13])
-      if(period=="present") ref <- stats[[var]][[period]][[1]][["mean"]][2:13]
+      region <- "global"
     } else {
       i.srex <- which(srex$name==input$region)
       region <- srex$label[i.srex]
-      x <- lapply(gcms, function(gcm) stats[[var]][[period]][[gcm]][[region]][["mean"]][2:13])
-      if(period=="present") ref <- stats[[var]][[period]][[1]][[region]][["mean"]][2:13]
     }
+    x <- lapply(gcms, function(gcm) stats[[var]][[period]][[gcm]][[region]][["mean"]][2:13])
+    if(period=="present") ref <- stats[[var]][[period]][[1]][[region]][["mean"]][2:13]
     if(var=="pr") {
-      x <- lapply(x, function(y) y*60*60*24)
-      ref <- ref*1E3 ## m to mm
+      x <- lapply(x, function(y) y*60*60*24) ## mm/s to mm/day
+      ref <- ref*1E3 ## m/day to mm/day
     }
     #if(var=="pr") ref <- NULL
     ylim <- c(NULL,NULL)

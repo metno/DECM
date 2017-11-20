@@ -278,13 +278,13 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
     file.remove(gcm.mon.file)
   }
   
-  median.rms <- median(unlist(lapply(store, function(x) x$global$rms)))
+  median.rms <- list()
+  for(region in names(store[[1]])) median.rms[[region]] <- median(unlist(lapply(store, function(x) x[[region]]$rms)))
   for(i in start:end){
     store.name <- paste("gcm",i,sep=".")
-    store[[store.name]]$global$e <- (store[[store.name]]$global$rms-median.rms)/median.rms
-    for(region in levels(shape$LAB)){
-      median.rms <- median(unlist(lapply(lapply(store, "[",region),function(x) x[[region]]$rms)))
-      store[[store.name]][[region]]$e <- (store[[store.name]][[region]]$rms-median.rms)/median.rms
+    for(region in names(store[[1]])){
+      store[[store.name]][[region]]$e <- 
+        (store[[store.name]][[region]]$rms-median.rms[[region]])/median.rms[[region]]
     }
   }
   save(file=store.file, store)
@@ -357,7 +357,6 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
                 infile=gcm.file,outfile=gcm.mon.file)
     gcm <- coredata(retrieve(gcm.mon.file))
-    browser()
     ref.i <- subset(ref,is=gcm)
     dim(gcm) <- dim(ref) <- c(12,length(longitude(gcm)),length(latitude(gcm)))
     store[[store.name]]$rms <- sqrt(sum(weights*(gcm-ref)^2)/sum(weights))
@@ -368,10 +367,6 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
   for(i in start:end){
     store.name <- paste("cm",i,sep=".")
     store[[store.name]]$e <- (store[[store.name]]$rms-median.rms)/median.rms
-    for(region in levels(shape$LAB)){
-      median.rms <- median(unlist(lapply(lapply(store, "[",region),function(x) x[[region]]$rms)))
-      store[[store.name]][[region]]$e <- (store[[store.name]][[region]]$rms-median.rms)/median.rms
-    }
   }
   save(file=store.file, store)
   file.remove(ref.mon.file)

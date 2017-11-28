@@ -10,18 +10,24 @@ getatt <- function(fname) {
 }
 
 ## Generic function to retrieve climate model (CM) file from the KNMI ClimateExplorer
-getCM <- function(url=NULL,destfile='CM.nc',lon=NULL,lat=NULL,force=FALSE,verbose=FALSE) {
+getCM <- function(url=NULL,destfile='CM.nc',path=NULL,lon=NULL,lat=NULL,force=FALSE,verbose=FALSE) {
   if(verbose) print("getCM")
   ## Retrieves the data
   if(is.null(url)) url <-
     'https://climexp.knmi.nl/CMIP5/monthly/tas/tas_Amon_ACCESS1-0_historical_000.nc'
+  if(!is.null(path)) destfile <- file.path(path,destfile)
   if (file.exists(destfile) & !force) {
     X <- try(retrieve(destfile,lon=lon,lat=lat,verbose=verbose))
     if (inherits(X,"try-error")) force <- TRUE # If downloaded file is incomplete, force new download
   }
   if (!file.exists(destfile) | force) {
     lok <- try(download.file(url=url, destfile=destfile))
-    if (inherits(lok,"try-error")) return()
+    # KMP 2017-11-27: download.file returns non-zero when failing
+    #if (inherits(lok,"try-error")) return()
+    if(lok>0) {
+      file.remove(destfile)
+      return()
+    }
     X <- retrieve(destfile,lon=lon,lat=lat,verbose=verbose)
   }
   ## Collect information stored in the netCDF header
@@ -41,10 +47,11 @@ getCM <- function(url=NULL,destfile='CM.nc',lon=NULL,lat=NULL,force=FALSE,verbos
 }
 
 ## Specific function to retrieve GCMs
-getGCMs <- function(select=1:9,varid='tas',destfile=NULL,verbose=FALSE) {
+getGCMs <- function(select=1:9,varid='tas',destfile=NULL,path=NULL,verbose=FALSE) {
   if(verbose) print("getGCMs")
   ## Set destfile
   if(is.null(destfile)) destfile <- paste(rep('GCM',length(select)),select,'.',varid,'.nc',sep='')
+  if(!is.null(path)) destfile <- file.path(path,destfile)
   ## Get the urls
   url <- cmip5.urls(varid=varid)[select] ## Get the URLs of the 
   ## Set up a list variable to contain all the metadata in sub-lists.
@@ -80,10 +87,11 @@ testGCM <- function(select=1:9,varid='tas',path=NULL,verbose=FALSE) {
 }
 
 ## Specific model to retrieve RCMs
-getRCMs <- function(select=1:9,varid='tas',destfile=NULL,verbose=FALSE) {
+getRCMs <- function(select=1:9,varid='tas',destfile=NULL,path=NULL,verbose=FALSE) {
   if(verbose) print("getRCMs")
   ## Set destfiles
   if(is.null(destfile)) destfile <- paste('CM',select,'.',varid,'.nc',sep='')
+  if(!is.null(path)) destfile <- file.path(path,destfile)
   ## Get the urls
   url <- cordex.urls(varid=varid)[select]
   ## Set up a list variable to contain all the metadata

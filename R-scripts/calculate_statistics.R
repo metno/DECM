@@ -6,16 +6,17 @@ setwd(system("find $HOME -name calculate_statistics.R -exec dirname {} \\;",inte
 library(DECM)
 
 ## Extract metadata for CMIP5 and CORDEX data
-verbose <- FALSE
-x <- c(getGCMs(select=1:30,varid="tas",verbose=verbose),
-       getGCMs(select=1:30,varid="pr",verbose=verbose),
-       getRCMs(select=1:20,varid="tas",verbose=verbose),
-       getRCMs(select=1:20,varid="pr",verbose=verbose))
+verbose <- TRUE
+path.data <- "/lustre/storeA/users/kajsamp/Data/ClimExpl"
+x <- c(getGCMs(select=1:110,varid="tas",verbose=verbose,path=path.data),
+       getGCMs(select=1:110,varid="pr",verbose=verbose,path=path.data),
+       getRCMs(select=1:20,varid="tas",verbose=verbose,path=path.data),
+       getRCMs(select=1:20,varid="pr",verbose=verbose,path=path.data))
 Y <- metaextract(x,verbose=verbose)
 
 ## Calculate statistics for CMIP5 data
 opt <- list(reference="era",verbose=TRUE,it=c(1981,2010),variable="tas",
-            nfiles=30,continue=FALSE,mask="coords.txt",help=FALSE)
+            nfiles="all",continue=FALSE,mask="coords.txt",help=FALSE)
 
 for (varid in c("tas","pr")) {
   ref <- getReference(opt$reference,varid)

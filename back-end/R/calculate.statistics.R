@@ -326,17 +326,6 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
                 infile=ref.mulc,outfile=ref.mon.file)
   }
-  ref <- coredata(retrieve(ref.mon.file))
-  
-  ## Calculate weights only once
-  r <- raster(ref)#.mon.file)
-  ## KMP 2017-11-13: these weights don't fit the gcm and ref on line 211
-  ## and xFromCol/yFromRow(r) doesn't match longitude/latitude(ref)
-  #lon <- xFromCol(r)
-  #lat <- yFromRow(r)
-  lon <- longitude(ref)
-  lat <- latitude(ref)
-  weights <- calculate.mon.weights(lon,lat)
   
   ## Check which files are processed
   ngcm <- length(cordex.urls(varid=variable))
@@ -350,6 +339,7 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
     end <- min(start + nfiles - 1, ngcm) 
   }
   
+  ref <- retrieve(ref.mon.file)
   for(i in start:end) {
     store.name <- paste("cm",i,sep=".")
     gcm.file <- file.path(path.gcm,paste("CM",i,".",variable,".nc",sep=""))
@@ -358,9 +348,11 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
                 infile=gcm.file,outfile=gcm.mon.file)
     gcm <- coredata(retrieve(gcm.mon.file))
-    ref.i <- subset(ref,is=gcm)
-    dim(gcm) <- dim(ref) <- c(12,length(longitude(gcm)),length(latitude(gcm)))
-    store[[store.name]]$rms <- sqrt(sum(weights*(gcm-ref)^2)/sum(weights))
+    ref.i <- subset(ref,is=list(lon=range(lon(gcm)),lat=range(lat(gcm))))
+    weights <- calculate.mon.weights(longitude(ref.i),latitude(ref.i))
+    ref.i <- coredata(ref.i)
+    dim(gcm) <- dim(ref.i) <- c(12,length(longitude(gcm)),length(latitude(gcm)))
+    store[[store.name]]$rms <- sqrt(sum(weights*(gcm-ref.i)^2,na.rm=TRUE)/sum(weights))
     file.remove(gcm.mon.file)
   }
   

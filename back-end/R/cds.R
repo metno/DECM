@@ -43,6 +43,10 @@ getCM <- function(url=NULL,destfile='CM.nc',path=NULL,lon=NULL,lat=NULL,force=FA
   nc_close(ncid)
   cid$model <- model
   cid$project_id <- cid$model$project_id
+  ## KMP 2017-11-29: One of the CMIP5 files (GCM36.tas.nc) is missing project_id in netCDF header:
+  if(is.null(cid$project_id) & !is.null(cid$model$title)) {
+    if(grepl("CMIP5",model$title)) cid$project_id <- "CMIP5"
+  }
   return(cid)
 }
 
@@ -112,7 +116,7 @@ cmip5.urls <- function(experiment='rcp45',varid='tas',
                        url="http://climexp.knmi.nl/CMIP5/monthly/",#path=NULL,
 		       off=FALSE,force=FALSE,verbose=FALSE) {
   if(verbose) print("cmip5.urls")
-  urlfiles <- "NA"
+  urlfiles <- c()
   #if(is.null(path)) path <- getwd()
   for (iexp in experiment) {
     if(verbose) print(iexp)
@@ -132,19 +136,21 @@ cmip5.urls <- function(experiment='rcp45',varid='tas',
         urlfile  <- paste(urlfile,iexp,sep="")         # add exp.name
         urlfile  <- paste(urlfile,run.id,sep="_")      # add exp ID number
         urlfile  <- paste(urlfile,".nc",sep="")        # add file ext
-        urlfiles <- c(urlfiles,urlfile)
-        if (verbose) print(urlfile)
+        if(url.exists(urlfile)) {
+          if (verbose) print(urlfile)
+          urlfiles <- c(urlfiles,urlfile)
+        }
       }
     } 
   }
-  return(urlfiles[-1])
+  return(urlfiles)
 }
 
 cordex.urls <- function(experiment='rcp45',varid='tas',
                         url="https://climexp.knmi.nl/CORDEX/EUR-44/mon/",#path=NULL,
 			off=FALSE,force=FALSE,verbose=FALSE) {
   if(verbose) print("cordex.urls")
-  urlfiles <- "NA"
+  urlfiles <- c()
   #if(is.null(path)) path <- getwd()
   for (iexp in experiment) {
     if(verbose) print(iexp)
@@ -164,12 +170,14 @@ cordex.urls <- function(experiment='rcp45',varid='tas',
         urlfile  <- paste(urlfile,iexp,"mon",sep="_")         # add exp.name
         urlfile  <- paste(urlfile,run.id,sep="_")      # add exp ID number
         urlfile  <- paste(urlfile,".nc",sep="")        # add file ext
-        urlfiles <- c(urlfiles,urlfile)
-        if (verbose) print(urlfile)
+        if(url.exists(urlfile)) {
+          if (verbose) print(urlfile)
+          urlfiles <- c(urlfiles,urlfile)
+        }
       }
     }
   }
-  return(urlfiles[-1])
+  return(urlfiles)
 }
 
 ## Function for generating urls to files available on a THREDDS data server (TDS). 

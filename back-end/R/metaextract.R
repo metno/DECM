@@ -110,14 +110,22 @@ metaextract.cmip5 <- function(x=NULL, verbose=FALSE) {
     if(!is.null(xx$model$parent_experiment_rip)) gcm.rip <- xx$model$parent_experiment_rip
     if(!is.null(xx$model$version_number)) gcm.v <- xx$model$version_number
     if(!is.null(xx$model$modeling_realm)) gcm.realm <- xx$model$modeling_realm
+    ## KMP 2017-11-29: One CMIP5 file (GCM36.tas.nc) is missing information
+    ## in netCDF header but the filename in the history contains some of it. 
+    if(is.null(xx$model$model_id) & xx$project_id=="CMIP5") {
+      h <- strsplit(xx$model$history," ")
+      filename <- unlist(h)[grep("rcp.*.nc",unlist(h))[1]]
+      gcm <- gsub("_rcp.*","",gsub(".*_Amon_","",filename))
+      gcm.rip <- substr(filename,regexpr("r[0-9]i[0-9]p[0-9]",filename)[1],regexpr("r[0-9]i[0-9]p[0-9]",filename)[1]+5)
+      experiment_id <- paste("historical",substr(filename,regexpr("rcp",filename)[1],regexpr("rcp",filename)[1]+4),sep="+")
+    }
     mx <- data.frame(project_id=project_id, url=url, filename=filename,
                      dim=paste(dim,collapse=","), dates=dates, var=paste(var,collapse=","),
                      longname=paste(longname,collapse=","), unit=paste(vunit,collapse=","),
-                     #var_id=paste(vid,collapse=","), 
                      resolution=res, lon=lon.rng, lon_unit=lon.unit, lat=lat.rng, lat_unit=lat.unit,
                      experiment_id=experiment_id, frequency=frequency, 
-                     creation_date=creation_date, #tracking_id=tracking_id,
-                     gcm=gcm, gcm_rip=gcm.rip)#, gcm_version=gcm.v, gcm_realm=gcm.realm)
+                     creation_date=creation_date, 
+                     gcm=gcm, gcm_rip=gcm.rip)
     meta <- names(mx)
     m <- length(meta)
     if (i==1) {

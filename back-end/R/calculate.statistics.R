@@ -2,7 +2,7 @@
 
 ## Calculate the mean annual cycle and spatial correlation for CMIP models
 calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), variable="tas", 
-                                      nfiles=5, path.cmip=NULL, continue=TRUE, mask="coords.txt", 
+                                      nfiles=5, path.gcm=NULL, continue=TRUE, mask="coords.txt", 
                                       verbose=FALSE) {
   if(verbose) print("calculate.statistics.cmip")
   shape <- get.shapefile("referenceRegions.shp")
@@ -70,9 +70,8 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
   } else {
     end <- min(start+nfiles-1,ngcm) 
   }
-  browser()
   for(i in start:end) {
-    X <- getGCMs(select=i, varid=variable, path=path.cmip)
+    X <- getGCMs(select=i, varid=variable, path=path.gcm)
     gcm.file <- X[[1]]$filename
     store.name <- paste("gcm",i,sep=".")
     store[[store.name]]$global$spatial.sd <- c(cdo.spatSd(gcm.file,period),
@@ -120,7 +119,7 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
 }
 
 calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), variable="tas", 
-                                        nfiles=5, path.cordex=NULL, continue=TRUE, verbose=FALSE) {
+                                        nfiles=5, path.gcm=NULL, continue=TRUE, verbose=FALSE) {
   
   region <- read.csv(find.file("RegionSpecifications.csv"))
   region.id <- as.character(region$Code)
@@ -156,7 +155,7 @@ calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), v
   }
   
   for(i in start:end){
-    X <- getRCMs(select=i, varid=variable, path=path.cordex)
+    X <- getRCMs(select=i, varid=variable, path=path.gcm)
     gcm.file <- X[[1]]$filename
     store.name <- paste("rcm",i,sep=".")
     store[[store.name]]$spatial.sd <- c(cdo.spatSd(gcm.file,period),
@@ -195,7 +194,7 @@ calculate.mon.weights <- function(lon,lat) {
 
 ## Calculate the root mean square error (rms) and relative rms (e)
 calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="tas", nfiles=4,
-                                continue=TRUE, verbose=FALSE, path=NULL, path.cmip=NULL) {
+                                continue=TRUE, verbose=FALSE, path=NULL, path.gcm=NULL) {
   if(verbose) print("calculate.rmse.cmip")
   shfile <- find.file("referenceRegions.shp")[1]
   shape <-  get.shapefile(shfile, with.path = TRUE)
@@ -213,7 +212,7 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   } else if (!dir.exists(path)) {
     path <- getwd()
   }
-  if(is.null(path.cmip)) path.cmip <- path
+  if(is.null(path.gcm)) path.gcm <- path
   
   ref.mulc <- paste(reference,"mulc",variable,"nc",sep=".")
   if(!is.character(find.file(ref.mulc)[1])) ref.mulc <- file.path(path,ref.mulc)
@@ -253,11 +252,11 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   } else {
     end <- min(start + nfiles - 1, ngcm) 
   }
-
+  
   for(i in start:end) {
     store.name <- paste("gcm",i,sep=".")
-    gcm.file <- file.path(path.cmip,paste("GCM",i,".",variable,".nc",sep=""))
-    if(!file.exists(gcm.file)) getGCMs(i, varid=variable, destfile=file.path(path.cmip,gcm.file))
+    gcm.file <- file.path(path.gcm,paste("GCM",i,".",variable,".nc",sep=""))
+    if(!file.exists(gcm.file)) getGCMs(i, varid=variable, destfile=file.path(path.gcm,gcm.file))
     gcm.mon.file <- file.path(path,"gcm.monmean.nc")
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
                 infile=gcm.file,outfile=gcm.mon.file)
@@ -294,7 +293,7 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
 }
 
 calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variable="tas", nfiles=4,
-                                  continue=TRUE, verbose=FALSE, path=NULL, path.cordex=NULL) {
+                                  continue=TRUE, verbose=FALSE, path=NULL, path.gcm=NULL) {
   if(verbose) print("calculate.rmse.cordex")
 
   store <- list()
@@ -310,7 +309,7 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
   } else if (!dir.exists(path)) {
     path <- getwd()
   }
-  if(is.null(path.cordex)) path.cordex <- path
+  if(is.null(path.gcm)) path.gcm <- path
   
   ref.mulc <- paste(reference,"mulc",variable,"nc",sep=".")
   if(!is.character(find.file(ref.mulc)[1])) ref.mulc <- file.path(path,ref.mulc)
@@ -353,8 +352,8 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
   
   for(i in start:end) {
     store.name <- paste("cm",i,sep=".")
-    gcm.file <- file.path(path.cordex,paste("CM",i,".",variable,".nc",sep=""))
-    if(!file.exists(gcm.file)) getGCMs(i, varid=variable, destfile=file.path(path.cordex,gcm.file))
+    gcm.file <- file.path(path.gcm,paste("CM",i,".",variable,".nc",sep=""))
+    if(!file.exists(gcm.file)) getGCMs(i, varid=variable, destfile=file.path(path.gcm,gcm.file))
     gcm.mon.file <- file.path(path,"cm.monmean.nc")
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
                 infile=gcm.file,outfile=gcm.mon.file)

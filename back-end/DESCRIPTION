@@ -12,6 +12,7 @@ Depends:
     PCICt,
     rgdal,
     raster,
+    RCurl,
     R (>= 2.10.0)
 Description: The package contains R functions for retrieving and organising data, extracting metadata into a metadatabase.
 License: GPL (>= 2)

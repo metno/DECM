@@ -24,8 +24,8 @@ getReference <- function(reference,variable,verbose=FALSE) {
                       era.pr="era-interim_monthly_1979-2017_pr.2.5deg.nc",
                       cfsr.tas="cfsr_tmp2m_mon.nc",
                       cfsr.pr="cfsr_prate_mon.nc",
-                      eobs.tas="tg_0.50deg_reg_v14.0_mon.nc",
-                      eobs.pr="rr_0.50deg_reg_v14.0_mon.nc")
+                      eobs.tas="tg_0.50deg_reg_v16.0_mon.nc",
+                      eobs.pr="rr_0.50deg_reg_v16.0_mon.nc")
   file.name <- find.file(file.name)[1]
   invisible(file.name)
   #invisible(paste(path,file.name,sep="/"))
@@ -38,7 +38,7 @@ get.name <- function(number,variable,is.rcm=FALSE,verbose=FALSE) {
   prefix <- "GCM"
   if(is.rcm) prefix <- "RCM"
   file.name <- paste(paste(prefix,number,sep=""),variable,"nc",sep=".")
-  invisible(paste(path,file.name,sep="/"))
+  invisible(file.path(path,file.name))
 }
 
 # Call to a python script which downloads data from the public ECMWF data server
@@ -182,21 +182,23 @@ getCFSR <- function(variable="tas",destfile=NULL,lon=NULL,lat=NULL,
 #Get daily EOBS data and convert it to monthly averages. Version and resolution
 #selection not implemented yet.
 getEOBS <- function(variable="tas", destfile=NULL, resolution="0.50", version="14",
-                    verbose=FALSE) {
+                    lon=NULL, lat=NULL, verbose=FALSE) {
   if(verbose) print("getEOBS")
   url.path <- "http://www.ecad.eu/download/ensembles/data/Grid_0.50deg_reg"
-  if(variable=="tas"){
-    filename <- "tg_0.50deg_reg_v14.0.nc.gz"
-  }else if(variable=="pr"){
-    filename <- "rr_0.50deg_reg_v14.0.nc.gz"
-  }else{
+  if(variable=="tas") {
+    filename <- "tg_0.50deg_reg_v16.0.nc.gz"
+  } else if(variable=="pr") {
+    filename <- "rr_0.50deg_reg_v16.0.nc.gz"
+  } else{
     return("Not implemented yet!")
   }
   if(!file.exists(filename)) download.file(paste(url.path,filename,sep="/"),destfile=filename)
   gunzip(filename)
   filename <- sub("\\.[[:alnum:]]+$", "", filename, perl=TRUE)
-  if(is.null(destfile)) destfile <- paste(paste(system("echo $EXTERNAL_DATA",intern=T),sub("\\.[[:alnum:]]+$", "", filename, perl=TRUE),sep="/"),"mon.nc",sep="_")
-  print(destfile)
+  if(is.null(destfile)) destfile <- paste(sub("\\.[[:alnum:]]+$", "", filename, perl=TRUE),"mon.nc",sep="_")
+  #if(is.null(destfile)) destfile <- file.path(system("echo $EXTERNAL_DATA",intern=T),
+  #                                            paste(sub("\\.[[:alnum:]]+$", "", filename, perl=TRUE),"mon.nc",sep="_"))
+  if(verbose) print(destfile)
   commands <- c("-f","nc","-copy","-monavg")
   input <- c("","","","")
   if(!file.exists(destfile)) cdo.command(commands,input,infile=filename,outfile=destfile)

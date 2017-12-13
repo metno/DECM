@@ -19,9 +19,9 @@ dashboardPage(skin = "blue",
                 checkboxGroupInput("gcms",
                   label = "Climate models (GCMs)",
                   choices = gcmnames,
-                  selected = gcmnames[sample(1:30,5)])),# for testing purposes: random choice of 5 models
+                  selected = gcmnames[sample(1:107,5)])),# for testing purposes: random choice of 5 models
             dashboardBody(
-              tags$script(HTML("$('body').addClass('fixed');")),#fix sidebar and header (no scrolling)
+              #tags$script(HTML("$('body').addClass('fixed');")),#fix sidebar and header (no scrolling)
               fluidPage(theme = "bootstrap.css",
                   fluidRow(column(12, box(title = "Disclaimer", status = 'info', collapsible = TRUE, collapsed = FALSE, width = '100%',
                                          tags$body("This is a prototype and should not be used as a basis for decision making."))

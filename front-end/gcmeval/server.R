@@ -98,12 +98,12 @@ shinyServer(function(input, output) {
                 pch=seq(length(dtas)),cex=1.4,lwd=1.5,new=FALSE)
     
     #total ensemble spread
-    dprSpread <- diff(range(dpr*(60*60*24)))
-    dtasSpread <- diff(range(dtas))
+    dprSpread <- diff(range(dpr*(60*60*24),na.rm=T))
+    dtasSpread <- diff(range(dtas,na.rm=T))
     
     #model selection spread
-    dprSelSpread <- diff(range(dpr[im]*(60*60*24)))
-    dtasSelSpread <- diff(range(dtas[im]))
+    dprSelSpread <- diff(range(dpr[im]*(60*60*24),na.rm=T))
+    dtasSelSpread <- diff(range(dtas[im],na.rm=T))
     
     #add colored legend
     legcols=two.colors(n=11,start="red",end="green",middle = "orange") #colors for background of legend
@@ -150,21 +150,21 @@ shinyServer(function(input, output) {
           SeasdtasSpread[si,peri,ri] <- diff(range(sapply(gcms, function(gcm) mean(sapply(Seasons[[si]], function(s)
             stats$tas[[Periods[[peri]]]][[gcm]][[region]][["mean"]][[s]])) - 
               mean(sapply(Seasons[[si]], function(s) 
-                stats$tas$present[[gcm]][[region]][["mean"]][[s]])))))
+                stats$tas$present[[gcm]][[region]][["mean"]][[s]]))),na.rm=T))
           SeasdprSpread[si,peri,ri] <- diff(range(sapply(gcms, function(gcm) mean(sapply(Seasons[[si]], function(s)
             stats$pr[[Periods[[peri]]]][[gcm]][[region]][["mean"]][[s]])) - 
               mean(sapply(Seasons[[si]], function(s) 
-                stats$pr$present[[gcm]][[region]][["mean"]][[s]])))))*60*60*24
+                stats$pr$present[[gcm]][[region]][["mean"]][[s]]))),na.rm=T))*60*60*24
           
           
           SeasdtasSelSpread[si,peri,ri] <- diff(range(sapply(gcms, function(gcm) mean(sapply(Seasons[[si]], function(s)
             stats$tas[[Periods[[peri]]]][[gcm]][[region]][["mean"]][[s]])) - 
               mean(sapply(Seasons[[si]], function(s) 
-                stats$tas$present[[gcm]][[region]][["mean"]][[s]])))[im]))
+                stats$tas$present[[gcm]][[region]][["mean"]][[s]])))[im],na.rm=T))
           SeasdprSelSpread[si,peri,ri] <- diff(range(sapply(gcms, function(gcm) mean(sapply(Seasons[[si]], function(s)
             stats$pr[[Periods[[peri]]]][[gcm]][[region]][["mean"]][[s]])) - 
               mean(sapply(Seasons[[si]], function(s) 
-                stats$pr$present[[gcm]][[region]][["mean"]][[s]])))[im]))*60*60*24
+                stats$pr$present[[gcm]][[region]][["mean"]][[s]])))[im],na.rm=T))*60*60*24
         }
       }
     }
@@ -410,9 +410,10 @@ shinyServer(function(input, output) {
         e <- (e + pr.e)/2
       }
     }
+    
     M <- data.frame(list(gcm=meta$gcm[im], rip=meta$gcm_rip[im], 
-                         "bias"=round(bias,digits=2), "sd.ratio"=round(sdratio,digits=2), 
-                         "spatial.corr"=round(corr,digits=2), "CMPI"=round(e,digits=2)))
+                         "bias"=round(bias,digits=2)[im], "sd.ratio"=round(sdratio,digits=2)[im], 
+                         "spatial.corr"=round(corr,digits=2)[im], "CMPI"=round(e,digits=2)[im]))
     datatable(M,filter='top',selection='single',options=list(),style="bootstrap",
               colnames=gsub("[.|_]"," ",names(M)))
   })

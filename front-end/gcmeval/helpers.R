@@ -79,7 +79,7 @@ taylor.diagram_Rsd <- function (R, sd.r, sd.f, add = FALSE, col = "red", pch = 1
     sd.f <- sd.f/sd.r
     sd.r <- 1
   }
-  maxsd <- maxsdfac * max(sd.f, sd.r)
+  maxsd <- maxsdfac * max(sd.f, sd.r,na.rm=T)
   oldpar <- par("mar", "xpd", "xaxs", "yaxs")
   if (!add) {
     if (pos.cor) {

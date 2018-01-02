@@ -11,17 +11,34 @@ library(raster)
 library(rgdal)
 library(plotly)
 library(shinydashboard)
+library(car)
+library(DECM)
+#library(fields)
 
 #if ('RgoogleMaps' %in% installed.packages()) install.packages('RgoogleMaps')
 #library(RgoogleMaps)
 
 initialExp <- TRUE
 
+## Messages section / initialization
+msgs <- data.frame(from=c('abdelkaderm','mezghani'),
+                      message = c('Welcome to DECM prototype tool','Enjoy the prototype')) 
+
+# msgs <- apply(msgData, 1, function(row) {
+#   messageItem(from = row[["from"]], message = row[["message"]])
+# })
+
+ntfs <- NULL # data.frame(message='abdelkaderm',status = 'success') 
+# ntfs <- apply(notData, 1, function(row) {
+#   notificationItem(text = row[["message"]], status = row[["status"]])
+# })
+
+
 ## Preparations - grid the station data and reduce the size of the data by keeping only
 ## the most important PCA modes.
 
 ## for Input data
-Z4 <- list()
+Z4 <- Z3 <- list()
 load('data/dse.kss.t2m.rcp45.djf.eof.rda')
 Z4$tas <- Z
 load('data/dse.kss.mu.rcp45.djf.eof.rda')
@@ -97,12 +114,44 @@ gcmnames.85 <- names(Z)[grep('_',names(Z))]
 ## Wet-day frequency
 load('data/dse.kss.fw.rcp45.djf.eof.rda')
 Z4$fw.djf.45 <- Z
+if (!file.exists('data/dse.kss.fw.rcp45.djf.station.rda')) {
+  attr(Z,'eof') <- NULL 
+  Z <- as.station(Z)
+  save(Z,file = 'data/dse.kss.fw.rcp45.djf.station.rda')
+} else 
+  load('data/dse.kss.fw.rcp45.djf.station.rda')
+Z3$fw.djf.45 <- Z
+
 load('data/dse.kss.fw.rcp45.mam.eof.rda')
 Z4$fw.mam.45 <- Z
+if (!file.exists('data/dse.kss.fw.rcp45.mam.station.rda')) {
+  attr(Z,'eof') <- NULL 
+  Z <- as.station(Z)
+  save(Z,file = 'data/dse.kss.fw.rcp45.mam.station.rda')
+} else 
+  load('data/dse.kss.fw.rcp45.mam.station.rda')
+Z3$fw.mam.45 <- Z
+
 load('data/dse.kss.fw.rcp45.jja.eof.rda')
 Z4$fw.jja.45 <- Z
+if (!file.exists('data/dse.kss.fw.rcp45.jja.station.rda')) {
+  attr(Z,'eof') <- NULL 
+  Z <- as.station(Z)
+  save(Z,file = 'data/dse.kss.fw.rcp45.jja.station.rda')
+} else 
+  load('data/dse.kss.fw.rcp45.jja.station.rda')
+Z3$fw.jja.45 <- Z
+
+
 load('data/dse.kss.fw.rcp45.son.eof.rda')
 Z4$fw.son.45 <- Z
+if (!file.exists('data/dse.kss.fw.rcp45.son.station.rda')) {
+  attr(Z,'eof') <- NULL 
+  Z <- as.station(Z)
+  save(Z,file = 'data/dse.kss.fw.rcp45.son.station.rda')
+} else 
+  load('data/dse.kss.fw.rcp45.son.station.rda')
+Z3$fw.son.45 <- Z
 
 load('data/dse.kss.fw.rcp26.djf.eof.rda')
 Z4$fw.djf.26 <- Z
@@ -125,12 +174,44 @@ Z4$fw.son.85 <- Z
 ## Wet-day mean precipitation
 load('data/dse.kss.mu.rcp45.djf.eof.rda')
 Z4$mu.djf.45 <- Z
+if (!file.exists('data/dse.kss.mu.rcp45.djf.station.rda')) {
+  attr(Z,'eof') <- NULL 
+  Z <- as.station(Z)
+  save(Z,file = 'data/dse.kss.mu.rcp45.djf.station.rda')
+} else 
+  load('data/dse.kss.mu.rcp45.djf.station.rda')
+Z3$mu.djf.45 <- Z
+
 load('data/dse.kss.mu.rcp45.mam.eof.rda')
 Z4$mu.mam.45 <- Z
+if (!file.exists('data/dse.kss.mu.rcp45.mam.station.rda')) {
+  attr(Z,'eof') <- NULL 
+  Z <- as.station(Z)
+  save(Z,file = 'data/dse.kss.mu.rcp45.mam.station.rda')
+} else 
+  load('data/dse.kss.mu.rcp45.mam.station.rda')
+Z3$mu.mam.45 <- Z
+
 load('data/dse.kss.mu.rcp45.jja.eof.rda')
 Z4$mu.jja.45 <- Z
+if (!file.exists('data/dse.kss.mu.rcp45.jja.station.rda')) {
+  attr(Z,'eof') <- NULL 
+  Z <- as.station(Z)
+  save(Z,file = 'data/dse.kss.mu.rcp45.jja.station.rda')
+} else 
+  load('data/dse.kss.mu.rcp45.jja.station.rda')
+Z3$mu.jja.45 <- Z
+
 load('data/dse.kss.mu.rcp45.son.eof.rda')
 Z4$mu.son.45 <- Z
+if (!file.exists('data/dse.kss.mu.rcp45.son.station.rda')) {
+  attr(Z,'eof') <- NULL 
+  Z <- as.station(Z)
+  save(Z,file = 'data/dse.kss.mu.rcp45.son.station.rda')
+} else 
+  load('data/dse.kss.mu.rcp45.son.station.rda')
+Z3$mu.son.45 <- Z
+
 
 load('data/dse.kss.mu.rcp26.djf.eof.rda')
 Z4$mu.djf.26 <- Z
@@ -275,4 +356,121 @@ stats$pr$ff <- store
 ## helpers.R
 ## Help functions for the shiny app "dpdt"
 
+
+## Function to get instute name from gcmnames
+getModel <- function(i) strsplit(x,split =' ')[[i]][2]
+x <- gsub('_',' ', gcmnames.45)
+models.45 <- apply(as.matrix(1:length(gcmnames.45)),1, getModel)
+
+x <- gsub('_',' ', gcmnames.26)
+models.26 <- apply(as.matrix(1:length(gcmnames.26)),1, getModel)
+
+x <- gsub('_',' ', gcmnames.85)
+models.85 <- apply(as.matrix(1:length(gcmnames.85)),1, getModel)
+
+
+### For the seasonal cycle menu Item
+
+## Load statistics calculated with script 'calculate_statistics.R'
+stats <- NULL
+data("statistics.cmip.era.tas.1981-2010")
+stats$tas$present <- store
+data("statistics.cmip.tas.2021-2050")
+stats$tas$nf <- store
+data("statistics.cmip.tas.2071-2100")
+stats$tas$ff <- store
+data("statistics.cmip.era.pr.1981-2010")
+stats$pr$present <- store
+data("statistics.cmip.pr.2021-2050")
+stats$pr$nf <- store
+data("statistics.cmip.pr.2071-2100")
+stats$pr$ff <- store
+
+## Help functions for the shiny app "seasoncycle"
+
+regions <- function(type=c("srex","prudence"),region=NULL) {
+  if(is.null(type) | length(type)>1) region <- NULL
+  if(is.null(type) | "srex" %in% tolower(type)) {
+    f <- "data/referenceRegions.shp"#find.file("referenceRegions.shp")
+    x <- get.shapefile(f[1],with.path=TRUE)
+    ivec <- 1:nrow(x)
+    if(!is.null(region)) {
+      if(is.numeric(region)) {
+        ivec <- region
+      } else if(region %in% x$LAB) {
+        ivec <- sapply(region, function(y) which(y==x$LAB))
+      } else if(region %in% x$NAME) {
+        ivec <- sapply(region, function(y) which(y==x$NAME))
+      } else {
+        print(paste("Unknown region",region))
+      }
+    }
+    y <- list(name=as.character(x$NAME[ivec]), 
+              label=as.character(x$LAB[ivec]), 
+              usage=as.character(x$USAGE[ivec]),
+              type=rep("srex",length(ivec)),
+              coords=lapply(ivec, function(i) t(coordinates(x@polygons[[i]]@Polygons[[1]]))))
+  } else {
+    y <- NULL
+  }
+  if(is.null(type) | "prudence" %in% tolower(type)) {
+    f <- "RegionSpecifications.csv"#find.file("RegionSpecifications.csv")
+    x <- read.table(f,sep=",")
+    ivec <- 2:nrow(x)
+    names <- as.character(x[2:nrow(x),1])
+    labels <- as.character(x[2:nrow(x),2])
+    if(!is.null(region)) {
+      if(is.numeric(region)) {
+        ivec <- region
+      } else if(region %in% labels) {
+        ivec <- sapply(region, function(y) which(y==labels)+1)
+      } else if(region %in% names) {
+        ivec <- sapply(region, function(y) which(y==names)+1)
+      } else {
+        print(paste("Unknown region",region))
+      }
+    }
+    prudence <- list(name=as.character(x[ivec,1]),
+                     label=as.character(x[ivec,2]),
+                     usage=rep("land",length(ivec)),
+                     type=rep("prudence",length(ivec)),
+                     coords=lapply(ivec, function(i) 
+                       t(matrix(sapply(c(4,5,5,4,4,6,6,7,7,6), 
+                                       function(j) factor2numeric(x[i,j])),
+                                nrow=5,ncol=2))))
+    if(is.null(y)) {
+      y <- prudence 
+    } else {
+      y <- mapply(c, y, prudence, SIMPLIFY=FALSE)
+    }
+  }
+  invisible(y)
+}
+
+## Function 'regions' is defined in helpers.R
+if (!file.exists('data/srex.rda')) {
+  srex <- regions("srex")
+  save(srex, file = 'data/srex.rda')
+} else
+  load('data/srex.rda')
+
+region.names <- c("Global", srex$name)
+# 
+#   "Alaska/N.W. Canada [ALA:1]","Amazon [AMZ:7]",
+#   "Central America/Mexico [CAM:6]","small islands regions Caribbean",
+#   "Central Asia [CAS:20]","Central Europe [CEU:12]",
+#   "Canada/Greenland/Iceland [CGI:2]","Central North America [CNA:4]",
+#   "East Africa [EAF:16]","East Asia [EAS:22]",
+#   "East North America [ENA:5]","South Europe/Mediterranean [MED:13]",
+#   "North Asia [NAS:18]","North Australia [NAU:25]",
+#   "North-East Brazil [NEB:8]","North Europe [NEU:11]",
+#   "Southern Africa [SAF:17]","Sahara [SAH:14]",
+#   "South Asia [SAS:23]","South Australia/New Zealand [SAU:26]",
+#   "Southeast Asia [SEA:24]","Southeastern South America [SSA:10]",
+#   "Tibetan Plateau [TIB:21]","West Africa [WAF:15]",
+#   "West Asia [WAS:19]","West North America [WNA:3]",
+#   "West Coast South America [WSA:9]","Antarctica",
+#   "Arctic","Pacific Islands region[2]",
+#   "Southern Topical Pacific","Pacific Islands region[3]",
+#   "West Indian Ocean")
 

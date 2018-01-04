@@ -272,17 +272,17 @@ varscore <- function(x) {
 
 # Scatter plot data ...
 stats <- NULL
-load("~/git/DECM/back-end/data/statistics.cmip.era.tas.1981-2010.rda")
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.era.tas.1981-2010.rda")
 stats$tas$present <- store
-load("~/git/DECM/back-end/data/statistics.cmip.tas.2021-2050.rda")
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.tas.2021-2050.rda")
 stats$tas$nf <- store
-load("~/git/DECM/back-end/data/statistics.cmip.tas.2071-2100.rda")
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.tas.2071-2100.rda")
 stats$tas$ff <- store
-load("~/git/DECM/back-end/data/statistics.cmip.era.pr.1981-2010.rda")
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.era.pr.1981-2010.rda")
 stats$pr$present <- store
-load("~/git/DECM/back-end/data/statistics.cmip.pr.2021-2050.rda")
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.pr.2021-2050.rda")
 stats$pr$nf <- store
-load("~/git/DECM/back-end/data/statistics.cmip.pr.2071-2100.rda")
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.pr.2071-2100.rda")
 stats$pr$ff <- store
 
 # regions <- function(type=c("srex","prudence"),region=NULL) {

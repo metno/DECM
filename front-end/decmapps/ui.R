@@ -88,7 +88,13 @@ dashboardPage(skin = 'red',
                           )),
                   tabItem(tabName = "gcms",
                           tabsetPanel(id = 'gcms.tabs',type = "tabs",
-                                      tabPanel("Metadata", p(),DT::dataTableOutput("gcm.meta")),
+                                      tabPanel("Metadata", p(),
+                                            tabsetPanel('meta.tabs',type = 'tabs', 
+						tabPanel('Temperature',DT::dataTableOutput("gcm.meta.tas")),
+						tabPanel('Precipitation',DT::dataTableOutput("gcm.meta.pr"))
+
+					    )
+				      ),
                                       #                     tabPanel("Map", p(), leafletOutput("gcm.map",width = '100%',height = '900'),
                                       #                              fluidRow(
                                       #                                column(3,selectInput("rcp7",label = "Scenario", choices = c("Intermediate emissions (RCP4.5)",

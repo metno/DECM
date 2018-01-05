@@ -28,12 +28,12 @@ dashboardPage(skin = 'red',
                                           menuSubItem("Spread or Uncertainty", tabName = "score2"),
                                           menuSubItem("Mean Annual Cycle", tabName = "score3"),
                                           menuSubItem("Individual Model", tabName = "score4"),
-                                          menuSubItem("Climate Change", tabName = "score5",selected = TRUE),
+                                          menuSubItem("Climate Change", tabName = "score5"),
                                           menuSubItem("Storm tracks", tabName = "score6"),
                                           menuSubItem("Individual Location", tabName = "score7"),
                                           menuSubItem("Comparator", tabName = "score8")),
                                  menuItem("KPIs for Data Users", tabName = 'pu',startExpanded = TRUE,
-                                          menuSubItem("Global Climate Models", tabName = "gcms"),
+                                          menuSubItem("Global Climate Models", tabName = "gcms",selected = TRUE),
                                           menuSubItem("Regioanl Climate Models", tabName = "rcms"),
                                           menuSubItem("Reanalysis", tabName = "rea"),
                                           menuSubItem("Weather Stations", tabName = "stations"),
@@ -89,12 +89,13 @@ dashboardPage(skin = 'red',
                   tabItem(tabName = "gcms",
                           tabsetPanel(id = 'gcms.tabs',type = "tabs",
                                       tabPanel("Metadata", p(),
-                                            tabsetPanel('meta.tabs',type = 'tabs', 
-						tabPanel('Temperature',DT::dataTableOutput("gcm.meta.tas")),
-						tabPanel('Precipitation',DT::dataTableOutput("gcm.meta.pr"))
-
-					    )
-				      ),
+                                               fluidPage(
+                                                 tabsetPanel(id = 'meta.tabs',type = 'tabs', 
+                                                           tabPanel('Temperature',DT::dataTableOutput("gcm.meta.tas")),
+                                                           tabPanel('Precipitation',DT::dataTableOutput("gcm.meta.pr"))
+                                                           
+                                               ))
+                                      ),
                                       #                     tabPanel("Map", p(), leafletOutput("gcm.map",width = '100%',height = '900'),
                                       #                              fluidRow(
                                       #                                column(3,selectInput("rcp7",label = "Scenario", choices = c("Intermediate emissions (RCP4.5)",
@@ -117,23 +118,26 @@ dashboardPage(skin = 'red',
                                       tabPanel("Seasonal Cycle", p(), 
                                                fluidPage(
                                                  fluidRow(
-                                                   column(3,selectInput("region", label = "Region", 
+                                                   column(2,selectInput("region", label = "Region", 
                                                                         choices = region.names,
                                                                         selected = "Global",width = '100%')),
-                                                   column(3,selectInput("period", label = "Period", 
+                                                   column(2,selectInput("period", label = "Period", 
                                                                         choices = c("Present (1981-2010)","Near Future (2021-2050)",
                                                                                     "Far Future (2071-2100)"),
                                                                         selected = "Present",width = '100%')),
-                                                   column(3,selectInput("type", label = "Chart Output", 
+                                                   column(2,selectInput("type", label = "Chart Output", 
                                                                         choices = c("Individual Models",
                                                                                     "Ensemble of All Models","Ensemble of Selected Models",
                                                                                     "Box Plots of All Models","Box Plots of Selected Models"),
                                                                         selected = "Ensemble",width = '100%')),
-                                                   column(3,selectInput("legend.sc", label = "Chart Legend", 
-                                                                                 choices = c("Display All",
-                                                                                             "Display Selected Models Only",
-                                                                                             "Hide All"),
-                                                                                 selected = "Display Models",width = '100%'))
+                                                   column(2,selectInput("legend.sc", label = "Chart Legend", 
+                                                                        choices = c("Display All",
+                                                                                    "Display Selected Models Only",
+                                                                                    "Hide All"),
+                                                                        selected = "Display Models",width = '100%')),
+                                                   column(2,selectInput("groupBy", label = "Group By", 
+                                                                        choices = c('None','---',names(gcm.tas.meta)),
+                                                                        selected = 'None',width = '100%'))
                                                  ),
                                                  fluidRow(
                                                    column(12,
@@ -149,13 +153,13 @@ dashboardPage(skin = 'red',
                                                                      plotlyOutput("gcm.sc.tas",width = '100%',height = '800')),
                                                             tabPanel("Data",
                                                                      DT::dataTableOutput("gcm.sc.tas.data")))
-                                                          ),
+                                                   ),
                                                    column(6,
                                                           tabsetPanel(
                                                             tabPanel("Chart", p(), tags$h4('Seasonal cycle of simulated and observed (black) precipitation.'),
                                                                      plotlyOutput("gcm.sc.pr",width = '100%',height = '800')),
                                                             tabPanel("Data", DT::dataTableOutput("gcm.sc.pr.data")))
-                                                          ))
+                                                   ))
                                                )
                                       ),
                                       tabPanel("Scatter Plot", p(), 
@@ -164,7 +168,7 @@ dashboardPage(skin = 'red',
                                                            column(3,selectInput("param7", label = "Element", 
                                                                                 choices = c("Temperature","Wet-day freq.","Precip. intensity"),
                                                                                 selected = "Temperature",width = '100%'))
-                                                           )
+                                                         )
                                                )
                                       )
                                       #tabPanel("Distribution", p(), box(fluidPage(plotOutput("gcm.prob",width = '100%',height = '900')))),

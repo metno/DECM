@@ -28,12 +28,12 @@ dashboardPage(skin = 'red',
                                           menuSubItem("Spread or Uncertainty", tabName = "score2"),
                                           menuSubItem("Mean Annual Cycle", tabName = "score3"),
                                           menuSubItem("Individual Model", tabName = "score4"),
-                                          menuSubItem("Climate Change", tabName = "score5",selected = TRUE),
+                                          menuSubItem("Climate Change", tabName = "score5"),
                                           menuSubItem("Storm tracks", tabName = "score6"),
                                           menuSubItem("Individual Location", tabName = "score7"),
                                           menuSubItem("Comparator", tabName = "score8")),
                                  menuItem("KPIs for Data Users", tabName = 'pu',startExpanded = TRUE,
-                                          menuSubItem("Global Climate Models", tabName = "gcms"),
+                                          menuSubItem("Global Climate Models", tabName = "gcms",selected = TRUE),
                                           menuSubItem("Regioanl Climate Models", tabName = "rcms"),
                                           menuSubItem("Reanalysis", tabName = "rea"),
                                           menuSubItem("Weather Stations", tabName = "stations"),
@@ -89,7 +89,7 @@ dashboardPage(skin = 'red',
                   tabItem(tabName = "gcms",
                           tabsetPanel(id = 'gcms.tabs',type = "tabs",
                                       tabPanel("Metadata", p(),
-                                            tabsetPanel('meta.tabs',type = 'tabs', 
+                                            tabsetPanel(id = 'meta.tabs',type = 'tabs', 
 						tabPanel('Temperature',DT::dataTableOutput("gcm.meta.tas")),
 						tabPanel('Precipitation',DT::dataTableOutput("gcm.meta.pr"))
 
@@ -145,14 +145,14 @@ dashboardPage(skin = 'red',
                                                  fluidRow(
                                                    column(6,
                                                           tabsetPanel(
-                                                            tabPanel("Chart",p(),tags$h4('Seasonal cycle of simulated and observed (black) temperature.'),
+                                                            tabPanel("Chart",p(),tags$h5('Seasonal cycle of simulated and observed (black) temperature.'),
                                                                      plotlyOutput("gcm.sc.tas",width = '100%',height = '800')),
                                                             tabPanel("Data",
                                                                      DT::dataTableOutput("gcm.sc.tas.data")))
                                                           ),
                                                    column(6,
                                                           tabsetPanel(
-                                                            tabPanel("Chart", p(), tags$h4('Seasonal cycle of simulated and observed (black) precipitation.'),
+                                                            tabPanel("Chart", p(), tags$h5('Seasonal cycle of simulated and observed (black) precipitation.'),
                                                                      plotlyOutput("gcm.sc.pr",width = '100%',height = '800')),
                                                             tabPanel("Data", DT::dataTableOutput("gcm.sc.pr.data")))
                                                           ))

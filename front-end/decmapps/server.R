@@ -771,7 +771,7 @@ function(input, output,session) {
                     'resolution','lon','lon_unit','lat','lat_unit',"experiment_id",'dim','dates','url','creation_date')]
     
     cm.meta <- subset(META, subset = (project_id == 'CMIP5') & (var == 'tas'))
-    cm.meta <- cm.meta[, c('project_id','gcm','gcm_rip','rcm','frequency', 
+    cm.meta <- cm.meta[, c('project_id','gcm','gcm_rip','rcm','var','unit','frequency', 
                            'resolution','lon','lon_unit','lat','lat_unit',
                            "experiment_id",'dim','dates','url','creation_date')]
 
@@ -808,11 +808,11 @@ function(input, output,session) {
     data(package= 'DECM', metaextract)
     library(dplyr)
     meta <- meta %>% mutate_if(is.factor, as.character)
-    META <- meta[,c('project_id','gcm','gcm_rip','rcm','longname','var','unit','frequency',
+    META <- meta[,c('project_id','gcm','gcm_rip','longname','var','unit','frequency',
                     'resolution','lon','lon_unit','lat','lat_unit',"experiment_id",'dim','dates','url','creation_date')]
     
     cm.meta <- subset(META, subset = (project_id == 'CMIP5') & (var == 'pr'))
-    cm.meta <- cm.meta[, c('project_id','gcm','gcm_rip','rcm','frequency', 
+    cm.meta <- cm.meta[, c('project_id','gcm','gcm_rip','frequency', 
                            'resolution','lon','lon_unit','lat','lat_unit',
                            "experiment_id",'dim','dates','url','creation_date')]
 

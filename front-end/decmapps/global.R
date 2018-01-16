@@ -272,17 +272,17 @@ varscore <- function(x) {
 
 # Scatter plot data ...
 stats <- NULL
-load("~/shiny/DECM/R-scripts/statistics.cmip.era.tas.1981-2010.rda")
+load("~/shiny/DECM/back-end/data/statistics.cmip.era.tas.1981-2010.rda")
 stats$tas$present <- store
-load("~/shiny/DECM/R-scripts/statistics.cmip.tas.2021-2050.rda")
+load("~/shiny/DECM/back-end/data/statistics.cmip.tas.2021-2050.rda")
 stats$tas$nf <- store
-load("~/shiny/DECM/R-scripts/statistics.cmip.tas.2071-2100.rda")
+load("~/shiny/DECM/back-end/data/statistics.cmip.tas.2071-2100.rda")
 stats$tas$ff <- store
-load("~/shiny/DECM/R-scripts/statistics.cmip.era.pr.1981-2010.rda")
+load("~/shiny/DECM/back-end/data/statistics.cmip.era.pr.1981-2010.rda")
 stats$pr$present <- store
-load("~/shiny/DECM/R-scripts/statistics.cmip.pr.2021-2050.rda")
+load("~/shiny/DECM/back-end/data/statistics.cmip.pr.2021-2050.rda")
 stats$pr$nf <- store
-load("~/shiny/DECM/R-scripts/statistics.cmip.pr.2071-2100.rda")
+load("~/shiny/DECM/back-end/data/statistics.cmip.pr.2071-2100.rda")
 stats$pr$ff <- store
 
 # regions <- function(type=c("srex","prudence"),region=NULL) {
@@ -474,3 +474,10 @@ region.names <- c("Global", srex$name)
 #   "Southern Topical Pacific","Pacific Islands region[3]",
 #   "West Indian Ocean")
 
+load('data/metaextract_v2.rda')
+meta <- as.data.frame(meta)
+META <- meta[,c('source','experiment','institute_id','model_id','parent_experiment_rip','realization','longname','variable','units','timeunit',
+                'resolution','longitude','latitude',"experiment_id",'dim1','index','calendar','creation_date',
+                'tracking_id','physics_version','forcing','reference','contact','comment','table_id','file')]
+gcm.meta.tas <- subset(META, subset = (source == 'CMIP5') & (variable == 'tas'))
+gcm.meta.pr <- subset(META, subset = (source == 'CMIP5') & (variable == 'pr'))

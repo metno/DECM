@@ -435,7 +435,11 @@ function(input, output,session) {
   # })
   # 
   gcm.sc.vals <- function(param,region,period) {
-    gcms <- names(stats$tas$ff)
+    if (param == 'tas')
+       	gcms <- names(stats$tas$ff)
+    else if (param == 'pr')
+	gcms <- names(stats$pr$ff)
+
     period <- switch(tolower(as.character(period)),
                      "present (1981-2010)"='present',
                      "far future (2071-2100)"='ff',
@@ -454,14 +458,15 @@ function(input, output,session) {
       ref <- stats[[param]][[period]][[id.ref]][[region]][["mean"]][2:13]
     }#
     
-    if(param=="pr") {
-      x <- lapply(x, function(y) y*60*60*24) ## convert to mm/day
+    if(param=="pr") {      
+     #browser()      
+     x <- lapply(x, function(y) y*60*60*24) ## convert to mm/day
       ref <- ref*1E3 ## convert to mm/day
     }
-    
-    gcm.vals <- as.data.frame(lapply(1:length(x),function(i) x[[i]]))
-    colnames(gcm.vals) <- gcms
-    # browser()
+  
+    gcm.vals <- as.data.frame(lapply(1:length(x),function(i) {if (length(x[[i]]) > 0) x[[i]] else x[[1]]})) ## AM Need to fix this later on     
+    colnames(gcm.vals) <- paste('gcm.',1:length(gcm.vals),sep='')
+
     df <- data.frame(gcm.vals,ref,stringsAsFactors = FALSE)
   }
   
@@ -746,17 +751,17 @@ function(input, output,session) {
     
     ## Global Climate Models Menu item ---      
     ## Metadata table
-    data(package= 'DECM', metaextract)
-    META <- meta[,c('project_id','gcm','gcm_rip','rcm','longname','var','unit','frequency',
-                    'resolution','lon','lon_unit','lat','lat_unit',"experiment_id",'dim','dates','url','filename',"creation_date")]
+    ## data(package= 'DECM', metaextract)
     
-    cm.meta <- subset(META, subset = (project_id == 'CMIP5') & (var == 'tas'))
-    cm.meta <- cm.meta[, c('project_id','gcm','gcm_rip','rcm','frequency', 
-                           'resolution','lon','lon_unit','lat','lat_unit',
-                           "experiment_id",'dim','dates','url','filename',"creation_date")]
-    
-    output$gcm.meta <- DT::renderDataTable({
-      DT::datatable(cm.meta,
+    #browser()
+    ## library(dplyr)
+   
+    output$gcm.meta.tas <- DT::renderDataTable({
+      ## Metadata table
+    #data(package= 'DECM', metaextract)
+     DF.tas <- data.frame(N = cbind(1:dim(gcm.meta.tas)[1],gcm.meta.tas))
+     colnames(DF.tas) <- c('N',colnames(gcm.meta.tas))
+      DT::datatable(DF.tas,
                     selection = 'multiple', 
                     callback = JS("table.on('click.dt', function() {
                             $(this).toggleClass('selected');
@@ -778,12 +783,42 @@ function(input, output,session) {
                                  deferRender = TRUE,
                                  scroller = TRUE,
                                  scrollX = TRUE,
-                                 responsive = TRUE,
                                  select.style = 'os',
                                  scrollY = 800
                     ))
     })
     
+    output$gcm.meta.pr <- DT::renderDataTable({
+      ## Metadata table
+      DF.pr <- data.frame(N = cbind(1:dim(gcm.meta.pr)[1],gcm.meta.pr))
+      colnames(DF.pr) <- c('N',colnames(gcm.meta.pr))
+      DT::datatable(DF.pr,
+                    selection = 'multiple', 
+                    callback = JS("table.on('click.dt', function() {
+                            $(this).toggleClass('selected');
+                            Shiny.onInputChange('rows2',table.rows('.selected').indexes().toArray());
+                    });"),
+                    extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'),
+                    rownames=FALSE,
+                    options=list(dom = 'Bfrtip',
+                                 buttons = c('colvis',
+                                             'selectAll','selectNone',
+                                             'copy', 'csv','excel', 'print'),
+                                 searching = T,
+                                 pageLength = 30,
+                                 searchHighlight = FALSE,
+                                 colReorder = TRUE,
+                                 fixedHeader = FALSE,
+                                 filter = 'top',
+                                 paging    = TRUE,
+                                 deferRender = TRUE,
+                                 scroller = TRUE,
+                                 scrollX = TRUE,
+                                 select.style = 'os',
+                                 scrollY = 800
+                    ))
+    })
+
     output$region <- renderLeaflet({
       id <- which(is.element(region.names,input$region))
       m <- leaflet() %>%
@@ -886,7 +921,9 @@ function(input, output,session) {
     
     ## Seasonal cycle 
     output$gcm.sc.tas <- renderPlotly({
-      df <- gcm.sc.tas.reactive() 
+      
+      df <- gcm.sc.tas.reactive()
+      #df <- df[,-36] # AM Quick fix but has to be removed ... once meta is updated.
       # GCM seasonal cycle
       df.env <- NULL
       low <- apply(subset(df,select = grep('gcm',colnames(df))),1,min,na.rm=TRUE)
@@ -905,17 +942,32 @@ function(input, output,session) {
         #p.sc <- plot_ly(df, x = ~month, y = ~gcm.1,type = 'scatter',mode = 'markers+lines', line = list(width = 2, color = "grey",shape = 'spline'))
         # create plot_ly
         p.sc <- plot_ly(df, x = ~month)
-        
+        browser()
         gcms <- colnames(df)[grep('gcm',colnames(df))]
-        gcm.meta <- subset(meta, subset = (var == 'tas') & (project_id == 'CMIP5'))
-        id <- as.integer(gcm.meta$gcm)
-        rgbcolsa <- c('rgba(242,121,121,0.3)', 'rgba(217,191,163,0.3)', 'rgba(102,99,51,0.3)', 'rgba(137,217,108,0.3)', 'rgba(115,207,230,0.3)', 'rgba(102,129,204,0.3)', 
-                      'rgba(149,89,179,0.3)', 'rgba(255,128,196,0.3)', 'rgba(102,51,51,0.3)', 'rgba(255,213,128,0.3)', 'rgba(45,51,38,0.3)', 'rgba(77,153,128,0.3)', 'rgba(38,69,77,0.3)', 
-                      'rgba(40,38,51,0.3)', 'rgba(77,38,64,0.3)')
+        if (is.element(input$groupBy,c('None','---'))) {
+          id <- 1 : (length(df) - 1)
+        lev <- gcm.meta.tas
+          }
+        else { 
+          id <- as.integer(factor(base::subset(gcm.meta.tas, select = input$groupBy)[[1]]))
+          lev <- levels(factor(base::subset(gcm.meta.tas, select = input$groupBy)[[1]]))
+        }
+        rgbcolsa <- c('rgba(45,51,38)', 'rgba(87,77,102)', 'rgba(255,191,200)', 'rgba(140,129,105)', 'rgba(234,191,255)', 'rgba(172,230,195)',
+                      'rgba(86,105,115)', 'rgba(115,86,94)', 'rgba(230,195,172)', 'rgba(255,234,191)', 'rgba(124,140,105)', 'rgba(51,26,43)',
+                      'rgba(191,96,172)', 'rgba(184,204,102)', 'rgba(153,87,77)', 'rgba(96,134,191)', 'rgba(230,115,145)', 'rgba(255,145,128)', 
+                      'rgba(229,161,115)', 'rgba(22,58,89)', 'rgba(85,89,22)', 'rgba(127,83,32)', 'rgba(80,179,45)', 'rgba(18,51,13)', 'rgba(64,16,22)',
+                      'rgba(22,16,64)', 'rgba(86,29,115)', 'rgba(54,98,217)', 'rgba(255,191,64)', 'rgba(61,182,242)', 'rgba(126,57,230)', 'rgba(51,38,13)', 
+                      'rgba(178,0,95)', 'rgba(0,128,85)', 'rgba(26,0,191)', 'rgba(255,0,238)', 'rgba(178,0,0)', 'rgba(0,202,217)', 'rgba(0,230,153)', 
+                      'rgba(0,255,34)', 'rgba(204,0,54)', 'rgba(102,0,14)', 'rgba(229,92,0)', 'rgba(0,107,115)', 'rgba(77,0,51)', 'rgba(204,255,0)', 
+                      'rgba(140,112,0)', 'rgba(12,89,0)')
         
-        rgbcols <- c('rgb(242,121,121)', 'rgb(217,191,163)', 'rgb(102,99,51)', 'rgb(137,217,108)', 'rgb(115,207,230)', 'rgb(102,129,204)', 
-                     'rgb(149,89,179)', 'rgb(255,128,196)', 'rgb(102,51,51)', 'rgb(255,213,128)', 'rgb(45,51,38)', 'rgb(77,153,128)', 'rgba(38,69,77)', 
-                     'rgb(40,38,51)', 'rgb(77,38,64)')
+        rgbcols <- c('rgb(45,51,38)', 'rgb(87,77,102)', 'rgb(255,191,200)', 'rgb(140,129,105)', 'rgb(234,191,255)', 'rgb(172,230,195)', 'rgb(86,105,115)', 
+                     'rgb(115,86,94)', 'rgb(230,195,172)', 'rgb(255,234,191)', 'rgb(124,140,105)', 'rgb(51,26,43)', 'rgb(191,96,172)', 'rgb(184,204,102)', 
+                     'rgb(153,87,77)', 'rgb(96,134,191)', 'rgb(230,115,145)', 'rgb(255,145,128)', 'rgb(229,161,115)', 'rgb(22,58,89)', 'rgb(85,89,22)', 
+                     'rgb(127,83,32)', 'rgb(80,179,45)', 'rgb(18,51,13)', 'rgb(64,16,22)', 'rgb(22,16,64)', 'rgb(86,29,115)', 'rgb(54,98,217)', 'rgb(255,191,64)',
+                     'rgb(61,182,242)', 'rgb(126,57,230)', 'rgb(51,38,13)', 'rgb(178,0,95)', 'rgb(0,128,85)', 'rgb(26,0,191)', 'rgb(255,0,238)', 'rgb(178,0,0)', 
+                     'rgb(0,202,217)', 'rgb(0,230,153)', 'rgb(0,255,34)', 'rgb(204,0,54)', 'rgb(102,0,14)', 'rgb(229,92,0)', 'rgb(0,107,115)', 'rgb(77,0,51)', 
+                     'rgb(204,255,0)', 'rgb(140,112,0)', 'rgb(12,89,0)')
         
         ## group by gcms
         colsa <- rgbcolsa[id]
@@ -924,7 +976,8 @@ function(input, output,session) {
         ## Add all models
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
-          leg.name <- paste(as.character(as.matrix(gcm.meta[i,c('gcm','gcm_rip')])),collapse = '  ')
+          #leg.name <- paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
+          leg.name <- paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
           grp.name <- paste('Group',id[i],sep='')
           if (input$legend.sc == 'Display All')
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
@@ -942,7 +995,7 @@ function(input, output,session) {
         if (!is.null(input$rows2)) {
           im <- input$rows2+1
           for (i in im) {
-            leg.name <- paste(as.character(as.matrix(gcm.meta[i,c('gcm','gcm_rip')])),collapse = '  ')
+            leg.name <- paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
             grp.name <- paste('Group',id[i],sep='')
             gcm <- gcms[i]
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
@@ -1017,6 +1070,7 @@ function(input, output,session) {
     })
     
     output$gcm.sc.pr <- renderPlotly({
+      
       df <- gcm.sc.pr.reactive()
       df.env <- NULL
       low <- apply(df[1:30],1,min,na.rm=TRUE)
@@ -1032,15 +1086,11 @@ function(input, output,session) {
         p.sc <- plot_ly(df,x = ~month)
         
         gcms <- colnames(df)[grep('gcm',colnames(df))]
-        gcm.meta <- subset(meta, subset = (var == 'tas') & (project_id == 'CMIP5'))
+        gcm.meta <- subset(meta, subset = (var == 'pr') & (project_id == 'CMIP5'))
         id <- as.integer(gcm.meta$gcm)
-        rgbcolsa <- c('rgba(242,121,121,0.3)', 'rgba(217,191,163,0.3)', 'rgba(102,99,51,0.3)', 'rgba(137,217,108,0.3)', 'rgba(115,207,230,0.3)', 'rgba(102,129,204,0.3)', 
-                      'rgba(149,89,179,0.3)', 'rgba(255,128,196,0.3)', 'rgba(102,51,51,0.3)', 'rgba(255,213,128,0.3)', 'rgba(45,51,38,0.3)', 'rgba(77,153,128,0.3)', 'rgba(38,69,77,0.3)', 
-                      'rgba(40,38,51,0.3)', 'rgba(77,38,64,0.3)')
+       rgbcolsa <- c('rgba(45,51,38)', 'rgba(87,77,102)', 'rgba(255,191,200)', 'rgba(140,129,105)', 'rgba(234,191,255)', 'rgba(172,230,195)', 'rgba(86,105,115)', 'rgba(115,86,94)', 'rgba(230,195,172)', 'rgba(255,234,191)', 'rgba(124,140,105)', 'rgba(51,26,43)', 'rgba(191,96,172)', 'rgba(184,204,102)', 'rgba(153,87,77)', 'rgba(96,134,191)', 'rgba(230,115,145)', 'rgba(255,145,128)', 'rgba(229,161,115)', 'rgba(22,58,89)', 'rgba(85,89,22)', 'rgba(127,83,32)', 'rgba(80,179,45)', 'rgba(18,51,13)', 'rgba(64,16,22)', 'rgba(22,16,64)', 'rgba(86,29,115)', 'rgba(54,98,217)', 'rgba(255,191,64)', 'rgba(61,182,242)', 'rgba(126,57,230)', 'rgba(51,38,13)', 'rgba(178,0,95)', 'rgba(0,128,85)', 'rgba(26,0,191)', 'rgba(255,0,238)', 'rgba(178,0,0)', 'rgba(0,202,217)', 'rgba(0,230,153)', 'rgba(0,255,34)', 'rgba(204,0,54)', 'rgba(102,0,14)', 'rgba(229,92,0)', 'rgba(0,107,115)', 'rgba(77,0,51)', 'rgba(204,255,0)', 'rgba(140,112,0)', 'rgba(12,89,0)')
         
-        rgbcols <- c('rgb(242,121,121)', 'rgb(217,191,163)', 'rgb(102,99,51)', 'rgb(137,217,108)', 'rgb(115,207,230)', 'rgb(102,129,204)', 
-                     'rgb(149,89,179)', 'rgb(255,128,196)', 'rgb(102,51,51)', 'rgb(255,213,128)', 'rgb(45,51,38)', 'rgb(77,153,128)', 'rgba(38,69,77)', 
-                     'rgb(40,38,51)', 'rgb(77,38,64)')
+         rgbcols <- c('rgb(45,51,38)', 'rgb(87,77,102)', 'rgb(255,191,200)', 'rgb(140,129,105)', 'rgb(234,191,255)', 'rgb(172,230,195)', 'rgb(86,105,115)', 'rgb(115,86,94)', 'rgb(230,195,172)', 'rgb(255,234,191)', 'rgb(124,140,105)', 'rgb(51,26,43)', 'rgb(191,96,172)', 'rgb(184,204,102)', 'rgb(153,87,77)', 'rgb(96,134,191)', 'rgb(230,115,145)', 'rgb(255,145,128)', 'rgb(229,161,115)', 'rgb(22,58,89)', 'rgb(85,89,22)', 'rgb(127,83,32)', 'rgb(80,179,45)', 'rgb(18,51,13)', 'rgb(64,16,22)', 'rgb(22,16,64)', 'rgb(86,29,115)', 'rgb(54,98,217)', 'rgb(255,191,64)', 'rgb(61,182,242)', 'rgb(126,57,230)', 'rgb(51,38,13)', 'rgb(178,0,95)', 'rgb(0,128,85)', 'rgb(26,0,191)', 'rgb(255,0,238)', 'rgb(178,0,0)', 'rgb(0,202,217)', 'rgb(0,230,153)', 'rgb(0,255,34)', 'rgb(204,0,54)', 'rgb(102,0,14)', 'rgb(229,92,0)', 'rgb(0,107,115)', 'rgb(77,0,51)', 'rgb(204,255,0)', 'rgb(140,112,0)', 'rgb(12,89,0)')
         
         ## group by gcms
         colsa <- rgbcolsa[id]
@@ -1160,11 +1210,13 @@ function(input, output,session) {
     })
     
     output$gcm.sc.tas.data <- DT::renderDataTable({
-      df.format <- t(round(gcm.sc.pr.reactive(),digits = 1))
+      browser()
+      df.format <- t(round(gcm.sc.tas.reactive(),digits = 1))
       colnames(df.format) <- month.abb
       df.format <- data.frame(N = c(1:(dim(df.format)[1]-1),0), 
-                              Model = c(as.character(as.vector(cm.meta$gcm)),'ERA'), 
-                              Run = c(as.character(as.vector(cm.meta$gcm_rip)),'ERA'),
+                              Model = c(as.character(as.vector(gcm.meta.tas$model_id)),'ERA'), 
+                              Run = c(as.character(as.vector(gcm.meta.tas$parent_experiment_rip)),'ERA'),
+                              Realization = c(as.character(as.vector(gcm.meta.tas$realization)),'ERA'),
                               df.format,stringsAsFactors = FALSE)
       DT::datatable(df.format,
                     caption = paste('Monthly estimates of regional temperature assuming an 

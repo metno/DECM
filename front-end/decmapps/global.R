@@ -270,7 +270,7 @@ varscore <- function(x) {
   return(c(score,lon(x),lat(x)))
 }
 
-# GCM statistics ...
+# Scatter plot data ...
 stats <- NULL
 load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.era.tas.1981-2010.rda")
 stats$tas$present <- store
@@ -285,6 +285,78 @@ stats$pr$nf <- store
 load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.pr.2071-2100.rda")
 stats$pr$ff <- store
 
+# regions <- function(type=c("srex","prudence"),region=NULL) {
+#   if(is.null(type) | length(type)>1) region <- NULL
+#   if(is.null(type) | "srex" %in% tolower(type)) {
+#     f <- "~/shiny/DECM/front-end/dpdt/referenceRegions.shp"#find.file("referenceRegions.shp")
+#     x <- get.shapefile(f,with.path=TRUE)
+#     ivec <- 1:nrow(x)
+#     if(!is.null(region)) {
+#       if(is.numeric(region)) {
+#         ivec <- region
+#       } else if(region %in% x$LAB) {
+#         ivec <- sapply(region, function(y) which(y==x$LAB))
+#       } else if(region %in% x$NAME) {
+#         ivec <- sapply(region, function(y) which(y==x$NAME))
+#       } else {
+#         print(paste("Unknown region",region))
+#       }
+#     }
+#     y <- list(name=as.character(x$NAME[ivec]), 
+#               label=as.character(x$LAB[ivec]), 
+#               usage=as.character(x$USAGE[ivec]),
+#               type=rep("srex",length(ivec)),
+#               coords=lapply(ivec, function(i) t(coordinates(x@polygons[[i]]@Polygons[[1]]))))
+#     #west=sapply(ivec, function(i) xmin(extent(x[i,]))),
+#     #east=sapply(ivec, function(i) xmax(extent(x[i,]))),
+#     #south=sapply(ivec, function(i) ymin(extent(x[i,]))),
+#     #north=sapply(ivec, function(i) ymax(extent(x[i,]))))
+#   } else {
+#     y <- NULL
+#   }
+#   if(is.null(type) | "prudence" %in% tolower(type)) {
+#     f <- "RegionSpecifications.csv"#find.file("RegionSpecifications.csv")
+#     x <- read.table(f,sep=",")
+#     ivec <- 2:nrow(x)
+#     names <- as.character(x[2:nrow(x),1])
+#     labels <- as.character(x[2:nrow(x),2])
+#     if(!is.null(region)) {
+#       if(is.numeric(region)) {
+#         ivec <- region
+#       } else if(region %in% labels) {
+#         ivec <- sapply(region, function(y) which(y==labels)+1)
+#       } else if(region %in% names) {
+#         ivec <- sapply(region, function(y) which(y==names)+1)
+#       } else {
+#         print(paste("Unknown region",region))
+#       }
+#     }
+#     prudence <- list(name=as.character(x[ivec,1]),
+#                      label=as.character(x[ivec,2]),
+#                      usage=rep("land",length(ivec)),
+#                      type=rep("prudence",length(ivec)),
+#                      coords=lapply(ivec, function(i) 
+#                        t(matrix(sapply(c(4,5,5,4,4,6,6,7,7,6), 
+#                                        function(j) factor2numeric(x[i,j])),
+#                                 nrow=5,ncol=2))))
+#     #west=as.numeric(x[2:nrow(x),4]),
+#     #east=as.numeric(x[2:nrow(x),5]),
+#     #south=as.numeric(x[2:nrow(x),6]),
+#     #north=as.numeric(x[2:nrow(x),7]))
+#     if(is.null(y)) {
+#       y <- prudence 
+#     } else {
+#       y <- mapply(c, y, prudence, SIMPLIFY=FALSE)
+#     }
+#   }
+#   invisible(y)
+# }
+
+#srex <- regions("srex")
+## helpers.R
+## Help functions for the shiny app "dpdt"
+
+
 ## Function to get instute name from gcmnames
 getModel <- function(i) strsplit(x,split =' ')[[i]][2]
 x <- gsub('_',' ', gcmnames.45)
@@ -295,6 +367,24 @@ models.26 <- apply(as.matrix(1:length(gcmnames.26)),1, getModel)
 
 x <- gsub('_',' ', gcmnames.85)
 models.85 <- apply(as.matrix(1:length(gcmnames.85)),1, getModel)
+
+
+### For the seasonal cycle menu Item
+
+## Load statistics calculated with script 'calculate_statistics.R'
+stats <- NULL
+data("statistics.cmip.era.tas.1981-2010")
+stats$tas$present <- store
+data("statistics.cmip.tas.2021-2050")
+stats$tas$nf <- store
+data("statistics.cmip.tas.2071-2100")
+stats$tas$ff <- store
+data("statistics.cmip.era.pr.1981-2010")
+stats$pr$present <- store
+data("statistics.cmip.pr.2021-2050")
+stats$pr$nf <- store
+data("statistics.cmip.pr.2071-2100")
+stats$pr$ff <- store
 
 ## Help functions for the shiny app "seasoncycle"
 
@@ -357,6 +447,7 @@ regions <- function(type=c("srex","prudence"),region=NULL) {
   invisible(y)
 }
 
+## Function 'regions' is defined in helpers.R
 if (!file.exists('data/srex.rda')) {
   srex <- regions("srex")
   save(srex, file = 'data/srex.rda')
@@ -364,10 +455,27 @@ if (!file.exists('data/srex.rda')) {
   load('data/srex.rda')
 
 region.names <- c("Global", srex$name)
+# 
+#   "Alaska/N.W. Canada [ALA:1]","Amazon [AMZ:7]",
+#   "Central America/Mexico [CAM:6]","small islands regions Caribbean",
+#   "Central Asia [CAS:20]","Central Europe [CEU:12]",
+#   "Canada/Greenland/Iceland [CGI:2]","Central North America [CNA:4]",
+#   "East Africa [EAF:16]","East Asia [EAS:22]",
+#   "East North America [ENA:5]","South Europe/Mediterranean [MED:13]",
+#   "North Asia [NAS:18]","North Australia [NAU:25]",
+#   "North-East Brazil [NEB:8]","North Europe [NEU:11]",
+#   "Southern Africa [SAF:17]","Sahara [SAH:14]",
+#   "South Asia [SAS:23]","South Australia/New Zealand [SAU:26]",
+#   "Southeast Asia [SEA:24]","Southeastern South America [SSA:10]",
+#   "Tibetan Plateau [TIB:21]","West Africa [WAF:15]",
+#   "West Asia [WAS:19]","West North America [WNA:3]",
+#   "West Coast South America [WSA:9]","Antarctica",
+#   "Arctic","Pacific Islands region[2]",
+#   "Southern Topical Pacific","Pacific Islands region[3]",
+#   "West Indian Ocean")
 
 # function to be used to combine META data with IPCC table
 merge.meta.ipcc <- function(meta = meta, ipcc = IPCC.AR5.Table.9.A.1) {
-  ## browser()
   meta$model_id <- gsub('\\.','-',meta$model_id)
   ipcc$Model.Name <- gsub('\\.','-',IPCC.AR5.Table.9.A.1$Model.Name)
   ipcc$Model.Name <- gsub('\\(','-',ipcc$Model.Name)
@@ -396,11 +504,14 @@ merge.meta.ipcc <- function(meta = meta, ipcc = IPCC.AR5.Table.9.A.1) {
 ## Load metadata for GCMs
 load('data/metaextract_v2.rda')
 data(package = 'esd','IPCC.AR5.Table.9.A.1')
+
+IPCC.AR5.Table.9.A.1$Horizontal.Resolution <- cmipgcmresolution()
+
 meta <- as.data.frame(meta)
 META <- meta[,c('source','experiment','institute_id','model_id','parent_experiment_rip','realization','longname','variable','units','timeunit',
                 'resolution','longitude','latitude',"experiment_id",'dim1','index','calendar','creation_date',
                 'tracking_id','physics_version','forcing','reference','contact','comment','table_id','file')]
-#browser()
+
 gcm.meta.tas <- subset(META, subset = (source == 'CMIP5') & (variable == 'tas'))
 gcm.meta.tas <- merge.meta.ipcc(meta = gcm.meta.tas,ipcc = IPCC.AR5.Table.9.A.1)
 
@@ -414,10 +525,20 @@ gcm.meta.pr <- subset(META, subset = (source == 'CMIP5') & (variable == 'pr'))
 gcm.meta.pr <- merge.meta.ipcc(gcm.meta.pr,IPCC.AR5.Table.9.A.1)
 
 # Common meta data for all variables
-id <- intersect(gcm.meta.pr$model_id,gcm.meta.tas$model_id)
-gcm.meta.all <- subset(gcm.meta.tas, subset = is.element(model_id,id))
-gcm.meta.all <- merge.meta.ipcc(gcm.meta.all,IPCC.AR5.Table.9.A.1)
+modelrip.tas <- paste(gcm.meta.tas$institute_id,gcm.meta.tas$model_id,gcm.meta.tas$parent_experiment_rip,gcm.meta.tas$realization)
+modelrip.pr <- paste(gcm.meta.pr$institute_id,gcm.meta.pr$model_id,gcm.meta.pr$parent_experiment_rip,gcm.meta.pr$realization)
+id <- intersect(modelrip.pr,modelrip.tas)
 
+id.tas <- which(is.element(modelrip.tas[!duplicated(modelrip.tas)],id))
+# Some of the attributes are duplicated for precipitation 
+id.pr <- which(is.element(modelrip.pr[!duplicated(modelrip.pr)],id)) 
+
+# Extract common simulations between variables
+gcm.meta.all <- subset(gcm.meta.tas, subset = is.element(modelrip.tas[!duplicated(modelrip.tas)],id))
+gcm.meta.all <- merge.meta.ipcc(gcm.meta.all,IPCC.AR5.Table.9.A.1)
+gcm.meta.all <- gcm.meta.all[,-c(7,8,9,10)]
+
+# ---- RCMs -------
 ## Load meta data for RCMs
 data(package = 'DECM','metaextract')
 meta <- as.data.frame(meta)
@@ -429,18 +550,20 @@ rcm.meta.tas <- subset(META, subset = (project_id == 'CORDEX') & (var == 'tas'))
 
 rcm.meta.pr <- subset(META, subset = (project_id == 'CORDEX') & (var == 'pr'))
 
-id <- intersect(rcm.meta.pr$model_id,rcm.meta.tas$model_id)
-rcm.meta.all <- subset(rcm.meta.tas, subset = is.element(rcm,id))
-
+rcm.meta.all <- rcm.meta.pr[,-c(5:8,15)]
+  
 # RCM statistics ...
 rcms <- NULL
 load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.eobs.tas.1981-2010.rda")
+store$eobs.tas$corr <- store$eobs.tas$mean
+store$eobs.tas$corr <- rep(1,13)
 rcms$tas$present <- store
 load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.tas.2021-2050.rda")
 rcms$tas$nf <- store
 load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.tas.2071-2100.rda")
 rcms$tas$ff <- store
 load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.eobs.pr.1981-2010.rda")
+store$eobs.pr$corr <- rep(1,13)
 rcms$pr$present <- store
 load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.pr.2021-2050.rda")
 rcms$pr$nf <- store

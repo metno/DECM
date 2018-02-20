@@ -143,6 +143,7 @@ dashboardPage(skin = 'red',
                           #             ),
                           #             tabPanel("Seasonal Cycle", p(),
                           fluidPage(
+                            p(),
                             fluidRow(
                               column(12,
                                      box(width = '100%', solidHeader = TRUE, status = 'danger',
@@ -182,7 +183,7 @@ dashboardPage(skin = 'red',
                                                      choices = c('None','---','Group'),
                                                      selected = 'None',width = '100%'),
                                          selectInput("gcm.outputValues", label = "Displayed values", 
-                                                     choices = c('Absolute','Anomaly','Bias'),
+                                                     choices = c('Absolute','Anomaly','Bias','Change'),
                                                      selected = 'Absolute',width = '100%'),
                                          selectInput("gcm.stat", label = "Statistics", 
                                                      choices = c('Mean','Standard Deviation',
@@ -220,7 +221,7 @@ dashboardPage(skin = 'red',
                                            tabPanel("Data", DT::dataTableOutput("gcm.sc.pr.data")),
                                            tabPanel('Metadata',DT::dataTableOutput("gcm.meta.pr"))),
                                          title = tags$p('4. Evaluate the seasonal cycle in Simulated Monthly Precipitation totals'), 
-                                         collapsible = TRUE, collapsed = TRUE)))
+                                         collapsible = TRUE, collapsed = FALSE)))
                           )
                           #             ),
                           #             tabPanel("Scatter Plot", p(), 

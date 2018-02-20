@@ -435,6 +435,7 @@ function(input, output,session) {
   # })
   # 
   gcm.sc.vals <- function(param,region,period,stat) {
+    ## browser()
     if (param == 'tas')
       gcms <- names(stats$tas$ff)
     else if (param == 'pr')
@@ -462,15 +463,16 @@ function(input, output,session) {
     x <- lapply(gcms, function(gcm) stats[[param]][[period]][[gcm]][[region]][[stat]][2:13])
     
     #if(period=="present") {
-      id.ref <- grep('era',names(stats[[param]][['present']])) 
-      if (is.element(stat,c('mean','spatial.sd')))
-        ref <- stats[[param]][['present']][[id.ref]][[region]][[stat]][2:13]
-      else if (stat == 'corr') {
-        ref <- rep(1,12)
-      } else if (stat == 'rms' | stat == 'e') {
-        ref <- rep(0,12)
-      } 
-    #}
+    id.ref <- grep('era',names(stats[[param]][['present']])) 
+    if (is.element(stat,c('mean','spatial.sd')))
+      ref <- stats[[param]][['present']][[id.ref]][[region]][[stat]][2:13]
+    else if (stat == 'corr') {
+      ref <- rep(1,12)
+    } else if (stat == 'rms' | stat == 'e') {
+      ref <- rep(0,12)
+    } 
+    #} else 
+    #  ref <- rep(NA,12)
     
     if((param=="pr") & (is.element(stat,c('mean','e','spatial.sd','rms')))) {      
       #      
@@ -506,8 +508,16 @@ function(input, output,session) {
     return(gcm.sc.vals(param = 'tas',region = input$gcm.region, period = input$gcm.period,stat = input$gcm.stat))
   })
   
+  gcm.sc.tas.present <- reactive({
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.region, period = 'Present (1981-2010)',stat = input$gcm.stat))
+  })
+  
   gcm.sc.pr.reactive <- reactive({
     return(gcm.sc.vals(param = 'pr',region = input$gcm.region,  period = input$gcm.period,stat = input$gcm.stat))
+  })
+  
+  gcm.sc.pr.present <- reactive({
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.region,  period = 'Present (1981-2010)',stat = input$gcm.stat))
   })
   
   ## RCMs 
@@ -1237,6 +1247,9 @@ function(input, output,session) {
         df <- df - df[,dim(df)[2]]      
       else if (input$gcm.outputValues == 'Anomaly')
         df <- df - colMeans(df)
+      else if (input$gcm.outputValues == 'Change') {
+        df <- gcm.sc.tas.reactive() - gcm.sc.tas.present()
+      }
       
       #df <- df[,-36] # AM Quick fix but has to be removed ... once meta is updated.
       # GCM seasonal cycle
@@ -1419,9 +1432,12 @@ function(input, output,session) {
       
       if (input$gcm.outputValues == 'Bias')  
         ylab <- "Bias in simulated regional temperature [deg. C]"
+      else if (input$gcm.outputValues == 'Anomaly')
+        ylab <- "Simulated regional temperature anomalies [deg. C]"
+      else if (input$gcm.outputValues == 'Change')
+        ylab <- "Absolute change in simulted regional temperature with regards to present [deg. C]"
       else 
         ylab <- "Simulated regional temperature [deg. C]"
-      
       p.sc <- p.sc %>% layout(#title = "Temperature [Degrees C]",
         paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
         xaxis = list(title = "Months",
@@ -1460,6 +1476,9 @@ function(input, output,session) {
         df <- ((df - df[,dim(df)[2]])/df[,dim(df)[2]]) * 100
       else if (input$gcm.outputValues == 'Anomaly')
         df <- df - colMeans(df)
+      else if (input$gcm.outputValues == 'Change') {
+        df <- ((gcm.sc.pr.reactive() - gcm.sc.pr.present())/ gcm.sc.pr.present()) * 100
+      }
       
       df.env <- NULL
       low <- round(apply(subset(df,select = grep('gcm',colnames(df))),1,min,na.rm=TRUE),digits = 2)
@@ -1591,8 +1610,12 @@ function(input, output,session) {
       
       if (input$gcm.outputValues == 'Bias')  
         ylab <- "Bias in simulated regional precipitation [%]"
+      else if (input$gcm.outputValues == 'Anomaly') 
+        ylab <- "Simulated regional precipitation anomalies [mm]"
+      else if (input$gcm.outputValues == 'Change')
+        ylab <- "Relative change in simulted regional precipitation with regards to present [%]"
       else 
-        ylab <- "Simulated regional precipitation [mm]"
+          ylab <- "Simulated regional precipitation [mm]"
       # Format layout 
       p.sc <- p.sc %>% layout(#title = "Regional average in mm/day",
         paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
@@ -2551,12 +2574,13 @@ function(input, output,session) {
     updateTabsetPanel(session, "tabs", 'score5.tabs')
   })
   observe(
-    showModal(modalDialog(footer = modalButton("Accept"),
+    showModal(modalDialog(
+      footer = modalButton("Accept"),
       title = "Disclaimer",
       tags$h4("This web application is a prototype and provides a straighforward and simple evaluation of the quality of climate models in simulating 
       basic climatic features such as the seasoanl cycle of mean air temperature and precipitation over various 
       regions in the world. This prototype is developed through the C3S DECM project and is the copyright of the Norwegian Meteorological Institute (2018).
-      By clicking on 'Accept' you accept ECMWF terms of use. Any feedbacks are welcome!"),
+      By clicking on 'Dismiss' you accept the terms of use. Any feedbacks are welcome!"),
       tags$h5('email to abdelkader@met.no or send your feedback from the following website'), tags$a(href= 'https://climatedatasite.net','https://climatedatasite.net')
     ))
   )

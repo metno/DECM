@@ -1414,16 +1414,26 @@ function(input, output,session) {
       } else if (grepl('box',tolower(input$gcm.chart.type))) {
         p.sc <- plot_ly(df, type = 'box')
         
+        month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+        col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                     'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                     'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                     'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                     'rgb(166,206,227)')
         for (i in 1:12) {
           leg.name <- month.abb[i]
-          eval(parse(text = paste("p.sc <- p.sc %>% 
+          leg.grp <- month.grp[i]
+            eval(parse(text = paste("p.sc <- p.sc %>% 
                                       add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
                                       type = 'box', boxpoints = 'all',
-                                      line = list(color='rgb(255,127,80)'),
-                                      name = leg.name,showlegend =FALSE)",sep='')))
+                                      legendgroup = leg.grp,
+                                      line = list(color=col.grp[",i,"],opacity=0.6),
+                                      name = leg.name,showlegend =TRUE)",sep='')))
           if (!is.null(df$ref))
             p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
-                                       line = list(color = 'black', dash = 'dash', width = 2))
+                                       line = list(color = 'black', dash = 'dash', width = 2),
+                                       legendgroup = leg.grp,
+                                       showlegend = TRUE)
         } 
       }
       # Add these lines to modify colors in box plot
@@ -1594,18 +1604,28 @@ function(input, output,session) {
         
       } else if (grepl('box',tolower(input$gcm.chart.type))) {
         p.sc <- plot_ly(df, type = 'box')
+        
+        month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+        col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                     'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                     'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                     'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                     'rgb(166,206,227)')
         for (i in 1:12) {
           leg.name <- month.abb[i]
+          leg.grp <- month.grp[i]
           eval(parse(text = paste("p.sc <- p.sc %>% 
                                       add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
                                       type = 'box', boxpoints = 'all',
-                                      marker = list(color = 'rgb(135,206,250'),
-                                      line = list(color = 'rgb(135,206,250'),
-                                      name = leg.name,showlegend =FALSE)",sep='')))
+                                      legendgroup = leg.grp, 
+                                      line = list(color=col.grp[",i,"],opacity=0.6),
+                                      name = leg.name,showlegend =TRUE)",sep='')))
           if (!is.null(df$ref))
-            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name, showlegend = FALSE, 
-                                       line = list(color = 'black', dash = 'dash', width = 2))
-        }
+            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
+                                       line = list(color = 'black', dash = 'dash', width = 2),
+                                       legendgroup = leg.grp,
+                                       showlegend = TRUE) 
+        } 
       }
       
       if (input$gcm.outputValues == 'Bias')  
@@ -1902,7 +1922,7 @@ function(input, output,session) {
                                       line = list(color='rgb(255,127,80)'),
                                       name = leg.name,showlegend =FALSE)",sep='')))
           if (!is.null(df$ref))
-            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name, showlegend = FALSE, 
+            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'line', name = leg.name, showlegend = FALSE, 
                                        line = list(color = 'black', dash = 'dash', width = 2))
         } 
       }
@@ -2058,7 +2078,7 @@ function(input, output,session) {
                                       line = list(color = 'rgb(135,206,250'),
                                       name = leg.name,showlegend =FALSE)",sep='')))
           if (!is.null(df$ref))
-            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name, showlegend = FALSE, 
+            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'line', name = leg.name, showlegend = FALSE, 
                                        line = list(color = 'black', dash = 'dash', width = 2))
         }
       }

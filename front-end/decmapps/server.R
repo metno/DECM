@@ -461,16 +461,16 @@ function(input, output,session) {
     }
     x <- lapply(gcms, function(gcm) stats[[param]][[period]][[gcm]][[region]][[stat]][2:13])
     
-    if(period=="present") {
-      id.ref <- grep('era',names(stats[[param]][[period]])) 
+    #if(period=="present") {
+      id.ref <- grep('era',names(stats[[param]][['present']])) 
       if (is.element(stat,c('mean','spatial.sd')))
-        ref <- stats[[param]][[period]][[id.ref]][[region]][[stat]][2:13]
+        ref <- stats[[param]][['present']][[id.ref]][[region]][[stat]][2:13]
       else if (stat == 'corr') {
         ref <- rep(1,12)
       } else if (stat == 'rms' | stat == 'e') {
         ref <- rep(0,12)
       } 
-    }
+    #}
     
     if((param=="pr") & (is.element(stat,c('mean','e','spatial.sd','rms')))) {      
       #      
@@ -2551,12 +2551,12 @@ function(input, output,session) {
     updateTabsetPanel(session, "tabs", 'score5.tabs')
   })
   observe(
-    showModal(modalDialog(
+    showModal(modalDialog(footer = modalButton("Accept"),
       title = "Disclaimer",
       tags$h4("This web application is a prototype and provides a straighforward and simple evaluation of the quality of climate models in simulating 
       basic climatic features such as the seasoanl cycle of mean air temperature and precipitation over various 
       regions in the world. This prototype is developed through the C3S DECM project and is the copyright of the Norwegian Meteorological Institute (2018).
-      By clicking on 'Dismiss' you accept the terms of use. Any feedbacks are welcome!"),
+      By clicking on 'Accept' you accept ECMWF terms of use. Any feedbacks are welcome!"),
       tags$h5('email to abdelkader@met.no or send your feedback from the following website'), tags$a(href= 'https://climatedatasite.net','https://climatedatasite.net')
     ))
   )

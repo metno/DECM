@@ -220,7 +220,7 @@ dashboardPage(skin = 'red',
                                            tabPanel("Data", DT::dataTableOutput("gcm.sc.pr.data")),
                                            tabPanel('Metadata',DT::dataTableOutput("gcm.meta.pr"))),
                                          title = tags$p('4. Evaluate the seasonal cycle in Simulated Monthly Precipitation totals'), 
-                                         collapsible = TRUE, collapsed = FALSE)))
+                                         collapsible = TRUE, collapsed = TRUE)))
                           )
                           #             ),
                           #             tabPanel("Scatter Plot", p(), 

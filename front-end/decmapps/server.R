@@ -435,7 +435,7 @@ function(input, output,session) {
   # })
   # 
   gcm.sc.vals <- function(param,region,period,stat) {
-    ## browser()
+    ## 
     if (param == 'tas')
       gcms <- names(stats$tas$ff)
     else if (param == 'pr')
@@ -1350,41 +1350,41 @@ function(input, output,session) {
         if (is.null(input$rowsGcm)) {
           for (gcm in gcms) {
             i <- which(is.element(gcms,gcm))
-            leg.name <- paste(paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '),
+            leg.name <- paste(paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '),
                               paste(substr(lev[id[i]],1,5),'...',sep=''),
                               sep = ' ')
             grp.name <- paste('Group',id[i],sep='')
             
             
-            if (is.null(input$rowsGcm)) {
+            #if (is.null(input$rowsGcm)) {
               if (is.element(input$gcm.colorBy, c('None','---')))
                 eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', 
-                                    showlegend = TRUE, legendgroup = grp.name,
+                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                    showlegend = TRUE, legendgroup = grp.name, 
                                     line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
               else
-                eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', 
+                eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter',
+                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                     showlegend = TRUE, legendgroup = grp.name,
                                     line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
-            }  
+            #}
             ## Highlight selected models in tab:models
           } 
         } else {
           im <- input$rowsGcm
           for (i in 1:length(im)) {
-            leg.name <- paste(as.character(as.matrix(gcm.meta.tas[im[i],c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
+            leg.name <- paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
             grp.name <- paste('Group',id[im[i]],sep='')
-            gcm <- gcms[im[i]]
+            gcm <- gcms[i] #gcms[im[i]]
             if (is.element(input$gcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', legendgroup = grp.name,
-                                    colors = ",i,",
+                                    name = leg.name, mode = 'lines', legendgroup = grp.name, 
+                                    colors = ",i,", hoverinfo = 'text+x+y',text=leg.name,
                                      line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
                                     name = leg.name, mode = 'lines', legendgroup = grp.name,
-                                    colors = colsa[im[",i,"]],
+                                    colors = colsa[im[",i,"]], hoverinfo = 'text+x+y',text=leg.name,
                                     line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }
         }
@@ -1426,7 +1426,7 @@ function(input, output,session) {
             eval(parse(text = paste("p.sc <- p.sc %>% 
                                       add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
                                       type = 'box', boxpoints = 'all',
-                                      legendgroup = leg.grp,
+                                      legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color=col.grp[",i,"],opacity=0.6),
                                       name = leg.name,showlegend =TRUE)",sep='')))
           if (!is.null(df$ref))
@@ -1552,12 +1552,12 @@ function(input, output,session) {
             
             if (is.element(input$gcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', 
+                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                     showlegend = TRUE, legendgroup = grp.name,
                                     line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', 
+                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                     showlegend = TRUE, legendgroup = grp.name,
                                     line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
             
@@ -1572,12 +1572,12 @@ function(input, output,session) {
             if (is.element(input$gcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
                                     name = leg.name, mode = 'lines', legendgroup = grp.name,
-                                    colors = ",i,",
+                                    colors = ",i,",hoverinfo = 'text+x+y',text=leg.name,
                                      line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
                                     name = leg.name, mode = 'lines', legendgroup = grp.name,
-                                    colors = colsa[im[",i,"]],
+                                    colors = colsa[im[",i,"]],hoverinfo = 'text+x+y',text=leg.name,
                                     line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }            
           
@@ -1617,7 +1617,7 @@ function(input, output,session) {
           eval(parse(text = paste("p.sc <- p.sc %>% 
                                       add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
                                       type = 'box', boxpoints = 'all',
-                                      legendgroup = leg.grp, 
+                                      legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color=col.grp[",i,"],opacity=0.6),
                                       name = leg.name,showlegend =TRUE)",sep='')))
           if (!is.null(df$ref))
@@ -1676,7 +1676,9 @@ function(input, output,session) {
         df <- df - df[,dim(df)[2]]      
       else if (input$gcm.outputValues == 'Anomaly')
         df <- df - colMeans(df)
-      
+      else if (input$gcm.outputValues == 'Change') {
+        df <- gcm.sc.tas.reactive() - gcm.sc.tas.present()
+      }
       caption <- paste('Monthly estimates of regional temperature assuming an 
                        intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                        The climate models and their corresponding runs are listed in the second and third columns, respectively. 
@@ -1753,7 +1755,14 @@ function(input, output,session) {
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The bias is computed as the deviation from the referance data set (Observation).',
                          sep= ' ')
-      } 
+      }  else if (input$gcm.outputValues == 'Change') {
+        df <- ((gcm.sc.pr.reactive() - gcm.sc.pr.present())/ gcm.sc.pr.present()) * 100
+        caption <- paste('Change [in %] in monthly estimates of regional preciptiation assuming an 
+                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second and third columns, respectively. 
+                         The changes are computed as the deviation from the historical simulations for the present (1981-2010).',
+                         sep= ' ')
+        }
       df.format <- t(round(df,digits = 1))
       colnames(df.format) <- month.abb
       df.format <- data.frame(N = c(1:(dim(df.format)[1]-1),0), 
@@ -1867,12 +1876,12 @@ function(input, output,session) {
           grp.name <- paste('Group',id[i],sep='')
           if (input$rcm.legend.sc == 'All Simulations')
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', 
+                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                     showlegend = TRUE, legendgroup = grp.name, 
                                     line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
           else if (input$legend.sc == 'None')
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', 
+                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                     showlegend = TRUE, legendgroup = grp.name, 
                                     line = list(color = cols[",i,"], width = 2, shape ='spline',showlegend = FALSE))",sep='')))
         }
@@ -1885,7 +1894,7 @@ function(input, output,session) {
             grp.name <- paste('Group',id[i],sep='')
             rcm <- rcms[i]
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', 
+                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                     showlegend = TRUE, line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
           }
         }
@@ -1918,7 +1927,7 @@ function(input, output,session) {
           leg.name <- month.abb[i]
           eval(parse(text = paste("p.sc <- p.sc %>% 
                                       add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
-                                      type = 'box', boxpoints = 'all',
+                                      type = 'box', boxpoints = 'all', hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color='rgb(255,127,80)'),
                                       name = leg.name,showlegend =FALSE)",sep='')))
           if (!is.null(df$ref))
@@ -2004,12 +2013,12 @@ function(input, output,session) {
           grp.name <- paste('Group',id[i],sep='')
           if (input$rcm.legend.sc == 'All Simulations')
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', 
+                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                     showlegend = TRUE, legendgroup = grp.name,
                                     line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
           else if (input$rcm.legend.sc == 'None')
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', 
+                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                     showlegend = TRUE, legendgroup = grp.name,
                                     line = list(color = cols[",i,"], width = 2, shape ='spline',showlegend = FALSE))",sep='')))
         }
@@ -2023,7 +2032,7 @@ function(input, output,session) {
             rcm <- rcms[i]
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
                                     name = leg.name, mode = 'lines', 
-                                    showlegend = TRUE, 
+                                    showlegend = TRUE, hoverinfo = 'text+x+y',text=leg.name,
                                     line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
           }
         }
@@ -2073,7 +2082,7 @@ function(input, output,session) {
           leg.name <- month.abb[i]
           eval(parse(text = paste("p.sc <- p.sc %>% 
                                       add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
-                                      type = 'box', boxpoints = 'all',
+                                      type = 'box', boxpoints = 'all',hoverinfo = 'text+x+y',text=leg.name,
                                       marker = list(color = 'rgb(135,206,250'),
                                       line = list(color = 'rgb(135,206,250'),
                                       name = leg.name,showlegend =FALSE)",sep='')))

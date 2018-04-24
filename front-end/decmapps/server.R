@@ -412,9 +412,9 @@ function(input, output,session) {
     DT::datatable(model.45, rownames = FALSE,  
                   options = list(selection = 'multiple',pageLength=20), 
                   callback = JS("table.on('search.dt', function() {
-                            $(this).toggleClass('selected');
-                            Shiny.onInputChange('rows',table.rows({page:'all',selected:true}).data().toArray());
-                    });"))
+                                $(this).toggleClass('selected');
+                                Shiny.onInputChange('rows',table.rows({page:'all',selected:true}).data().toArray());
+  });"))
   }) #options = list(pageLength=20)})
   
   # selModel <- reactive({
@@ -524,9 +524,9 @@ function(input, output,session) {
   rcm.sc.vals <- function(param,region,period,stat) {
     stats <- rcms
     if (param == 'tas')
-      gcms <- names(stats$tas$ff)
+      rcms <- names(stats$tas$ff)
     else if (param == 'pr')
-      gcms <- names(stats$pr$ff)
+      rcms <- names(stats$pr$ff)
     
     period <- switch(tolower(as.character(period)),
                      "present (1981-2010)"='present',
@@ -534,34 +534,61 @@ function(input, output,session) {
                      "near future (2021-2050)"='nf')
     
     stat <- switch(tolower(as.character(stat)),
+                   "root mean square" = 'rms',
+                   "error" = 'e',
                    "standard deviation"='spatial.sd',
                    "mean"="mean",
                    "correlation"='corr')
     
     ref <- NULL
-    if(tolower(region)=="global") {
-      region <- "global"
+    if(tolower(region)=="europe") {
+      region <- "europe"
     } else {
       i.srex <- which(srex$name==region)
       region <- srex$label[i.srex]
     }
-    x <- lapply(gcms, function(gcm) stats[[param]][[period]][[gcm]][["mean"]][2:13])
+    x <- lapply(rcms, function(rcm) stats[[param]][[period]][[rcm]][[stat]][2:13])
     
-    if(period=="present") {
-      id.ref <- grep('eobs',names(stats[[param]][[period]])) 
-      ref <- stats[[param]][[period]][[id.ref]][["mean"]][2:13]
-    }#
+    #if(period=="present") {
+    id.ref <- grep('eobs',names(stats[[param]][['present']])) 
+    if (is.element(stat,c('mean','spatial.sd')))
+      ref <- stats[[param]][['present']][[id.ref]][[stat]][2:13]
+    else if (stat == 'corr') {
+      ref <- rep(1,12)
+    } else if (stat == 'rms' | stat == 'e') {
+      ref <- rep(0,12)
+    } 
+    #} else 
+    #  ref <- rep(NA,12)
     
-    if(param=="pr") {      
+    if((param=="pr") & (is.element(stat,c('mean','e','spatial.sd','rms')))) {      
       #      
-      x <- lapply(x, function(y) y*60*60*24 * 30) ## convert to mm/month
-      #ref <- ref*1E3 ## convert to mm/day
+      x <- lapply(x, function(y) y*60*60*24 * 30) ## convert to mm/day
+      #ref <- ref*1E3 * 30## convert to mm/day
     }
     
-    gcm.vals <- as.data.frame(lapply(1:length(x),function(i) {if (length(x[[i]]) > 0) x[[i]] else x[[1]]})) ## AM Need to fix this later on     
-    colnames(gcm.vals) <- paste('rcm.',1:length(gcm.vals),sep='')
+    rcm.vals <- as.data.frame(lapply(1:length(x),function(i) {if (length(x[[i]]) > 0) x[[i]] else x[[1]]})) ## AM Need to fix this later on     
+    colnames(rcm.vals) <- paste('rcm.',1:length(rcm.vals),sep='')
     
-    df <- data.frame(gcm.vals,ref,stringsAsFactors = FALSE)
+    # # common models to all climate variables
+    # if (input$rcm.var != 'Individual') {
+    #   if (param=="pr") 
+    #     rcm.vals <- base::subset(rcm.vals,select = id.pr)
+    #   else if (param=="tas")
+    #     rcm.vals <- base::subset(rcm.vals,select = id.tas)
+    # }
+    
+    if (input$rcm.sim.sc == "Selected Simulations") {
+      if (!is.null(input$rowsRcm))
+        rcm.vals <- rcm.vals[,input$rowsRcm]
+      else
+        showNotification('Please select a model from the meta data table!')
+    }
+    
+    if (!is.null(ref))
+      df <- data.frame(rcm.vals,ref,stringsAsFactors = FALSE)
+    else
+      df <- data.frame(rcm.vals,stringsAsFactors = FALSE)
   }
   
   rcm.sc.tas.reactive <- reactive({
@@ -570,6 +597,14 @@ function(input, output,session) {
   
   rcm.sc.pr.reactive <- reactive({
     return(rcm.sc.vals(param = 'pr',region = input$rcm.region,  period = input$rcm.period,stat = input$rcm.stat))
+  })
+  
+  rcm.sc.tas.present <- reactive({
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat))
+  })
+  
+  rcm.sc.pr.present <- reactive({
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat))
   })
   
   # observe(priority = -1, {
@@ -609,6 +644,26 @@ function(input, output,session) {
       return(gcm.meta.pr)
     } else 
       return(gcm.meta.all)
+  })
+  
+  rcm.meta.tas.reactive <- reactive({
+    if (input$rcm.var == 'Individual'){
+      return(rcm.meta.tas)
+    } else 
+      return(rcm.meta.all)
+  })
+  
+  rcm.meta.pr.reactive <- reactive({
+    
+    if (input$rcm.var == 'Individual'){
+      return(rcm.meta.pr)
+    } else 
+      return(rcm.meta.all)
+  })
+  
+  txttab <- reactive({
+    txt <- paste('Monthly estimates of regional temperature assuming an intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the referance data set (Observation).', sep= ' ')
+    return(txt)
   })
   
   
@@ -816,9 +871,9 @@ function(input, output,session) {
       DT::datatable(data.frame(Names = gcmnames.45),
                     selection = 'multiple', 
                     callback = JS("table.on('click.dt', function() {
-                            $(this).toggleClass('selected');
-                            Shiny.onInputChange('rows.cc',table.rows('.selected').data().toArray());
-                    });"),
+                                  $(this).toggleClass('selected');
+                                  Shiny.onInputChange('rows.cc',table.rows('.selected').data().toArray());
+    });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'),
                     rownames=FALSE,
                     options=list(dom = 'Bfrtip',
@@ -838,7 +893,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-    })
+  })
     
     output$prob.cc <- renderPlot({
       z <- c(as.numeric(z.reactive()))
@@ -873,9 +928,9 @@ function(input, output,session) {
       DT::datatable(data.frame(Date = as.character(index(z.reactive())), Value = coredata(z.reactive())),
                     selection = 'multiple', 
                     callback = JS("table.on('click.dt', function() {
-                            $(this).toggleClass('selected');
-                            Shiny.onInputChange('rows.cc',table.rows('.selected').data().toArray());
-                    });"),
+                                  $(this).toggleClass('selected');
+                                  Shiny.onInputChange('rows.cc',table.rows('.selected').data().toArray());
+    });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'),
                     rownames=FALSE,
                     options=list(dom = 'Bfrtip',
@@ -895,7 +950,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-    })
+})
     
     ## Global Climate Models Menu item ---      
     ## Metadata table
@@ -915,12 +970,12 @@ function(input, output,session) {
                     The culumns visibily allow displaying or hiding by the user unecessary columns.',
                     selection = list(mode = 'multiple',target = 'row'),
                     callback = JS("table.on('click.dt', function() {
-                                   table.select.style( 'os' );                                  
+                                  table.select.style( 'os' );                                  
                                   $(this).toggleClass('selected');                               
                                   var rowData = table.rows('.selected',0).indexes();
                                   var rowidx = table.cells( rowData, 0 ).data().toArray();                               
                                   Shiny.onInputChange('rowsGcm',rowidx);
-                    });"),
+    });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'),
                     rownames=FALSE,
                     options=list(dom = 'Bfrtip',
@@ -940,7 +995,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-    })
+})
     
     output$gcm.meta.pr <- DT::renderDataTable({
       gcm.meta.pr <- gcm.meta.pr.reactive()
@@ -952,12 +1007,12 @@ function(input, output,session) {
                     The culumns visibily allow displaying or hiding by the user unecessary columns.',
                     selection = list(mode = 'multiple',target = 'row'),
                     callback = JS("table.on('click.dt', function() {
-                                   table.select.style( 'os' );                                  
+                                  table.select.style( 'os' );                                  
                                   $(this).toggleClass('selected');                               
                                   var rowData = table.rows('.selected',0).indexes();
                                   var rowidx = table.cells( rowData, 0 ).data().toArray();                               
                                   Shiny.onInputChange('rowsGcm',rowidx);
-                    });"),
+    });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'),
                     rownames=FALSE,
                     options=list(dom = 'Bfrtip',
@@ -977,7 +1032,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-    })
+  })
     
     output$gcm.meta.all <- DT::renderDataTable({
       ## Metadata table
@@ -986,9 +1041,9 @@ function(input, output,session) {
       DT::datatable(DF.pr,
                     selection = list(mode = 'multiple',target = 'row'),
                     callback = JS("table.on('click.dt', function() {
-                            $(this).toggleClass('selected');
-                            Shiny.onInputChange('rowsGcm',table.rows('.selected').indexes().toArray());
-                    });"),
+                                  $(this).toggleClass('selected');
+                                  Shiny.onInputChange('rowsGcm',table.rows('.selected').indexes().toArray());
+    });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'),
                     rownames=FALSE,
                     options=list(dom = 'Bfrtip',
@@ -1008,7 +1063,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-    })
+      })
     
     ## RCMs tablets 
     
@@ -1019,9 +1074,12 @@ function(input, output,session) {
       DT::datatable(DF.tas,
                     selection = list(mode = 'multiple',target = 'row'),
                     callback = JS("table.on('click.dt', function() {
-                                  $(this).toggleClass('selected');
-                                  Shiny.onInputChange('rowsGcm',table.rows('.selected').indexes().toArray());
-                    });"),
+                                  table.select.style( 'os' );                                  
+                                  $(this).toggleClass('selected');                               
+                                  var rowData = table.rows('.selected',0).indexes();
+                                  var rowidx = table.cells( rowData, 0 ).data().toArray();                               
+                                  Shiny.onInputChange('rowsRcm',rowidx);
+    });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'),
                     rownames=FALSE,
                     options=list(dom = 'Bfrtip', 
@@ -1043,7 +1101,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-    })
+      })
     
     output$rcm.meta.pr <- DT::renderDataTable({
       ## Metadata table
@@ -1053,8 +1111,11 @@ function(input, output,session) {
       DT::datatable(DF.pr,
                     selection = 'multiple', 
                     callback = JS("table.on('click.dt', function() {
-                                  $(this).toggleClass('selected');
-                                  Shiny.onInputChange('rows2',table.rows('.selected').indexes().toArray());
+                                  table.select.style( 'os' );                                  
+                                  $(this).toggleClass('selected');                               
+                                  var rowData = table.rows('.selected',0).indexes();
+                                  var rowidx = table.cells( rowData, 0 ).data().toArray();                               
+                                  Shiny.onInputChange('rowsRcm',rowidx);
     });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'),
                     rownames=FALSE,
@@ -1075,7 +1136,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-    })
+      })
     
     output$rcm.meta.all <- DT::renderDataTable({
       ## Metadata table
@@ -1086,8 +1147,11 @@ function(input, output,session) {
       DT::datatable(DF.com,
                     selection = 'multiple', 
                     callback = JS("table.on('click.dt', function() {
-                                  $(this).toggleClass('selected');
-                                  Shiny.onInputChange('rowsCom',table.rows('.selected').indexes().toArray());
+                                  table.select.style( 'os' );                                  
+                                  $(this).toggleClass('selected');                               
+                                  var rowData = table.rows('.selected',0).indexes();
+                                  var rowidx = table.cells( rowData, 0 ).data().toArray();                               
+                                  Shiny.onInputChange('rowsRcm',rowidx);
     });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'),
                     rownames=FALSE,
@@ -1108,7 +1172,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-    })
+      })
     
     ## Define reions
     output$gcm.region <- renderLeaflet({
@@ -1154,100 +1218,22 @@ function(input, output,session) {
       m
     })
     
-    ## Seasonal scatter plot DT vs DP 
-    output$gcm.scatter <- renderLeaflet({
-      
-      season <- switch(as.character(input$season7),
-                       'Annual'='ann',
-                       'Winter (DJF)'=c('dec','jan','feb'),
-                       'Spring (MAM)'=c('mar','apr','may'),
-                       'Summer (JJA)'=c('jun','jul','aug'),
-                       'Autumn (SON)'=c('sep','oct','nov'))
-      
-      gcms <- names(stats$tas$ff)
-      
-      df <- function(season,period){
-        
-        #'annual mean'='ann','winter'='djf','spring'='mam',
-        #'summer'='jja','autumn'='son')
-        
-        if(tolower(input$region)=="global") {
-          region <- "global"
-          dtas <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
-            stats$tas[[period]][[gcm]][["mean"]][[s]])) - 
-              mean(sapply(season, function(s) 
-                stats$tas$present[[gcm]][["mean"]][[s]])))
-          dpr <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
-            stats$pr[[period]][[gcm]][["mean"]][[s]])) - 
-              mean(sapply(season, function(s) 
-                stats$pr$present[[gcm]][["mean"]][[s]])))
-        } else {
-          i.srex <- which(srex$name==input$region)
-          region <- srex$label[i.srex]
-          dtas <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
-            stats$tas[[period]][[gcm]][[region]][["mean"]][[s]])) - 
-              mean(sapply(season, function(s) 
-                stats$tas$present[[gcm]][[region]][["mean"]][[s]])))
-          dpr <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
-            stats$pr[[period]][[gcm]][[region]][["mean"]][[s]])) - 
-              mean(sapply(season, function(s) 
-                stats$pr$present[[gcm]][[region]][["mean"]][[s]])))
-        }
-        dtas <- round(dtas,digits = 1)
-        dpr <- round(dpr*(60*60*24)*100,digits = 1)
-        invisible(data.frame(dtas,dpr))
-      }
-      
-      df.nf <- df(season,'nf')
-      df.ff <- df(season,'ff')
-      
-      df <- data.frame(dtas.nf= df.nf$dtas,dpr.nf= df.nf$dpr,dtas.ff= df.ff$dtas,dpr.ff = df.ff$dpr)
-      
-      p.scatter <- plot_ly(df) %>% 
-        add_trace(x = ~dtas.nf, y = ~dpr.nf, mode = 'markers',name ='Near Future (2021-2050)',
-                  marker = list(size = 10, symbol = 'circle', color = 'rgba(255, 182, 193, .6)',
-                                line = list(color = 'rgba(152, 0, 0, .7)', width = 2))) %>% 
-        add_trace(df.ff, x = ~dtas.ff, y = ~dpr.ff,mode = 'markers', name = 'Far Future (2071-2100)',
-                  marker = list(size = 10, symbol = 'x', color = 'rgba(255, 182, 193, .6)',
-                                line = list(color = 'rgba(152, 0, 0, .7)', width = 2)))
-      
-      if (!is.null(input$rowsGcm)) {
-        im <- input$rowsGcm
-        for (i in 1:length(im)) {
-          eval(parse(text = paste("p.scatter <- p.scatter %>% add_trace(x = ~dtas.nf[",i,"], y = ~dpr.nf[",i,"], mode = 'markers',name =gcms[",i,"],
-                                             marker = list(size = 14, symbol = 'circle', color = 'rgba(255, 182, 193, .6)',
-                                                           line = list(color = I('black'), width = 2))) %>% 
-                                                              add_trace(x = ~dtas.ff[",i,"], y = ~dpr.ff[",i,"],mode = 'markers', name = gcms[",i,"],
-                                             marker = list(size = 14, symbol = 'x',color = 'rgba(255, 182, 193, .6)',
-                                                           line = list(color = I('black'), width = 2)))",
-                                  sep='')))
-        }
-      }
-      
-      p.scatter <- p.scatter %>% layout(title = "Scatter Plot",
-                                        xaxis = list(title = 'Temperature Change [Degrees C]',autotick = FALSE,
-                                                     tick0 = 0,dtick = 0.5,zeroline = TRUE,showline = TRUE,range(-0.5,10)),
-                                        yaxis = list (title = "Precipitation Change [%]",autotick = FALSE,
-                                                      tick0 = 0,dtick = 5,zeroline = TRUE,showline = TRUE,range = c(-5,20)))
-      p.scatter$elementId <- NULL
-      p.scatter
-    })
-    
     ## Seasonal cycle 
     output$gcm.sc.tas <- renderPlotly({
       
       gcm.meta.tas <- gcm.meta.tas.reactive()
       df <- gcm.sc.tas.reactive()
       
-      if (input$gcm.sim.sc == 'Selected Simulations') {
-        gcm.meta.tas <- gcm.meta.tas[input$rowsGcm,]
-      }
+      if (!is.null(input$rowsGcm))
+        if (input$gcm.sim.sc == 'Selected Simulations')
+          gcm.meta.tas <- gcm.meta.tas[input$rowsGcm,]
       
       if (input$gcm.outputValues == 'Bias')
         df <- df - df[,dim(df)[2]]      
-      else if (input$gcm.outputValues == 'Anomaly')
-        df <- df - colMeans(df)
-      else if (input$gcm.outputValues == 'Change') {
+      else if (input$gcm.outputValues == 'Anomaly') {
+        DF <- t(df)
+        df <- as.data.frame(t(DF - rowMeans(DF)))
+      } else if (input$gcm.outputValues == 'Change') {
         df <- gcm.sc.tas.reactive() - gcm.sc.tas.present()
       }
       
@@ -1357,16 +1343,16 @@ function(input, output,session) {
             
             
             #if (is.null(input$rowsGcm)) {
-              if (is.element(input$gcm.colorBy, c('None','---')))
-                eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
-                                    showlegend = TRUE, legendgroup = grp.name, 
-                                    line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
-              else
-                eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter',
-                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
-                                    showlegend = TRUE, legendgroup = grp.name,
-                                    line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
+            if (is.element(input$gcm.colorBy, c('None','---')))
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
+                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name, 
+                                      line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
+            else
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter',
+                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name,
+                                      line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
             #}
             ## Highlight selected models in tab:models
           } 
@@ -1378,64 +1364,67 @@ function(input, output,session) {
             gcm <- gcms[i] #gcms[im[i]]
             if (is.element(input$gcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', legendgroup = grp.name, 
-                                    colors = ",i,", hoverinfo = 'text+x+y',text=leg.name,
-                                     line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
+                                      name = leg.name, mode = 'lines', legendgroup = grp.name, 
+                                      colors = ",i,", hoverinfo = 'text+x+y',text=leg.name,
+                                      line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', legendgroup = grp.name,
-                                    colors = colsa[im[",i,"]], hoverinfo = 'text+x+y',text=leg.name,
-                                    line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
+                                      name = leg.name, mode = 'lines', legendgroup = grp.name,
+                                      colors = colsa[im[",i,"]], hoverinfo = 'text+x+y',text=leg.name,
+                                      line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }
-        }
+          }
         if (!is.null(df$ref))
           p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-      } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
-        
-        p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
-                        line = list(color = 'transparent'),
-                        showlegend = FALSE, name = 'High') %>%
-          add_trace(y = ~low, type = 'scatter', mode = 'lines',
-                    fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
-                    showlegend = FALSE, name = 'Low') %>%
-          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                    line = list(color='rgb(255,127,80)'),
-                    name = 'Average') 
-        
-        
-        if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
-                                     line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-        
-        
-        
-      } else if (grepl('box',tolower(input$gcm.chart.type))) {
-        p.sc <- plot_ly(df, type = 'box')
-        
-        month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
-        col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
-                     'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
-                     'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
-                     'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
-                     'rgb(166,206,227)')
-        for (i in 1:12) {
-          leg.name <- month.abb[i]
-          leg.grp <- month.grp[i]
-            eval(parse(text = paste("p.sc <- p.sc %>% 
+          } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
+            
+            p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
+                            line = list(color = 'transparent'),
+                            showlegend = TRUE, name = 'High') %>%
+              add_trace(y = ~low, type = 'scatter', mode = 'lines', 
+                        fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
+                        showlegend = TRUE, name = 'Low') %>%
+              add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',name = 'Ens. Mean',
+                        line = list(color='rgb(255,127,80)'), showlegend = TRUE,
+                        name = 'Average') 
+            
+            
+            if (!is.null(df$ref))
+              p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', showlegend = TRUE,
+                                         line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
+            
+            p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+            
+            if (input$gcm.legend.sc == 'Hide')
+              p.sc <- p.sc %>% layout(showlegend = FALSE)
+            
+          } else if (grepl('box',tolower(input$gcm.chart.type))) {
+            p.sc <- plot_ly(df, type = 'box')
+            
+            month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+            col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                         'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                         'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                         'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                         'rgb(166,206,227)')
+            for (i in 1:12) {
+              leg.name <- month.abb[i]
+              leg.grp <- month.grp[i]
+              eval(parse(text = paste("p.sc <- p.sc %>% 
                                       add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
                                       type = 'box', boxpoints = 'all',
                                       legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color=col.grp[",i,"],opacity=0.6),
                                       name = leg.name,showlegend =TRUE)",sep='')))
-          if (!is.null(df$ref))
-            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
-                                       line = list(color = 'black', dash = 'dash', width = 2),
-                                       legendgroup = leg.grp,
-                                       showlegend = TRUE)
-        } 
-      }
+              if (!is.null(df$ref))
+                p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
+                                           line = list(color = 'black', dash = 'dash', width = 2),
+                                           legendgroup = leg.grp,
+                                           showlegend = TRUE)
+            } 
+          }
       # Add these lines to modify colors in box plot
       # marker = list(color = 'rgb(135,206,250'),
       # line = list(color = 'rgb(135,206,250'),
@@ -1472,21 +1461,23 @@ function(input, output,session) {
         p.sc <- p.sc %>% layout(showlegend = TRUE)
       p.sc$elementId <- NULL
       p.sc
-    })
+        })
     
     output$gcm.sc.pr <- renderPlotly({
       gcm.meta.pr <- gcm.meta.pr.reactive()
       df <- gcm.sc.pr.reactive()
       
-      if (input$gcm.sim.sc == 'Selected Simulations') {
-        gcm.meta.pr <- gcm.meta.pr[input$rowsGcm,]
-      }
+      if (!is.null(input$gcm.sim.sc))
+        if (input$gcm.sim.sc == 'Selected Simulations')
+          if (!is.null(input$rowsGcm))
+            gcm.meta.pr <- gcm.meta.pr[input$rowsGcm,]
       
       if (input$gcm.outputValues == 'Bias')
         df <- ((df - df[,dim(df)[2]])/df[,dim(df)[2]]) * 100
-      else if (input$gcm.outputValues == 'Anomaly')
-        df <- df - colMeans(df)
-      else if (input$gcm.outputValues == 'Change') {
+      else if (input$gcm.outputValues == 'Anomaly') {
+        DF <- t(df)
+        df <- as.data.frame(t(DF - rowMeans(DF)))
+      } else if (input$gcm.outputValues == 'Change') {
         df <- ((gcm.sc.pr.reactive() - gcm.sc.pr.present())/ gcm.sc.pr.present()) * 100
       }
       
@@ -1539,7 +1530,7 @@ function(input, output,session) {
           colsa <- rgbcolsa
           cols <- rgbcols
         }
-        
+        # browser()
         ## Add all Simulations
         if (is.null(input$rowsGcm)) {
           for (gcm in gcms) {
@@ -1552,14 +1543,14 @@ function(input, output,session) {
             
             if (is.element(input$gcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
-                                    showlegend = TRUE, legendgroup = grp.name,
-                                    line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
+                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name,
+                                      line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
-                                    showlegend = TRUE, legendgroup = grp.name,
-                                    line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
+                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name,
+                                      line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
             
           }
           ## Highlight selected Simulations in tab:models
@@ -1571,62 +1562,64 @@ function(input, output,session) {
             gcm <- gcms[i]
             if (is.element(input$gcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', legendgroup = grp.name,
-                                    colors = ",i,",hoverinfo = 'text+x+y',text=leg.name,
-                                     line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
+                                      name = leg.name, mode = 'lines', legendgroup = grp.name,
+                                      colors = ",i,",hoverinfo = 'text+x+y',text=leg.name,
+                                      line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', legendgroup = grp.name,
-                                    colors = colsa[im[",i,"]],hoverinfo = 'text+x+y',text=leg.name,
-                                    line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
+                                      name = leg.name, mode = 'lines', legendgroup = grp.name,
+                                      colors = colsa[im[",i,"]],hoverinfo = 'text+x+y',text=leg.name,
+                                      line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }            
           
-        }
+          }
         
         if (!is.null(df$ref))
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-      } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
-        p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
-                        line = list(color = 'transparent'),
-                        showlegend = FALSE, name = 'High') %>%
-          add_trace(y = ~low, type = 'scatter', mode = 'lines',
-                    fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),
-                    showlegend = FALSE, name = 'Low') %>%
-          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                    line = list(color='rgb(135,206,250)'),
-                    name = 'Average') 
-        
-        if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
-                                     line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-        
-      } else if (grepl('box',tolower(input$gcm.chart.type))) {
-        p.sc <- plot_ly(df, type = 'box')
-        
-        month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
-        col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
-                     'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
-                     'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
-                     'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
-                     'rgb(166,206,227)')
-        for (i in 1:12) {
-          leg.name <- month.abb[i]
-          leg.grp <- month.grp[i]
-          eval(parse(text = paste("p.sc <- p.sc %>% 
-                                      add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
-                                      type = 'box', boxpoints = 'all',
-                                      legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
-                                      line = list(color=col.grp[",i,"],opacity=0.6),
-                                      name = leg.name,showlegend =TRUE)",sep='')))
+        } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
+          p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
+                          line = list(color = 'transparent'),name = 'High',showlegend = TRUE) %>%
+            add_trace(y = ~low, type = 'scatter', mode = 'lines',showlegend = TRUE,
+                      fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),name = 'Low') %>%
+            add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',line = list(color='rgb(135,206,250)'),
+                      name = 'Ens. Mean',showlegend = TRUE) 
+          
           if (!is.null(df$ref))
-            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
-                                       line = list(color = 'black', dash = 'dash', width = 2),
-                                       legendgroup = leg.grp,
-                                       showlegend = TRUE) 
-        } 
-      }
+            p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+                                       line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
+          
+          p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+          
+          if (input$gcm.legend.sc == 'Hide') 
+            p.sc <- p.sc %>% layout(showlegend = FALSE)
+          
+        } else if (grepl('box',tolower(input$gcm.chart.type))) {
+          p.sc <- plot_ly(df, type = 'box')
+          
+          month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+          col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                       'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                       'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                       'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                       'rgb(166,206,227)')
+          for (i in 1:12) {
+            leg.name <- month.abb[i]
+            leg.grp <- month.grp[i]
+            eval(parse(text = paste("p.sc <- p.sc %>% 
+                                    add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
+                                    type = 'box', boxpoints = 'all',
+                                    legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
+                                    line = list(color=col.grp[",i,"],opacity=0.6),
+                                    name = leg.name,showlegend =TRUE)",sep='')))
+            if (!is.null(df$ref))
+              p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
+                                         line = list(color = 'black', dash = 'dash', width = 2),
+                                         legendgroup = leg.grp,
+                                         showlegend = TRUE) 
+          } 
+        }
       
       if (input$gcm.outputValues == 'Bias')  
         ylab <- "Bias in simulated regional precipitation [%]"
@@ -1635,7 +1628,7 @@ function(input, output,session) {
       else if (input$gcm.outputValues == 'Change')
         ylab <- "Relative change in simulted regional precipitation with regards to present [%]"
       else 
-          ylab <- "Simulated regional precipitation [mm]"
+        ylab <- "Simulated regional precipitation [mm]"
       # Format layout 
       p.sc <- p.sc %>% layout(#title = "Regional average in mm/day",
         paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
@@ -1661,16 +1654,16 @@ function(input, output,session) {
       
       p.sc$elementId <- NULL
       p.sc
-    })
+        })
     
     output$gcm.sc.tas.data <- DT::renderDataTable({
       
       gcm.meta.tas <- gcm.meta.tas.reactive()
       df <- gcm.sc.tas.reactive()
       
-      if (input$gcm.sim.sc == 'Selected Simulations') {
-        gcm.meta.tas <- gcm.meta.tas[input$rowsGcm,]
-      }
+      if (!is.null(input$rowsGcm))
+        if (input$gcm.sim.sc == 'Selected Simulations')
+          gcm.meta.tas <- gcm.meta.tas[input$rowsGcm,]
       
       if (input$gcm.outputValues == 'Bias')
         df <- df - df[,dim(df)[2]]      
@@ -1730,23 +1723,23 @@ function(input, output,session) {
       gcm.meta.pr <- gcm.meta.pr.reactive()
       df <- gcm.sc.pr.reactive()
       
-      if (input$gcm.sim.sc == 'Selected Simulations') {
-        gcm.meta.pr <- gcm.meta.pr[input$rowsGcm,]
-      }
+      if (!is.null(input$rowsGcm))
+        if (input$gcm.sim.sc == 'Selected Simulations') 
+          gcm.meta.pr <- gcm.meta.pr[input$rowsGcm,]
       
       if (input$gcm.outputValues == 'Absolute')
         
         caption <- paste('Monthly estimates of regional preciptiation assuming an 
-                       intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
-                       The climate models and their corresponding runs are listed in the second and third columns, respectively. 
-                       The last row in the table shows the estimated values from the referance data set (Observation).',
+                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second and third columns, respectively. 
+                         The last row in the table shows the estimated values from the referance data set (Observation).',
                          sep= ' ')
       else if (input$gcm.outputValues == 'Anomaly') {
         df <- df - colMeans(df)
         caption <- paste('Monthly anomalies in estimated regional preciptiation assuming an 
-                       intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
-                       The climate models and their corresponding runs are listed in the second and third columns, respectively. 
-                       The last row in the table shows the estimated values from the referance data set (Observation).',
+                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second and third columns, respectively. 
+                         The last row in the table shows the estimated values from the referance data set (Observation).',
                          sep= ' ')
       } else if (input$gcm.outputValues == 'Bias') {
         df <- (df - df[,dim(df)[2]])/df[,dim(df)[2]] * 100 
@@ -1762,7 +1755,7 @@ function(input, output,session) {
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The changes are computed as the deviation from the historical simulations for the present (1981-2010).',
                          sep= ' ')
-        }
+      }
       df.format <- t(round(df,digits = 1))
       colnames(df.format) <- month.abb
       df.format <- data.frame(N = c(1:(dim(df.format)[1]-1),0), 
@@ -1789,27 +1782,377 @@ function(input, output,session) {
                                  paging    = TRUE,
                                  deferRender = TRUE,
                                  scroller = TRUE,
-                                 scrollX = TRUE, #responsive = TRUE,
+                                 scrollX = TRUE,
                                  scrollY = 800,
                                  select.style = 'os'
                     )
       )
     })
-    ## RCMs tablets 
-    output$rcm.sc.tas <- renderPlotly({
+    
+    ## Seasonal scatter plot DT vs DP 
+    output$gcm.scatter <- renderPlotly({
+      #browser()
+      gcm.meta.pr <- gcm.meta.pr.reactive()
+      dpr <- gcm.sc.pr.reactive()
+      gcms <- names(dpr)
+      if (input$gcm.outputValues == 'Bias')
+        dpr <- ((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]) * 100
+      else if (input$gcm.outputValues == 'RMSE') {
+        dpr <- sqrt((((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]))^2) * 100
+      } else if (input$gcm.outputValues == 'Anomaly') {
+        DF <- t(dpr)
+        dpr <- as.data.frame(t(DF - rowMeans(DF)))
+      } else if (input$gcm.outputValues == 'Change') {
+        dpr <- ((dpr - gcm.sc.pr.present())/ gcm.sc.pr.present()) * 100
+      } 
       
+      gcm.meta.tas <- gcm.meta.tas.reactive()
+      
+      dtas <- gcm.sc.tas.reactive()
+      if (input$gcm.outputValues == 'Bias')
+        dtas <- dtas - dtas[,dim(dtas)[2]]
+      else if (input$gcm.outputValues == 'RMSE') {
+        dtas <- sqrt((dtas-dtas[,dim(dtas)[2]])^2)
+      } else if (input$gcm.outputValues == 'Anomaly') {
+        DF <- t(dtas)
+        dtas <- as.data.frame(t(DF - rowMeans(DF)))
+      } else if (input$gcm.outputValues == 'Change') {
+        dtas <- dtas - gcm.sc.tas.present()
+      }
+      
+      if (!is.null(input$rowsGcm))
+        if (input$gcm.sim.sc == 'Selected Simulations') {
+          dpr <- dpr[input$rowsGcm,]
+          dtas <- dtas[input$rowsGcm,]
+          gcm.meta.tas <- gcm.meta.tas[input$rowsGcm,]
+          gcm.meta.pr <- gcm.meta.pr[input$rowsGcm,]
+          gcms <- gcms[input$rowsGcm]
+        } 
+      
+      gcm.name <- function(i) {
+        gcmi <- gcm.meta.pr[i,c('model_id','parent_experiment_rip','realization')]
+        gcmi[is.na(gcmi)] <- ''
+        return(paste(as.character(as.matrix(gcmi)),collapse = '_'))
+      }
+      inst.name <- function(i) {
+        gcmi <- gcm.meta.pr[i,c('model_id')]
+        gcmi[is.na(gcmi)] <- ''
+        return(paste(as.character(as.matrix(gcmi)),collapse = '_'))
+      }
+      gcmall <- c(sapply(1:dim(gcm.meta.pr)[1],gcm.name),'ERAINT')
+      gcm.inst <- c(sapply(1:dim(gcm.meta.pr)[1],inst.name),'ERAINT')
+      
+      df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),dpr = as.numeric(round(colMeans(dpr),digits = 2)),
+                       gcm.name = gcmall, inst.name = gcm.inst,stringsAsFactors = FALSE)
+      
+      if (is.element(input$gcm.groupBy,c('None','---'))) {
+        id <- 1 : (length(df$dtas) - 1)
+        lev <- levels(factor(id))
+      }
+      else { 
+        id <- as.integer(factor(base::subset(gcm.meta.pr, select = input$gcm.groupBy)[[1]]))
+        lev <- levels(factor(base::subset(gcm.meta.pr, select = input$gcm.groupBy)[[1]]))
+      }
+      
+      rgbcolsa <- c('rgba(45,51,38,0.5)', 'rgba(87,77,102,0.5)', 'rgba(255,191,200,0.5)', 'rgba(140,129,105,0.5)', 'rgba(234,191,255,0.5)', 'rgba(172,230,195,0.5)',
+                    'rgba(86,105,115,0.5)', 'rgba(115,86,94,0.5)', 'rgba(230,195,172,0.5)', 'rgba(255,234,191,0.5)', 'rgba(124,140,105,0.5)', 'rgba(51,26,43,0.5)',
+                    'rgba(191,96,172,0.5)', 'rgba(184,204,102,0.5)', 'rgba(153,87,77,0.5)', 'rgba(96,134,191,0.5)', 'rgba(230,115,145,0.5)', 'rgba(255,145,128,0.5)', 
+                    'rgba(229,161,115,0.5)', 'rgba(22,58,89,0.5)', 'rgba(85,89,22,0.5)', 'rgba(127,83,32,0.5)', 'rgba(80,179,45,0.5)', 'rgba(18,51,13,0.5)', 'rgba(64,16,22,0.5)',
+                    'rgba(22,16,64,0.5)', 'rgba(86,29,115,0.5)', 'rgba(54,98,217,0.5)', 'rgba(255,191,64,0.5)', 'rgba(61,182,242,0.5)', 'rgba(126,57,230,0.5)', 'rgba(51,38,13,0.5)', 
+                    'rgba(178,0,95,0.5)', 'rgba(0,128,85,0.5)', 'rgba(26,0,191,0.5)', 'rgba(255,0,238,0.5)', 'rgba(178,0,0,0.5)', 'rgba(0,202,217,0.5)', 'rgba(0,230,153,0.5)', 
+                    'rgba(0,255,34,0.5)', 'rgba(204,0,54,0.5)', 'rgba(102,0,14,0.5)', 'rgba(229,92,0,0.5)', 'rgba(0,107,115,0.5)', 'rgba(77,0,51,0.5)', 'rgba(204,255,0,0.5)', 
+                    'rgba(140,112,0,0.5)', 'rgba(12,89,0,0.5)')
+      
+      rgbcols <- c('rgb(45,51,38)', 'rgb(87,77,102)', 'rgb(255,191,200)', 'rgb(140,129,105)', 'rgb(234,191,255)', 'rgb(172,230,195)', 'rgb(86,105,115)', 
+                   'rgb(115,86,94)', 'rgb(230,195,172)', 'rgb(255,234,191)', 'rgb(124,140,105)', 'rgb(51,26,43)', 'rgb(191,96,172)', 'rgb(184,204,102)', 
+                   'rgb(153,87,77)', 'rgb(96,134,191)', 'rgb(230,115,145)', 'rgb(255,145,128)', 'rgb(229,161,115)', 'rgb(22,58,89)', 'rgb(85,89,22)', 
+                   'rgb(127,83,32)', 'rgb(80,179,45)', 'rgb(18,51,13)', 'rgb(64,16,22)', 'rgb(22,16,64)', 'rgb(86,29,115)', 'rgb(54,98,217)', 'rgb(255,191,64)',
+                   'rgb(61,182,242)', 'rgb(126,57,230)', 'rgb(51,38,13)', 'rgb(178,0,95)', 'rgb(0,128,85)', 'rgb(26,0,191)', 'rgb(255,0,238)', 'rgb(178,0,0)', 
+                   'rgb(0,202,217)', 'rgb(0,230,153)', 'rgb(0,255,34)', 'rgb(204,0,54)', 'rgb(102,0,14)', 'rgb(229,92,0)', 'rgb(0,107,115)', 'rgb(77,0,51)', 
+                   'rgb(204,255,0)', 'rgb(140,112,0)', 'rgb(12,89,0)')
+      
+      
+      # Color by
+      if (input$gcm.colorBy == 'Group') {
+        colsa <- rgbcolsa[id]
+        cols <- rgbcols[id]
+      } else {
+        colsa <- rgbcolsa
+        cols <- rgbcols
+      }
+      
+      ## Create the plot
+      p.sc <- plot_ly(df)
+      if ((input$gcm.chart.type == 'Individual Simulations')) {
+        ## Add all Simulations
+        if (is.null(input$rowsGcm)) {
+          for (gcm in gcms) {
+            i <- which(is.element(gcms,gcm))
+            #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
+            leg.name <- paste(paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '),
+                              paste(substr(lev[id[i]],1,5),'...',sep=''),
+                              sep = ' ')
+            grp.name <- paste('Group',id[i],sep='')
+            
+            if (is.element(input$gcm.colorBy, c('None','---')))
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
+                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name,
+                                      marker = list(color = ",i,", symbol = 3,size = 12,opacity = 0.7,line = list(width = 2,color = '#FFFFFF')))",sep='')))
+            else
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
+                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name,
+                                      marker = list(color = cols[",i,"], symbol = 3,size = 12,opacity=0.7,line = list(width = 2,color = '#FFFFFF')))",sep='')))
+            
+          }
+          ## Highlight selected Simulations in tab:models
+        } else {
+          im <- input$rowsGcm
+          for (i in 1:length(im)) {
+            leg.name <- paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' ')
+            grp.name <- paste('Group',id[i],sep='')
+            gcm <- gcms[i]
+            if (is.element(input$gcm.colorBy, c('None','---')))
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
+                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name,
+                                      marker = list(color = ",i,", symbol = 3,size = 12,opacity = 0.7,line = list(width = 1)))",sep='')))
+            else
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
+                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name,
+                                      marker = list(color = cols[im[",i,"]], symbol = 3,size = 12,opacity=0.7,line = list(width = 1))",sep='')))
+          }
+          }
+          } 
+      
+      if (length(df$dpr) > 1 | length(df$dtas) > 1)
+        p.sc <-  p.sc  %>%  layout(shapes = list(list(name = 'Env. 90% of all sim',type = 'rect',
+                                                      xref = 'x', x0 = quantile(df$dtas[-length(df$dtas)],probs = 0.05,na.rm = TRUE), x1 = quantile(df$dtas[-length(df$dtas)],0.95,na.rm=TRUE),
+                                                      yref = 'y', y0 = quantile(df$dpr[-length(df$dpr)],0.05,na.rm=TRUE), y1 = quantile(df$dpr[-length(df$dpr)],0.95,na.rm=TRUE),
+                                                      fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
+                                                      opacity = 0.4),
+                                                 list(name = 'Env. of all sim.',type = 'rect',
+                                                      xref = 'x', x0 = min(df$dtas[-length(df$dtas)],na.rm=TRUE), x1 = max(df$dtas[-length(df$dtas)],na.rm=TRUE),
+                                                      yref = 'y', y0 = min(df$dpr[-length(df$dpr)],na.rm=TRUE), y1 = max(df$dpr[-length(df$dpr)],na.rm=TRUE),
+                                                      fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
+                                                      opacity = 0.3)))
+      
+      if ((input$gcm.chart.type == 'Ensemble of All Simulations') | (input$gcm.chart.type == "Both - Ensemble & Individual Simulations"))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+      #}
+      
+      if (input$gcm.legend.sc == 'Display') {
+        p.sc <- p.sc %>% add_trace(x = ~mean(df$dtas[-length(df$dpr)]),y = ~ mean(df$dpr[-length(df$dpr)]),type = 'scatter',mode = 'markers',
+                                   name = 'Ens. Mean', hoverinfo = 'text+x+y',text='Ens. Mean',showlegend = TRUE,
+                                   marker = list(color = 'rgb(255,127,80)', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
+        
+        p.sc <- p.sc %>% add_trace(x = df$dtas[length(df$dtas)],y = df$dpr[length(df$dpr)],type = 'scatter',mode = 'markers',
+                                   name = 'ERAINT', hoverinfo = 'text+x+y',text='ERAINT',showlegend = TRUE,
+                                   marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
+      } else {
+        p.sc <- p.sc %>% add_trace(x = ~mean(df$dtas[-length(df$dpr)]),y = ~ mean(df$dpr[-length(df$dpr)]),type = 'scatter',mode = 'markers',
+                                   name = 'Ens. Mean', hoverinfo = 'text+x+y',text='Ens. Mean',showlegend = FALSE,
+                                   marker = list(color = 'rgb(255,127,80)', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
+        
+        p.sc <- p.sc %>% add_trace(x = df$dtas[length(df$dtas)],y = df$dpr[length(df$dpr)],type = 'scatter',mode = 'markers',
+                                   name = 'ERAINT', hoverinfo = 'text+x+y',text='ERAINT',showlegend = FALSE,
+                                   marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
+      }
+      if (input$gcm.outputValues == 'Bias') {
+        ylab <- 'Bias (absolute) in annual means of regioanl temperature values [deg. C]'
+        xlab <- 'Bias (relative) in annual means of regioanl precitation values [%]'
+      } else if (input$gcm.outputValues == 'Bias') {
+        ylab <- 'RMSE (absolute) in annual means of regioanl temperature values [deg. C]'
+        xlab <- 'RMSE (relative) in annual means of regioanl precitation values [%]'
+      } else if (input$gcm.outputValues == 'Anomaly') {
+        ylab <- 'Anomaly (absolute) in annual means of regioanl temperature values [deg. C]'
+        xlab <- 'Anomaly (relative) in annual means of regioanl precitation values [%]'
+      } else if (input$gcm.outputValues == 'Change') {
+        ylab <- 'Change (absolute) in annual means of regioanl temperature values [deg. C]'
+        xlab <- 'Change (relative) in annual means of regioanl precitation values [%]'
+      } else  {
+        ylab <- 'Annual means of regioanl temperature values [deg. C]'
+        xlab <- 'Annual means of regional precitation values [mm/month]'
+      }
+      
+      
+      
+      p.sc <- p.sc %>% layout(
+        paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
+        xaxis = list(title = ylab,
+                     gridcolor = 'rgb(255,255,255)',
+                     showgrid = TRUE,
+                     showline = FALSE,
+                     showticklabels = TRUE,
+                     tickcolor = 'rgb(127,127,127)',
+                     ticks = 'outside',
+                     zeroline = TRUE),
+        yaxis = list(title = xlab,
+                     gridcolor = 'rgb(255,255,255)',
+                     showgrid = TRUE,
+                     showline = FALSE,
+                     showticklabels = TRUE,
+                     tickcolor = 'rgb(127,127,127)',
+                     ticks = 'outside',
+                     zeroline = TRUE))
+      
+      if (input$gcm.legend.sc == 'Hide')
+        p.sc <- p.sc %>% layout(showlegend = FALSE)
+      else
+        p.sc <- p.sc %>% layout(showlegend = TRUE)
+      #gcm.dtdp$elementId <- NULL
+      # gcm.dtdp
+      p.sc$elementId <- NULL
+      p.sc
+          })
+    
+    
+    output$gcm.scatter.data <- DT::renderDataTable({
+      
+      gcm.meta.pr <- gcm.meta.pr.reactive()
+      dpr <- gcm.sc.pr.reactive()
+      gcms <- names(dpr)
+      if (input$gcm.outputValues == 'Bias')
+        dpr <- ((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]) * 100
+      else if (input$gcm.outputValues == 'RMSE') {
+        dpr <- sqrt((((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]))^2) * 100
+      } else if (input$gcm.outputValues == 'Anomaly') {
+        DF <- t(dpr)
+        dpr <- as.data.frame(t(DF - rowMeans(DF)))
+      } else if (input$gcm.outputValues == 'Change') {
+        dpr <- ((dpr - gcm.sc.pr.present())/ gcm.sc.pr.present()) * 100
+      } 
+      
+      gcm.meta.tas <- gcm.meta.tas.reactive()
+      
+      dtas <- gcm.sc.tas.reactive()
+      if (input$gcm.outputValues == 'Bias')
+        dtas <- dtas - dtas[,dim(dtas)[2]]
+      else if (input$gcm.outputValues == 'RMSE') {
+        dtas <- sqrt((dtas-dtas[,dim(dtas)[2]])^2)
+      } else if (input$gcm.outputValues == 'Anomaly') {
+        DF <- t(dtas)
+        dtas <- as.data.frame(t(DF - rowMeans(DF)))
+      } else if (input$gcm.outputValues == 'Change') {
+        dtas <- dtas - gcm.sc.tas.present()
+      }
+      
+      if (!is.null(input$rowsGcm))
+        if (input$gcm.sim.sc == 'Selected Simulations') {
+          dpr <- dpr[input$rowsGcm,]
+          dtas <- dtas[input$rowsGcm,]
+          gcm.meta.tas <- gcm.meta.tas[input$rowsGcm,]
+          gcm.meta.pr <- gcm.meta.pr[input$rowsGcm,]
+          gcms <- gcms[input$rowsGcm]
+        } 
+      
+      gcm.name <- function(i) {
+        gcmi <- gcm.meta.pr[i,c('model_id','parent_experiment_rip','realization')]
+        gcmi[is.na(gcmi)] <- ''
+        return(paste(as.character(as.matrix(gcmi)),collapse = '_'))
+      }
+      inst.name <- function(i) {
+        gcmi <- gcm.meta.pr[i,c('model_id')]
+        gcmi[is.na(gcmi)] <- ''
+        return(paste(as.character(as.matrix(gcmi)),collapse = '_'))
+      }
+      gcmall <- c(sapply(1:dim(gcm.meta.pr)[1],gcm.name),'ERAINT')
+      gcm.inst <- c(sapply(1:dim(gcm.meta.pr)[1],inst.name),'ERAINT')
+      
+      df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),dpr = as.numeric(round(colMeans(dpr),digits = 2)),
+                       gcm.name = gcmall, inst.name = gcm.inst,stringsAsFactors = FALSE)
+      
+      caption <- paste('Annual means of monthly estimates of both regional temperature (deg. C) and precipitation (mm/month) assuming an 
+                       intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+                       The climate models and their corresponding runs are listed in the second and third columns, respectively. 
+                       The last row in the table shows the estimated values from the referance data set (last row).',
+                       sep= ' ')
+      
+      if (input$gcm.outputValues == 'Bias') {
+        caption <- paste('Annual means of Biases in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
+                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second and third columns, respectively. 
+                         The bias is computed as the deviation from the referance data set (last row).',
+                         sep= ' ')
+      } else if (input$gcm.outputValues == 'RMSE'){
+        caption <- paste('Annual means of RMSE in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
+                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second and third columns, respectively. 
+                         The RMSE is computed as the square root mean of deviations from the referance data set (last row).',
+                         sep= ' ')
+        
+      } else if (input$gcm.outputValues == 'Change'){
+        caption <- paste('Annual means of Changes in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
+                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second column, respectively. 
+                         The RMSE is computed as the square root mean of deviations from the referance data set (last row).',
+                         sep= ' ')
+        
+      }
+      
+      #df.format <- t(round(df,digits = 1))
+      #colnames(df.format) <- month.abb
+      df.format <- data.frame(N = c(1:dim(df)[1]), 
+                              Model = df[,3], 
+                              Temperature = df[,1],
+                              Preciptiation = df[,2],
+                              stringsAsFactors = FALSE)
+      
+      DT::datatable(df.format,
+                    caption = caption, 
+                    selection = list(mode = 'multiple',target = 'row'), 
+                    extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'), #'Responsive',
+                    rownames=FALSE,
+                    options=list(dom = 'Bfrtip',
+                                 buttons = c('colvis',
+                                             'selectAll','selectNone',
+                                             'copy', 'csv','excel', 'print'),
+                                 searching = T,
+                                 pageLength = 30,
+                                 searchHighlight = FALSE,
+                                 colReorder = TRUE,
+                                 fixedHeader = FALSE,
+                                 filter = 'top',
+                                 paging    = TRUE,
+                                 deferRender = TRUE,
+                                 scroller = TRUE,
+                                 scrollX = TRUE, 
+                                 scrollY = 800,
+                                 select.style = 'os'
+                    )
+      )
+    })
+    
+    
+    ## RCMs tablets 
+    # RCM Seasonal cycle expression and output
+    rcm.sc.tas <- renderPlotly({
+      
+      rcm.meta.tas <- rcm.meta.tas.reactive()
       df <- rcm.sc.tas.reactive()
       
-      # Convert to biases
+      if (input$rcm.sim.sc == 'Selected Simulations') {
+        rcm.meta.tas <- rcm.meta.tas[input$rowsRcm,]
+      }
+      
       if (input$rcm.outputValues == 'Bias')
         df <- df - df[,dim(df)[2]]      
+      else if (input$rcm.outputValues == 'Anomaly') {
+        DF <- t(df)
+        df <- as.data.frame(t(DF - rowMeans(DF)))
+      } else if (input$rcm.outputValues == 'Change') {
+        df <- rcm.sc.tas.reactive() - rcm.sc.tas.present()
+      }
       
+      #df <- df[,-36] # AM Quick fix but has to be removed ... once meta is updated.
       # rcm seasonal cycle
       df.env <- NULL
-      low <- apply(subset(df,select = grep('rcm',colnames(df))),1,min,na.rm=TRUE)
-      high <- apply(subset(df,select = grep('rcm',colnames(df))),1,max,na.rm=TRUE)
-      avg <- apply(subset(df,select = grep('rcm',colnames(df))),1,mean,na.rm=TRUE)
-      df.env <- data.frame(low,avg,high,ref = df$ref,month = factor(month.abb, levels =  month.abb))
+      low <- round(apply(subset(df,select = grep('rcm',colnames(df))),1,min,na.rm=TRUE),digits = 2)
+      high <- round(apply(subset(df,select = grep('rcm',colnames(df))),1,max,na.rm=TRUE),digits = 2)
+      avg <- round(apply(subset(df,select = grep('rcm',colnames(df))),1,mean,na.rm=TRUE),digits = 2)
+      df.env <- data.frame(low,avg,high,ref = round(df$ref,digits = 2),month = factor(month.abb, levels =  month.abb))
       
       #The default order will be alphabetized unless specified as below:
       df$month <- factor(month.abb, levels = month.abb)
@@ -1833,14 +2176,53 @@ function(input, output,session) {
           lev <- levels(factor(base::subset(rcm.meta.tas, select = input$rcm.groupBy)[[1]]))
         }
         
-        rgbcolsa <- c('rgba(45,51,38,0.6)', 'rgba(87,77,102,0.6)', 'rgba(255,191,200,0.6)', 'rgba(140,129,105,0.6)', 'rgba(234,191,255,0.6)', 'rgba(172,230,195,0.6)',
-                      'rgba(86,105,115,0.6)', 'rgba(115,86,94,0.6)', 'rgba(230,195,172,0.6)', 'rgba(255,234,191,0.6)', 'rgba(124,140,105,0.6)', 'rgba(51,26,43,0.6)',
-                      'rgba(191,96,172,0.6)', 'rgba(184,204,102,0.6)', 'rgba(153,87,77,0.6)', 'rgba(96,134,191,0.6)', 'rgba(230,115,145,0.6)', 'rgba(255,145,128,0.6)', 
-                      'rgba(229,161,115,0.6)', 'rgba(22,58,89,0.6)', 'rgba(85,89,22,0.6)', 'rgba(127,83,32,0.6)', 'rgba(80,179,45,0.6)', 'rgba(18,51,13,0.6)', 'rgba(64,16,22,0.6)',
-                      'rgba(22,16,64,0.6)', 'rgba(86,29,115,0.6)', 'rgba(54,98,217,0.6)', 'rgba(255,191,64,0.6)', 'rgba(61,182,242,0.6)', 'rgba(126,57,230,0.6)', 'rgba(51,38,13,0.6)', 
-                      'rgba(178,0,95,0.6)', 'rgba(0,128,85,0.6)', 'rgba(26,0,191,0.6)', 'rgba(255,0,238,0.6)', 'rgba(178,0,0,0.6)', 'rgba(0,202,217,0.6)', 'rgba(0,230,153,0.6)', 
-                      'rgba(0,255,34,0.6)', 'rgba(204,0,54,0.6)', 'rgba(102,0,14,0.6)', 'rgba(229,92,0,0.6)', 'rgba(0,107,115,0.6)', 'rgba(77,0,51,0.6)', 'rgba(204,255,0,0.6)', 
-                      'rgba(140,112,0,0.6)', 'rgba(12,89,0,0.6)')
+        if (length(lev) > 50) {
+          # 108 distinct colors
+          rgbcols <- c('rgb(255,128,128)', 'rgb(178,89,89)', 'rgb(51,26,26)', 'rgb(217,123,108)', 'rgb(140,79,70)', 'rgb(89,51,45)', 'rgb(64,36,32)', 'rgb(242,153,121)', 'rgb(178,113,89)', 
+                       'rgb(102,65,51)', 'rgb(76,48,38)', 'rgb(51,32,26)', 'rgb(217,152,108)', 'rgb(153,107,77)', 'rgb(102,71,51)', 'rgb(76,54,38)', 'rgb(229,176,115)', 'rgb(178,137,89)',
+                       'rgb(140,108,70)', 'rgb(102,78,51)', 'rgb(51,39,26)', 'rgb(217,181,108)', 'rgb(140,117,70)', 'rgb(76,64,38)', 'rgb(178,161,89)', 'rgb(102,92,51)', 'rgb(51,46,26)', 
+                       'rgb(229,222,115)', 'rgb(173,179,89)', 'rgb(74,77,38)', 'rgb(229,255,128)', 'rgb(126,140,70)', 'rgb(46,51,26)', 'rgb(170,204,102)', 'rgb(85,102,51)', 'rgb(186,242,121)', 
+                       'rgb(127,166,83)', 'rgb(81,128,64)', 'rgb(116,204,102)', 'rgb(127,255,128)', 'rgb(83,166,94)', 'rgb(51,102,58)', 'rgb(38,77,43)', 'rgb(26,51,29)', 'rgb(115,230,161)', 
+                       'rgb(77,153,107)', 'rgb(64,128,98)', 'rgb(45,89,68)', 'rgb(102,204,170)', 'rgb(26,51,43)', 'rgb(121,242,218)', 'rgb(83,166,149)', 'rgb(51,102,92)', 'rgb(38,77,69)',
+                       'rgb(102,204,197)', 'rgb(121,234,242)', 'rgb(83,160,166)', 'rgb(57,111,115)', 'rgb(38,74,77)', 'rgb(26,49,51)', 'rgb(108,195,217)', 'rgb(77,138,153)', 'rgb(121,202,242)', 
+                       'rgb(89,149,179)', 'rgb(70,117,140)', 'rgb(51,85,102)', 'rgb(32,53,64)', 'rgb(128,196,255)', 'rgb(102,156,204)', 'rgb(64,98,128)', 'rgb(128,179,255)', 'rgb(102,143,204)', 
+                       'rgb(45,62,89)', 'rgb(26,36,51)', 'rgb(121,153,242)', 'rgb(77,97,153)', 'rgb(128,145,255)', 'rgb(89,101,179)', 'rgb(64,72,128)', 'rgb(45,51,89)', 'rgb(32,36,64)', 'rgb(108,108,217)', 			      'rgb(58,51,102)', 'rgb(162,128,255)', 'rgb(113,89,179)', 'rgb(89,70,140)', 'rgb(48,38,77)', 'rgb(39,26,51)', 'rgb(128,77,153)', 'rgb(74,45,89)', 'rgb(172,96,191)', 
+                       'rgb(247,128,255)', 'rgb(111,57,115)', 'rgb(62,32,64)', 'rgb(242,121,218)', 'rgb(191,96,172)', 'rgb(89,45,80)', 'rgb(51,26,46)', 'rgb(128,64,106)', 'rgb(166,83,127)', 
+                       'rgb(242,121,170)', 'rgb(102,51,71)', 'rgb(51,26,36)', 'rgb(191,96,121)', 'rgb(128,64,81)', 'rgb(77,38,48)', 'rgb(229,115,130)', 'rgb(153,77,87)', 'rgb(102,51,58)')
+          
+          # 108 distinct colors with transparency
+          rgbcolsa <- c('rgba(255,128,128,0.5)', 'rgba(178,89,89,0.5)', 'rgba(51,26,26,0.5)', 'rgba(217,123,108,0.5)', 'rgba(140,79,70,0.5)', 'rgba(89,51,45,0.5)', 'rgba(64,36,32,0.5)', 
+                        'rgba(242,153,121,0.5)', 'rgba(178,113,89,0.5)', 'rgba(102,65,51,0.5)', 'rgba(76,48,38,0.5)', 'rgba(51,32,26,0.5)', 'rgba(217,152,108,0.5)', 'rgba(153,107,77,0.5)', 'rgba(102,71,51,0.5)', 'rgba(76,54,38,0.5)', 'rgba(229,176,115,0.5)', 'rgba(178,137,89,0.5)', 'rgba(140,108,70,0.5)', 'rgba(102,78,51,0.5)', 'rgba(51,39,26,0.5)', 'rgba(217,181,108,0.5)', 'rgba(140,117,70,0.5)', 'rgba(76,64,38,0.5)', 'rgba(178,161,89,0.5)', 'rgba(102,92,51,0.5)', 'rgba(51,46,26,0.5)', 
+                        'rgba(229,222,115,0.5)', 'rgba(173,179,89,0.5)', 'rgba(74,77,38,0.5)', 'rgba(229,255,128,0.5)', 'rgba(126,140,70,0.5)', 'rgba(46,51,26,0.5)', 'rgba(170,204,102,0.5)', 'rgba(85,102,51,0.5)', 'rgba(186,242,121,0.5)', 'rgba(127,166,83,0.5)', 'rgba(81,128,64,0.5)', 'rgba(116,204,102,0.5)', 'rgba(127,255,128,0.5)', 'rgba(83,166,94,0.5)', 'rgba(51,102,58,0.5)', 'rgba(38,77,43,0.5)', 'rgba(26,51,29,0.5)', 'rgba(115,230,161,0.5)', 'rgba(77,153,107,0.5)', 'rgba(64,128,98,0.5)', 'rgba(45,89,68,0.5)', 'rgba(102,204,170,0.5)', 'rgba(26,51,43,0.5)', 'rgba(121,242,218,0.5)', 'rgba(83,166,149,0.5)', 'rgba(51,102,92,0.5)', 'rgba(38,77,69,0.5)', 'rgba(102,204,197,0.5)', 'rgba(121,234,242,0.5)', 'rgba(83,160,166,0.5)', 'rgba(57,111,115,0.5)', 'rgba(38,74,77,0.5)', 'rgba(26,49,51,0.5)', 'rgba(108,195,217,0.5)', 'rgba(77,138,153,0.5)', 'rgba(121,202,242,0.5)', 'rgba(89,149,179,0.5)', 'rgba(70,117,140),0.5', 'rgba(51,85,102,0.5)', 'rgba(32,53,64,0.5)', 'rgba(128,196,255,0.5)', 'rgba(102,156,204,0.5)', 'rgba(64,98,128,0.5)', 'rgba(128,179,255,0.5)', 'rgba(102,143,204,0.5)', 'rgba(45,62,89,0.5)', 'rgba(26,36,51,0.5)', 'rgba(121,153,242,0.5)', 'rgba(77,97,153,0.5)', 'rgba(128,145,255,0.5)', 'rgba(89,101,179,0.5)', 'rgba(64,72,128,0.5)', 'rgba(45,51,89,0.5)', 'rgba(32,36,64,0.5)', 'rgba(108,108,217,0.5)', 'rgba(58,51,102,0.5)', 'rgba(162,128,255,0.5)', 'rgba(113,89,179,0.5)', 'rgba(89,70,140)', 'rgba(48,38,77,0.5)', 'rgba(39,26,51,0.5)', 'rgba(128,77,153,0.5)', 'rgba(74,45,89)', 'rgba(172,96,191,0.5)', 
+                        'rgba(247,128,255,0.5)', 'rgba(111,57,115,0.5)', 'rgba(62,32,64,0.5)', 'rgba(242,121,218,0.5)', 'rgba(191,96,172,0.5)', 'rgba(89,45,80,0.5)', 'rgba(51,26,46,0.5)', 'rgba(128,64,106,0.5)', 'rgba(166,83,127,0.5)', 
+                        'rgba(242,121,170,0.5)', 'rgba(102,51,71,0.5)', 'rgba(51,26,36,0.5)', 'rgba(191,96,121,0.5)', 'rgba(128,64,81,0.5)', 'rgba(77,38,48,0.5)', 'rgba(229,115,130,0.5)', 'rgba(153,77,87,0.5)', 'rgba(102,51,58,0.5)')
+        } else {
+          rgbcolsa <- c('rgba(45,51,38,0.5)', 'rgba(87,77,102,0.5)', 'rgba(255,191,200,0.5)', 'rgba(140,129,105,0.5)', 'rgba(234,191,255,0.5)', 'rgba(172,230,195,0.5)',
+                        'rgba(86,105,115,0.5)', 'rgba(115,86,94,0.5)', 'rgba(230,195,172,0.5)', 'rgba(255,234,191,0.5)', 'rgba(124,140,105,0.5)', 'rgba(51,26,43,0.5)',
+                        'rgba(191,96,172,0.5)', 'rgba(184,204,102,0.5)', 'rgba(153,87,77,0.5)', 'rgba(96,134,191,0.5)', 'rgba(230,115,145,0.5)', 'rgba(255,145,128,0.5)', 
+                        'rgba(229,161,115,0.5)', 'rgba(22,58,89,0.5)', 'rgba(85,89,22,0.5)', 'rgba(127,83,32,0.5)', 'rgba(80,179,45,0.5)', 'rgba(18,51,13,0.5)', 'rgba(64,16,22,0.5)',
+                        'rgba(22,16,64,0.5)', 'rgba(86,29,115,0.5)', 'rgba(54,98,217,0.5)', 'rgba(255,191,64,0.5)', 'rgba(61,182,242,0.5)', 'rgba(126,57,230,0.5)', 'rgba(51,38,13,0.5)', 
+                        'rgba(178,0,95,0.5)', 'rgba(0,128,85,0.5)', 'rgba(26,0,191,0.5)', 'rgba(255,0,238,0.5)', 'rgba(178,0,0,0.5)', 'rgba(0,202,217,0.5)', 'rgba(0,230,153,0.5)', 
+                        'rgba(0,255,34,0.5)', 'rgba(204,0,54,0.5)', 'rgba(102,0,14,0.5)', 'rgba(229,92,0,0.5)', 'rgba(0,107,115,0.5)', 'rgba(77,0,51,0.5)', 'rgba(204,255,0,0.5)', 
+                        'rgba(140,112,0,0.5)', 'rgba(12,89,0,0.5)')
+          
+          rgbcols <- c('rgb(45,51,38)', 'rgb(87,77,102)', 'rgb(255,191,200)', 'rgb(140,129,105)', 'rgb(234,191,255)', 'rgb(172,230,195)', 'rgb(86,105,115)', 
+                       'rgb(115,86,94)', 'rgb(230,195,172)', 'rgb(255,234,191)', 'rgb(124,140,105)', 'rgb(51,26,43)', 'rgb(191,96,172)', 'rgb(184,204,102)', 
+                       'rgb(153,87,77)', 'rgb(96,134,191)', 'rgb(230,115,145)', 'rgb(255,145,128)', 'rgb(229,161,115)', 'rgb(22,58,89)', 'rgb(85,89,22)', 
+                       'rgb(127,83,32)', 'rgb(80,179,45)', 'rgb(18,51,13)', 'rgb(64,16,22)', 'rgb(22,16,64)', 'rgb(86,29,115)', 'rgb(54,98,217)', 'rgb(255,191,64)',
+                       'rgb(61,182,242)', 'rgb(126,57,230)', 'rgb(51,38,13)', 'rgb(178,0,95)', 'rgb(0,128,85)', 'rgb(26,0,191)', 'rgb(255,0,238)', 'rgb(178,0,0)', 
+                       'rgb(0,202,217)', 'rgb(0,230,153)', 'rgb(0,255,34)', 'rgb(204,0,54)', 'rgb(102,0,14)', 'rgb(229,92,0)', 'rgb(0,107,115)', 'rgb(77,0,51)', 
+                       'rgb(204,255,0)', 'rgb(140,112,0)', 'rgb(12,89,0)')
+        }
+        ## Same as precip ...
+        rgbcolsa <- c('rgba(45,51,38,0.5)', 'rgba(87,77,102,0.5)', 'rgba(255,191,200,0.5)', 'rgba(140,129,105,0.5)', 'rgba(234,191,255,0.5)', 'rgba(172,230,195,0.5)',
+                      'rgba(86,105,115,0.5)', 'rgba(115,86,94,0.5)', 'rgba(230,195,172,0.5)', 'rgba(255,234,191,0.5)', 'rgba(124,140,105,0.5)', 'rgba(51,26,43,0.5)',
+                      'rgba(191,96,172,0.5)', 'rgba(184,204,102,0.5)', 'rgba(153,87,77,0.5)', 'rgba(96,134,191,0.5)', 'rgba(230,115,145,0.5)', 'rgba(255,145,128,0.5)', 
+                      'rgba(229,161,115,0.5)', 'rgba(22,58,89,0.5)', 'rgba(85,89,22,0.5)', 'rgba(127,83,32,0.5)', 'rgba(80,179,45,0.5)', 'rgba(18,51,13,0.5)', 'rgba(64,16,22,0.5)',
+                      'rgba(22,16,64,0.5)', 'rgba(86,29,115,0.5)', 'rgba(54,98,217,0.5)', 'rgba(255,191,64,0.5)', 'rgba(61,182,242,0.5)', 'rgba(126,57,230,0.5)', 'rgba(51,38,13,0.5)', 
+                      'rgba(178,0,95,0.5)', 'rgba(0,128,85,0.5)', 'rgba(26,0,191,0.5)', 'rgba(255,0,238,0.5)', 'rgba(178,0,0,0.5)', 'rgba(0,202,217,0.5)', 'rgba(0,230,153,0.5)', 
+                      'rgba(0,255,34,0.5)', 'rgba(204,0,54,0.5)', 'rgba(102,0,14,0.5)', 'rgba(229,92,0,0.5)', 'rgba(0,107,115,0.5)', 'rgba(77,0,51,0.5)', 'rgba(204,255,0,0.5)', 
+                      'rgba(140,112,0,0.5)', 'rgba(12,89,0,0.5)')
         
         rgbcols <- c('rgb(45,51,38)', 'rgb(87,77,102)', 'rgb(255,191,200)', 'rgb(140,129,105)', 'rgb(234,191,255)', 'rgb(172,230,195)', 'rgb(86,105,115)', 
                      'rgb(115,86,94)', 'rgb(230,195,172)', 'rgb(255,234,191)', 'rgb(124,140,105)', 'rgb(51,26,43)', 'rgb(191,96,172)', 'rgb(184,204,102)', 
@@ -1850,16 +2232,6 @@ function(input, output,session) {
                      'rgb(0,202,217)', 'rgb(0,230,153)', 'rgb(0,255,34)', 'rgb(204,0,54)', 'rgb(102,0,14)', 'rgb(229,92,0)', 'rgb(0,107,115)', 'rgb(77,0,51)', 
                      'rgb(204,255,0)', 'rgb(140,112,0)', 'rgb(12,89,0)')
         
-        rgbcols <- c('rgb(204,27,0)', 'rgb(191,108,96)', 'rgb(255,200,191)', 'rgb(77,60,57)', 'rgb(64,17,0)', 'rgb(127,51,0)', 'rgb(242,170,121)', 'rgb(242,129,0)', 'rgb(64,41,16)', 'rgb(153,135,115)', 'rgb(102,68,0)', 'rgb(217,163,54)', 'rgb(204,194,153)', 'rgb(242,226,0)', 'rgb(95,102,0)',' rgb(88,89,67)', 'rgb(161,179,89)', 'rgb(182,242,61)', 'rgb(38,51,13)', 'rgb(0,255,0)', 'rgb(26,102,26)', 'rgb(163,217,170)', 'rgb(51,204,92)', 'rgb(22,89,67)', 'rgb(0,230,184)', 'rgb(115,153,145)', 'rgb(57,218,230)', 'rgb(0,133,166)', 'rgb(19,65,77)', 'rgb(0,170,255)', 'rgb(124,152,166)', 'rgb(38,45,51)', 'rgb(0,71,179)', 'rgb(29,63,115)', 'rgb(0,0,89)', 'rgb(172,172,230)', 'rgb(23,13,51)', 'rgb(162,128,255)', 'rgb(115,105,140)', 'rgb(95,0,179)', 'rgb(86,29,115)', 'rgb(217,0,202)', 'rgb(64,0,51)', 'rgb(166,83,149)', 'rgb(230,172,210)', 'rgb(77,57,70)', 'rgb(153,0,82)', 'rgb(255,64,140)', 'rgb(204,0,54)', 'rgb(140,105,115)', 'rgb(127,32,45)', 'rgb(51,26,29)')
-        
-        rgbcolsa <- c('rgba(242,121,121,0.3)', 'rgba(217,191,163,0.3)', 'rgba(102,99,51,0.3)', 'rgba(137,217,108,0.3)', 'rgba(115,207,230,0.3)', 'rgba(102,129,204,0.3)', 
-                      'rgba(149,89,179,0.3)', 'rgba(255,128,196,0.3)', 'rgba(102,51,51,0.3)', 'rgba(255,213,128,0.3)', 'rgba(45,51,38,0.3)', 'rgba(77,153,128,0.3)', 'rgba(38,69,77,0.3)', 
-                      'rgba(40,38,51,0.3)', 'rgba(77,38,64,0.3)')
-        
-        rgbcols <- c('rgb(242,121,121)', 'rgb(217,191,163)', 'rgb(102,99,51)', 'rgb(137,217,108)', 'rgb(115,207,230)', 'rgb(102,129,204)', 
-                     'rgb(149,89,179)', 'rgb(255,128,196)', 'rgb(102,51,51)', 'rgb(255,213,128)', 'rgb(45,51,38)', 'rgb(77,153,128)', 'rgba(38,69,77)', 
-                     'rgb(40,38,51)', 'rgb(77,38,64)')
-        
         ## color by groups
         if (input$rcm.colorBy == 'Group') {
           colsa <- rgbcolsa[id]
@@ -1868,114 +2240,159 @@ function(input, output,session) {
           colsa <- rgbcolsa
           cols <- rgbcols
         }
-        ## Add all Simulations
-        for (rcm in rcms) {
-          i <- which(is.element(rcms,rcm))
-          #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
-          leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = '  ')
-          grp.name <- paste('Group',id[i],sep='')
-          if (input$rcm.legend.sc == 'All Simulations')
-            eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
-                                    showlegend = TRUE, legendgroup = grp.name, 
-                                    line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
-          else if (input$legend.sc == 'None')
-            eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
-                                    showlegend = TRUE, legendgroup = grp.name, 
-                                    line = list(color = cols[",i,"], width = 2, shape ='spline',showlegend = FALSE))",sep='')))
-        }
         
-        ## Highlight selected Simulations in tab:models
-        if (!is.null(input$rows2)) {
-          im <- input$rows2+1
-          for (i in im) {
-            leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = '  ')
+        # Add all models
+        if (is.null(input$rowsRcm)) {
+          for (rcm in rcms) {
+            i <- which(is.element(rcms,rcm))
+            leg.name <- paste(paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = ' '),
+                              paste(substr(lev[id[i]],1,5),'...',sep=''),
+                              sep = ' ')
             grp.name <- paste('Group',id[i],sep='')
-            rcm <- rcms[i]
-            eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
-                                    showlegend = TRUE, line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
+            
+            
+            #if (is.null(input$rowsRcm)) {
+            if (is.element(input$rcm.colorBy, c('None','---')))
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
+                                      name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name, 
+                                      line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
+            else
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter',
+                                      name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name,
+                                      line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
+            #}
+            ## Highlight selected models in tab:models
+          } 
+        } else {
+          im <- input$rowsRcm
+          for (i in 1:length(im)) {
+            leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = '  ')
+            grp.name <- paste('Group',id[im[i]],sep='')
+            rcm <- rcms[i] #rcms[im[i]]
+            if (is.element(input$rcm.colorBy, c('None','---')))
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
+                                      name = paste(im[",i,"],substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name, 
+                                      colors = ",i,", hoverinfo = 'text+x+y',text=leg.name,
+                                      line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
+            else
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
+                                      name = paste(im[",i,"],substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                      colors = colsa[im[",i,"]], hoverinfo = 'text+x+y',text=leg.name,
+                                      line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }
-        }
+          }
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'EOBS', mode = 'lines', line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-        
-      } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
-        
-        p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
-                        line = list(color = 'transparent'),
-                        showlegend = FALSE, name = 'High') %>%
-          add_trace(y = ~low, type = 'scatter', mode = 'lines',
-                    fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
-                    showlegend = FALSE, name = 'Low') %>%
-          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                    line = list(color='rgb(255,127,80)'),
-                    name = 'Average') 
-        
-        
-        if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        
-        
-      } else if (grepl('box',tolower(input$rcm.chart.type))) {
-        p.sc <- plot_ly(df, type = 'box')
-        
-        for (i in 1:12) {
-          leg.name <- month.abb[i]
-          eval(parse(text = paste("p.sc <- p.sc %>% 
+          } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
+            
+            p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
+                            line = list(color = 'transparent'),
+                            showlegend = FALSE, name = 'High') %>%
+              add_trace(y = ~low, type = 'scatter', mode = 'lines',
+                        fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
+                        showlegend = FALSE, name = 'Low') %>%
+              add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
+                        line = list(color='rgb(255,127,80)'),
+                        name = 'Average') 
+            
+            
+            if (!is.null(df$ref))
+              p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
+                                         line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
+            
+            
+            
+          } else if (grepl('box',tolower(input$rcm.chart.type))) {
+            p.sc <- plot_ly(df, type = 'box')
+            
+            month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+            col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                         'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                         'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                         'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                         'rgb(166,206,227)')
+            for (i in 1:12) {
+              leg.name <- month.abb[i]
+              leg.grp <- month.grp[i]
+              eval(parse(text = paste("p.sc <- p.sc %>% 
                                       add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
-                                      type = 'box', boxpoints = 'all', hoverinfo = 'text+x+y',text=leg.name,
-                                      line = list(color='rgb(255,127,80)'),
-                                      name = leg.name,showlegend =FALSE)",sep='')))
-          if (!is.null(df$ref))
-            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'line', name = leg.name, showlegend = FALSE, 
-                                       line = list(color = 'black', dash = 'dash', width = 2))
-        } 
-      }
+                                      type = 'box', boxpoints = 'all',
+                                      legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
+                                      line = list(color=col.grp[",i,"],opacity=0.6),
+                                      name = leg.name,showlegend =TRUE)",sep='')))
+              if (!is.null(df$ref))
+                p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
+                                           line = list(color = 'black', dash = 'dash', width = 2),
+                                           legendgroup = leg.grp,
+                                           showlegend = TRUE)
+            } 
+          }
       # Add these lines to modify colors in box plot
       # marker = list(color = 'rgb(135,206,250'),
       # line = list(color = 'rgb(135,206,250'),
       
-      p.sc <- p.sc %>% layout(title = "Temperature [Degrees C]",
-                              paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
-                              xaxis = list(title = "Months",
-                                           gridcolor = 'rgb(255,255,255)',
-                                           showgrid = TRUE,
-                                           showline = FALSE,
-                                           showticklabels = TRUE,
-                                           tickcolor = 'rgb(127,127,127)',
-                                           ticks = 'outside',
-                                           zeroline = FALSE),
-                              yaxis = list(title = "Regional average in degrees C",
-                                           gridcolor = 'rgb(255,255,255)',
-                                           showgrid = TRUE,
-                                           showline = FALSE,
-                                           showticklabels = TRUE,
-                                           tickcolor = 'rgb(127,127,127)',
-                                           ticks = 'outside',
-                                           zeroline = FALSE))
-      if (input$rcm.legend.sc == 'None')
+      if (input$rcm.outputValues == 'Bias')  
+        ylab <- "Bias in simulated regional temperature [deg. C]"
+      else if (input$rcm.outputValues == 'Anomaly')
+        ylab <- "Simulated regional temperature anomalies [deg. C]"
+      else if (input$rcm.outputValues == 'Change')
+        ylab <- "Absolute change in simulted regional temperature with regards to present [deg. C]"
+      else 
+        ylab <- "Simulated regional temperature [deg. C]"
+      p.sc <- p.sc %>% layout(#title = "Temperature [Degrees C]",
+        paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
+        xaxis = list(title = "Months",
+                     gridcolor = 'rgb(255,255,255)',
+                     showgrid = TRUE,
+                     showline = FALSE,
+                     showticklabels = TRUE,
+                     tickcolor = 'rgb(127,127,127)',
+                     ticks = 'outside',
+                     zeroline = FALSE),
+        yaxis = list(title = ylab,
+                     gridcolor = 'rgb(255,255,255)',
+                     showgrid = TRUE,
+                     showline = FALSE,
+                     showticklabels = TRUE,
+                     tickcolor = 'rgb(127,127,127)',
+                     ticks = 'outside',
+                     zeroline = FALSE))
+      if (input$rcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
+      else
+        p.sc <- p.sc %>% layout(showlegend = TRUE)
       p.sc$elementId <- NULL
       p.sc
-    })
+        })
+    output$rcm.sc.tas <- rcm.sc.tas
+    output$hydro.sc.tas <- rcm.sc.tas
     
-    output$rcm.sc.pr <- renderPlotly({
-      
+    rcm.sc.pr <- renderPlotly({
+      rcm.meta.pr <- rcm.meta.pr.reactive()
       df <- rcm.sc.pr.reactive()
       
-      # Convert to biases
+      if (input$rcm.sim.sc == 'Selected Simulations') {
+        rcm.meta.pr <- rcm.meta.pr[input$rowsRcm,]
+      }
+      
       if (input$rcm.outputValues == 'Bias')
         df <- ((df - df[,dim(df)[2]])/df[,dim(df)[2]]) * 100
+      else if (input$rcm.outputValues == 'Anomaly') {
+        DF <- t(df)
+        df <- as.data.frame(t(DF - rowMeans(DF)))
+      } else if (input$rcm.outputValues == 'Change') {
+        df <- ((rcm.sc.pr.reactive() - rcm.sc.pr.present())/ rcm.sc.pr.present()) * 100
+      }
       
       df.env <- NULL
-      low <- apply(subset(df,select = grep('rcm',colnames(df))),1,min,na.rm=TRUE)
-      high <- apply(subset(df,select = grep('rcm',colnames(df))),1,max,na.rm=TRUE)
-      avg <- apply(subset(df,select = grep('rcm',colnames(df))),1,mean,na.rm=TRUE)
-      df.env <- data.frame(low,avg,high,ref = df$ref,month = factor(month.abb, levels =  month.abb))
+      low <- round(apply(subset(df,select = grep('rcm',colnames(df))),1,min,na.rm=TRUE),digits = 2)
+      high <- round(apply(subset(df,select = grep('rcm',colnames(df))),1,max,na.rm=TRUE),digits = 2)
+      avg <- round(apply(subset(df,select = grep('rcm',colnames(df))),1,mean,na.rm=TRUE),digits = 2)
+      df.env <- data.frame(low,avg,high,ref = round(df$ref,digits = 2),month = factor(month.abb, levels =  month.abb))
       
       #The default order will be alphabetized unless specified as below:
       df$month <- factor(month.abb, levels = month.abb)
@@ -1994,10 +2411,25 @@ function(input, output,session) {
           lev <- levels(factor(base::subset(rcm.meta.pr, select = input$rcm.groupBy)[[1]]))
         }
         
-        rgbcolsa <- c('rgba(45,51,38,0.4)', 'rgba(87,77,102,0.4)', 'rgba(255,191,200,0.4)', 'rgba(140,129,105,0.4)', 'rgba(234,191,255,0.4)', 'rgba(172,230,195,0.4)', 'rgba(86,105,115,0.4)', 'rgba(115,86,94,0.4)', 'rgba(230,195,172,0.4)', 'rgba(255,234,191,0.4)', 'rgba(124,140,105,0.4)', 'rgba(51,26,43,0.4)', 'rgba(191,96,172,0.4)', 'rgba(184,204,102,0.4)', 'rgba(153,87,77,0.4)', 'rgba(96,134,191,0.4)', 'rgba(230,115,145,0.4)', 'rgba(255,145,128,0.4)', 'rgba(229,161,115,0.4)', 'rgba(22,58,89,0.4)', 'rgba(85,89,22,0.4)', 'rgba(127,83,32,0.4)', 'rgba(80,179,45,0.4)', 'rgba(18,51,13,0.4)', 'rgba(64,16,22,0.4)', 'rgba(22,16,64,0.4)', 'rgba(86,29,115,0.4)', 'rgba(54,98,217,0.4)', 'rgba(255,191,64,0.4)', 'rgba(61,182,242,0.4)', 'rgba(126,57,230,0.4)', 'rgba(51,38,13,0.4)', 'rgba(178,0,95,0.4)', 'rgba(0,128,85,0.4)', 'rgba(26,0,191,0.4)', 'rgba(255,0,238,0.4)', 'rgba(178,0,0,0.4)', 'rgba(0,202,217,0.4)', 'rgba(0,230,153,0.4)', 'rgba(0,255,34,0.4)', 'rgba(204,0,54,0.4)', 'rgba(102,0,14,0.4)', 'rgba(229,92,0,0.4)', 'rgba(0,107,115,0.4)', 'rgba(77,0,51,0.4)', 'rgba(204,255,0,0.4)', 'rgba(140,112,0,0.4)', 'rgba(12,89,0,0.4)')
+        rgbcolsa <- c('rgba(45,51,38,0.5)', 'rgba(87,77,102,0.5)', 'rgba(255,191,200,0.5)', 'rgba(140,129,105,0.5)', 'rgba(234,191,255,0.5)', 'rgba(172,230,195,0.5)',
+                      'rgba(86,105,115,0.5)', 'rgba(115,86,94,0.5)', 'rgba(230,195,172,0.5)', 'rgba(255,234,191,0.5)', 'rgba(124,140,105,0.5)', 'rgba(51,26,43,0.5)',
+                      'rgba(191,96,172,0.5)', 'rgba(184,204,102,0.5)', 'rgba(153,87,77,0.5)', 'rgba(96,134,191,0.5)', 'rgba(230,115,145,0.5)', 'rgba(255,145,128,0.5)', 
+                      'rgba(229,161,115,0.5)', 'rgba(22,58,89,0.5)', 'rgba(85,89,22,0.5)', 'rgba(127,83,32,0.5)', 'rgba(80,179,45,0.5)', 'rgba(18,51,13,0.5)', 'rgba(64,16,22,0.5)',
+                      'rgba(22,16,64,0.5)', 'rgba(86,29,115,0.5)', 'rgba(54,98,217,0.5)', 'rgba(255,191,64,0.5)', 'rgba(61,182,242,0.5)', 'rgba(126,57,230,0.5)', 'rgba(51,38,13,0.5)', 
+                      'rgba(178,0,95,0.5)', 'rgba(0,128,85,0.5)', 'rgba(26,0,191,0.5)', 'rgba(255,0,238,0.5)', 'rgba(178,0,0,0.5)', 'rgba(0,202,217,0.5)', 'rgba(0,230,153,0.5)', 
+                      'rgba(0,255,34,0.5)', 'rgba(204,0,54,0.5)', 'rgba(102,0,14,0.5)', 'rgba(229,92,0,0.5)', 'rgba(0,107,115,0.5)', 'rgba(77,0,51,0.5)', 'rgba(204,255,0,0.5)', 
+                      'rgba(140,112,0,0.5)', 'rgba(12,89,0,0.5)')
         
-        rgbcols <- c('rgb(45,51,38)', 'rgb(87,77,102)', 'rgb(255,191,200)', 'rgb(140,129,105)', 'rgb(234,191,255)', 'rgb(172,230,195)', 'rgb(86,105,115)', 'rgb(115,86,94)', 'rgb(230,195,172)', 'rgb(255,234,191)', 'rgb(124,140,105)', 'rgb(51,26,43)', 'rgb(191,96,172)', 'rgb(184,204,102)', 'rgb(153,87,77)', 'rgb(96,134,191)', 'rgb(230,115,145)', 'rgb(255,145,128)', 'rgb(229,161,115)', 'rgb(22,58,89)', 'rgb(85,89,22)', 'rgb(127,83,32)', 'rgb(80,179,45)', 'rgb(18,51,13)', 'rgb(64,16,22)', 'rgb(22,16,64)', 'rgb(86,29,115)', 'rgb(54,98,217)', 'rgb(255,191,64)', 'rgb(61,182,242)', 'rgb(126,57,230)', 'rgb(51,38,13)', 'rgb(178,0,95)', 'rgb(0,128,85)', 'rgb(26,0,191)', 'rgb(255,0,238)', 'rgb(178,0,0)', 'rgb(0,202,217)', 'rgb(0,230,153)', 'rgb(0,255,34)', 'rgb(204,0,54)', 'rgb(102,0,14)', 'rgb(229,92,0)', 'rgb(0,107,115)', 'rgb(77,0,51)', 'rgb(204,255,0)', 'rgb(140,112,0)', 'rgb(12,89,0)')
+        rgbcols <- c('rgb(45,51,38)', 'rgb(87,77,102)', 'rgb(255,191,200)', 'rgb(140,129,105)', 'rgb(234,191,255)', 'rgb(172,230,195)', 'rgb(86,105,115)', 
+                     'rgb(115,86,94)', 'rgb(230,195,172)', 'rgb(255,234,191)', 'rgb(124,140,105)', 'rgb(51,26,43)', 'rgb(191,96,172)', 'rgb(184,204,102)', 
+                     'rgb(153,87,77)', 'rgb(96,134,191)', 'rgb(230,115,145)', 'rgb(255,145,128)', 'rgb(229,161,115)', 'rgb(22,58,89)', 'rgb(85,89,22)', 
+                     'rgb(127,83,32)', 'rgb(80,179,45)', 'rgb(18,51,13)', 'rgb(64,16,22)', 'rgb(22,16,64)', 'rgb(86,29,115)', 'rgb(54,98,217)', 'rgb(255,191,64)',
+                     'rgb(61,182,242)', 'rgb(126,57,230)', 'rgb(51,38,13)', 'rgb(178,0,95)', 'rgb(0,128,85)', 'rgb(26,0,191)', 'rgb(255,0,238)', 'rgb(178,0,0)', 
+                     'rgb(0,202,217)', 'rgb(0,230,153)', 'rgb(0,255,34)', 'rgb(204,0,54)', 'rgb(102,0,14)', 'rgb(229,92,0)', 'rgb(0,107,115)', 'rgb(77,0,51)', 
+                     'rgb(204,255,0)', 'rgb(140,112,0)', 'rgb(12,89,0)')
         
+        
+        # Color by
         if (input$rcm.colorBy == 'Group') {
           colsa <- rgbcolsa[id]
           cols <- rgbcols[id]
@@ -2005,135 +2437,176 @@ function(input, output,session) {
           colsa <- rgbcolsa
           cols <- rgbcols
         }
+        
         ## Add all Simulations
-        
-        for (rcm in rcms) {
-          i <- which(is.element(rcms,rcm))
-          leg.name <- paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','gcm_rip','rcm')])),collapse = '  ')
-          grp.name <- paste('Group',id[i],sep='')
-          if (input$rcm.legend.sc == 'All Simulations')
-            eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
-                                    showlegend = TRUE, legendgroup = grp.name,
-                                    line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
-          else if (input$rcm.legend.sc == 'None')
-            eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
-                                    showlegend = TRUE, legendgroup = grp.name,
-                                    line = list(color = cols[",i,"], width = 2, shape ='spline',showlegend = FALSE))",sep='')))
-        }
-        
-        ## Highlight selected models in tab:models
-        if (!is.null(input$rcm.rows2)) {
-          im <- input$rcm.rows2+1
-          for (i in im) {
-            leg.name <- paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','gcm_rip','rcm')])),collapse = ' ')
+        if (is.null(input$rowsRcm)) {
+          for (rcm in rcms) {
+            i <- which(is.element(rcms,rcm))
+            #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
+            leg.name <- paste(paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','rcm')])),collapse = ' '),
+                              paste(substr(lev[id[i]],1,5),'...',sep=''),
+                              sep = ' ')
+            grp.name <- paste('Group',id[i],sep='') #leg.name
+            
+            if (is.element(input$rcm.colorBy, c('None','---')))
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
+                                      name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                      colors = ",i,",hoverinfo = 'text+x+y',text=leg.name, legendgroup = grp.name,
+                                      line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
+            else
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
+                                      name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                      colors = colsa[",i,"],hoverinfo = 'text+x+y',text=leg.name,
+                                      line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
+            
+          }
+          ## Highlight selected Simulations in tab:models
+        } else {
+          im <- input$rowsRcm
+          for (i in 1:length(im)) {
+            leg.name <- paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','rcm')])),collapse = ' ')
             grp.name <- paste('Group',id[i],sep='')
             rcm <- rcms[i]
-            eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', 
-                                    showlegend = TRUE, hoverinfo = 'text+x+y',text=leg.name,
-                                    line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
+            if (is.element(input$rcm.colorBy, c('None','---')))
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
+                                      name = paste(",im,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                      colors = ",i,",hoverinfo = 'text+x+y',text=leg.name,
+                                      line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
+            else
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
+                                      name = paste(",im,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                      colors = colsa[im[",i,"]],hoverinfo = 'text+x+y',text=leg.name,
+                                      line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
+          }            
+          
           }
-        }
         
         if (!is.null(df$ref))
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        ## Format the layout
-        p.sc <- p.sc %>% layout(title = "Precipitation",
-                                paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
-                                xaxis = list(title = "Months",
-                                             gridcolor = 'rgb(255,255,255)',
-                                             showgrid = TRUE,
-                                             showline = FALSE,
-                                             showticklabels = TRUE,
-                                             tickcolor = 'rgb(127,127,127)',
-                                             ticks = 'outside',
-                                             zeroline = FALSE),
-                                yaxis = list(title = "Regional average in mm/day",
-                                             gridcolor = 'rgb(255,255,255)',
-                                             showgrid = TRUE,
-                                             showline = FALSE,
-                                             showticklabels = TRUE,
-                                             tickcolor = 'rgb(127,127,127)',
-                                             ticks = 'outside',
-                                             zeroline = FALSE))
-        
-      } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
-        p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
-                        line = list(color = 'transparent'),
-                        showlegend = FALSE, name = 'High') %>%
-          add_trace(y = ~low, type = 'scatter', mode = 'lines',
-                    fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),
-                    showlegend = FALSE, name = 'Low') %>%
-          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                    line = list(color='rgb(135,206,250)'),
-                    name = 'Average') 
-        
-        if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
-                                     line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-        
-      } else if (grepl('box',tolower(input$rcm.chart.type))) {
-        p.sc <- plot_ly(df, type = 'box')
-        for (i in 1:12) {
-          leg.name <- month.abb[i]
-          eval(parse(text = paste("p.sc <- p.sc %>% 
-                                      add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
-                                      type = 'box', boxpoints = 'all',hoverinfo = 'text+x+y',text=leg.name,
-                                      marker = list(color = 'rgb(135,206,250'),
-                                      line = list(color = 'rgb(135,206,250'),
-                                      name = leg.name,showlegend =FALSE)",sep='')))
+        } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
+          p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
+                          line = list(color = 'transparent'),
+                          showlegend = FALSE, name = 'High') %>%
+            add_trace(y = ~low, type = 'scatter', mode = 'lines',
+                      fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),
+                      showlegend = FALSE, name = 'Low') %>%
+            add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
+                      line = list(color='rgb(135,206,250)'),
+                      name = 'Average') 
+          
           if (!is.null(df$ref))
-            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'line', name = leg.name, showlegend = FALSE, 
-                                       line = list(color = 'black', dash = 'dash', width = 2))
+            p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+                                       line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
+          
+        } else if (grepl('box',tolower(input$rcm.chart.type))) {
+          p.sc <- plot_ly(df, type = 'box')
+          
+          month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+          col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                       'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                       'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                       'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                       'rgb(166,206,227)')
+          for (i in 1:12) {
+            leg.name <- month.abb[i]
+            leg.grp <- month.grp[i]
+            eval(parse(text = paste("p.sc <- p.sc %>% 
+                                    add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
+                                    type = 'box', boxpoints = 'all',
+                                    legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
+                                    line = list(color=col.grp[",i,"],opacity=0.6),
+                                    name = leg.name,showlegend =TRUE)",sep='')))
+            if (!is.null(df$ref))
+              p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
+                                         line = list(color = 'black', dash = 'dash', width = 2),
+                                         legendgroup = leg.grp,
+                                         showlegend = TRUE) 
+          } 
         }
-      }
       
+      if (input$rcm.outputValues == 'Bias')  
+        ylab <- "Bias in simulated regional precipitation [%]"
+      else if (input$rcm.outputValues == 'Anomaly') 
+        ylab <- "Simulated regional precipitation anomalies [mm]"
+      else if (input$rcm.outputValues == 'Change')
+        ylab <- "Relative change in simulted regional precipitation with regards to present [%]"
+      else 
+        ylab <- "Simulated regional precipitation [mm]"
       # Format layout 
-      p.sc <- p.sc %>% layout(title = "Regional average in mm/day",
-                              paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
-                              xaxis = list(title = "Months",
-                                           gridcolor = 'rgb(255,255,255)',
-                                           showgrid = TRUE,
-                                           showline = FALSE,
-                                           showticklabels = TRUE,
-                                           tickcolor = 'rgb(127,127,127)',
-                                           ticks = 'outside',
-                                           zeroline = FALSE),
-                              yaxis = list(title = "Precipitation (mm/day)",
-                                           gridcolor = 'rgb(255,255,255)',
-                                           showgrid = TRUE,
-                                           showline = FALSE,
-                                           showticklabels = TRUE,
-                                           tickcolor = 'rgb(127,127,127)',
-                                           ticks = 'outside',
-                                           zeroline = FALSE))
+      p.sc <- p.sc %>% layout(#title = "Regional average in mm/day",
+        paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
+        xaxis = list(title = "Months",
+                     gridcolor = 'rgb(255,255,255)',
+                     showgrid = TRUE,
+                     showline = FALSE,
+                     showticklabels = TRUE,
+                     tickcolor = 'rgb(127,127,127)',
+                     ticks = 'outside',
+                     zeroline = FALSE),
+        yaxis = list(title = ylab,
+                     gridcolor = 'rgb(255,255,255)',
+                     showgrid = TRUE,
+                     showline = FALSE,
+                     showticklabels = TRUE,
+                     tickcolor = 'rgb(127,127,127)',
+                     ticks = 'outside',
+                     zeroline = FALSE))
       
-      if (input$rcm.legend.sc == 'None')
+      if (input$rcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       
       p.sc$elementId <- NULL
       p.sc
-    })
+        })
+    output$rcm.sc.pr <- rcm.sc.pr
+    output$hydro.sc.pr <- rcm.sc.pr
     
     output$rcm.sc.tas.data <- DT::renderDataTable({
       
-      df.format <- t(round(rcm.sc.tas.reactive(),digits = 2))
+      rcm.meta.tas <- rcm.meta.tas.reactive()
+      df <- rcm.sc.tas.reactive()
+      
+      if (input$rcm.sim.sc == 'Selected Simulations') {
+        rcm.meta.tas <- rcm.meta.tas[input$rowsRcm,]
+      }
+      
+      caption <- paste('Simulated regional temperature [deg. C] assuming an 
+                       intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+                       The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
+                       The last row in the table shows the estimated values from the referance data set (Observation).',sep= ' ')
+      
+      if (input$rcm.outputValues == 'Bias') {
+        df <- df - df[,dim(df)[2]]      
+        caption <- paste('Bias in simulated regional temperature [deg. C] assuming an 
+                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
+                         The last row in the table shows the estimated values from the referance data set (Observation).',sep= ' ')
+      } else if (input$rcm.outputValues == 'Anomaly') {
+        DF <- t(df)
+        df <- as.data.frame(t(DF - rowMeans(DF)))
+        caption <- paste('Simulated regional temperature anomalies [deg. C] assuming an 
+                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
+                         The last row in the table shows the estimated values from the referance data set (Observation).',sep= ' ')
+      } else if (input$rcm.outputValues == 'Change') {
+        df <- rcm.sc.tas.reactive() - rcm.sc.tas.present()
+        caption <- paste('Absolute changes in regional temperature [deg. C] assuming an 
+                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
+                         Changes are computed with regards to the reference period 1981-2010.',sep= ' ')
+      }
+      
+      df.format <- t(round(df,digits = 2))
       colnames(df.format) <- month.abb
       df.format <- data.frame(N = c(1:(dim(df.format)[1]-1),0), 
-                              GCM = c(as.character(as.vector(rcm.meta.tas$gcm)),'ERA'), 
-                              Run = c(as.character(as.vector(rcm.meta.tas$gcm_rip)),'ERA'),
-                              RCM = c(as.character(as.vector(rcm.meta.tas$rcm)),'ERA'),
+                              GCM = c(as.character(as.vector(rcm.meta.tas$gcm)),'EOBS'), 
+                              Run = c(as.character(as.vector(rcm.meta.tas$gcm_rip)),'EOBS'),
+                              RCM = c(as.character(as.vector(rcm.meta.tas$rcm)),'EOBS'),
                               df.format,stringsAsFactors = FALSE)
       DT::datatable(df.format,
-                    caption = paste('Monthly estimates of regional temperature assuming an 
-                                    intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
-                                    The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
-                                    The last row in the table shows the estimated values from the referance data set (Observation).',
-                                    sep= ' '), 
+                    caption = caption, 
                     selection = list(mode = 'multiple',target = 'row'), 
                     callback = JS("table.on('click.dt', function() {
                                   table.select.style( 'os' );                                  
@@ -2141,7 +2614,7 @@ function(input, output,session) {
                                   var rowData = table.rows('.selected',0).indexes();
                                   var rowidx = table.cells( rowData, 0 ).data().toArray();                               
                                   Shiny.onInputChange('rows4',rowidx);
-    });"),
+      });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'), #'Responsive',
                     rownames=FALSE,
                     options=list(dom = 'Bfrtip',
@@ -2165,27 +2638,58 @@ function(input, output,session) {
     })
     
     output$rcm.sc.pr.data <- DT::renderDataTable({
-      df.format <- t(round(rcm.sc.pr.reactive(),digits = 2))
+      
+      rcm.meta.pr <- rcm.meta.pr.reactive()
+      df <- rcm.sc.pr.reactive()
+      
+      if (input$rcm.sim.sc == 'Selected Simulations') {
+        rcm.meta.pr <- rcm.meta.pr[input$rowsRcm,]
+      }
+      
+      caption <- paste('Simulated regional precipitation [mm/month] assuming an 
+                       intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+                       The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
+                       The last row in the table shows the estimated values from the referance data set (Observation).',sep= ' ')
+      
+      if (input$rcm.outputValues == 'Bias') {
+        df <- ((df - df[,dim(df)[2]])/df[,dim(df)[2]]) * 100
+        caption <- paste('Bias in simulated regional precipitation [%] assuming an 
+                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
+                         The last row in the table shows the estimated values from the referance data set (Observation).',sep= ' ')
+      } else if (input$rcm.outputValues == 'Anomaly') {
+        DF <- t(df)
+        df <- as.data.frame(t(DF - rowMeans(DF)))
+        caption <- paste('Simulated regional precipitation anomalies [mm/month] assuming an 
+                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
+                         The last row in the table shows the estimated values from the referance data set (Observation).',sep= ' ')
+      } else if (input$rcm.outputValues == 'Change') {
+        df <- ((rcm.sc.pr.reactive() - rcm.sc.pr.present())/ rcm.sc.pr.present()) * 100
+        caption <- paste('Relative changes in regional precipitation [%] assuming an 
+                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
+                         Changes are computed with regards to the reference period 1981-2010',sep= ' ')
+      }
+      
+      
+      df.format <- t(round(df,digits = 2))
       colnames(df.format) <- month.abb
       df.format <- data.frame(N = c(1:(dim(df.format)[1]-1),0), 
-                              Model = c(as.character(as.vector(rcm.meta.pr$gcm)),'ERA'), 
-                              Run = c(as.character(as.vector(rcm.meta.pr$gcm_rip)),'ERA'),
-                              RCM = c(as.character(as.vector(rcm.meta.pr$rcm)),'ERA'),
+                              Model = c(as.character(as.vector(rcm.meta.pr$gcm)),'EOBS'), 
+                              Run = c(as.character(as.vector(rcm.meta.pr$gcm_rip)),'EOBS'),
+                              RCM = c(as.character(as.vector(rcm.meta.pr$rcm)),'EOBS'),
                               df.format,stringsAsFactors = FALSE)
-      DT::datatable(caption = paste('Monthly estimates of regional temperature assuming an 
-                              intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
-                                    The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
-                                    The last row in the table shows the estimated values from the referance data set (Observation).',
-                                    sep= ' '), 
+      DT::datatable(caption = caption, 
                     df.format,
                     selection = list(mode = 'multiple', target = 'row'), 
                     callback = JS("table.on('click.dt', function() {
-                                   table.select.style( 'os' );                                  
+                                  table.select.style( 'os' );                                  
                                   $(this).toggleClass('selected');                               
                                   var rowData = table.rows('.selected',0).indexes();
                                   var rowidx = table.cells( rowData, 0 ).data().toArray();                               
                                   Shiny.onInputChange('rows4',rowidx);
-                    });"),
+      });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'), #'Responsive',
                     rownames=FALSE,
                     options=list(dom = 'Bfrtip',
@@ -2208,6 +2712,343 @@ function(input, output,session) {
       )
     })
     
+    output$rcm.scatter <- renderPlotly({
+      #browser()
+      rcm.meta.pr <- rcm.meta.pr.reactive()
+      dpr <- rcm.sc.pr.reactive()
+      rcms <- names(dpr)
+      if (input$rcm.outputValues == 'Bias')
+        dpr <- ((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]) * 100
+      else if (input$rcm.outputValues == 'RMSE') {
+        dpr <- sqrt((((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]))^2) * 100
+      } else if (input$rcm.outputValues == 'Anomaly') {
+        DF <- t(dpr)
+        dpr <- as.data.frame(t(DF - rowMeans(DF)))
+      } else if (input$rcm.outputValues == 'Change') {
+        dpr <- ((dpr - rcm.sc.pr.present())/ rcm.sc.pr.present()) * 100
+      } 
+      
+      rcm.meta.tas <- rcm.meta.tas.reactive()
+      
+      dtas <- rcm.sc.tas.reactive()
+      if (input$rcm.outputValues == 'Bias')
+        dtas <- dtas - dtas[,dim(dtas)[2]]
+      else if (input$rcm.outputValues == 'RMSE') {
+        dtas <- sqrt((dtas-dtas[,dim(dtas)[2]])^2)
+      } else if (input$rcm.outputValues == 'Anomaly') {
+        DF <- t(dtas)
+        dtas <- as.data.frame(t(DF - rowMeans(DF)))
+      } else if (input$rcm.outputValues == 'Change') {
+        dtas <- dtas - rcm.sc.tas.present()
+      }
+      
+      if (!is.null(input$rowsRcm))
+        if (input$rcm.sim.sc == 'Selected Simulations') {
+          dpr <- dpr[input$rowsRcm,]
+          dtas <- dtas[input$rowsRcm,]
+          rcm.meta.tas <- rcm.meta.tas[input$rowsRcm,]
+          rcm.meta.pr <- rcm.meta.pr[input$rowsRcm,]
+          rcms <- rcms[input$rowsRcm]
+        } 
+      
+      rcm.name <- function(i) {
+        rcmi <- rcm.meta.pr[i,c('gcm','gcm_rip','rcm')]
+        rcmi[is.na(rcmi)] <- ''
+        return(paste(as.character(as.matrix(rcmi)),collapse = '_'))
+      }
+      inst.name <- function(i) {
+        rcmi <- rcm.meta.pr[i,c('model_id')]
+        rcmi[is.na(rcmi)] <- ''
+        return(paste(as.character(as.matrix(rcmi)),collapse = '_'))
+      }
+      rcmall <- c(sapply(1:dim(rcm.meta.pr)[1],rcm.name),'ERAINT')
+      rcm.inst <- c(sapply(1:dim(rcm.meta.pr)[1],inst.name),'ERAINT')
+      
+      df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),dpr = as.numeric(round(colMeans(dpr),digits = 2)),
+                       rcm.name = rcmall, inst.name = rcm.inst,stringsAsFactors = FALSE)
+      
+      if (is.element(input$rcm.groupBy,c('None','---'))) {
+        id <- 1 : (length(df$dtas) - 1)
+        lev <- levels(factor(id))
+      }
+      else { 
+        id <- as.integer(factor(base::subset(rcm.meta.pr, select = input$rcm.groupBy)[[1]]))
+        lev <- levels(factor(base::subset(rcm.meta.pr, select = input$rcm.groupBy)[[1]]))
+      }
+      
+      rgbcolsa <- c('rgba(45,51,38,0.5)', 'rgba(87,77,102,0.5)', 'rgba(255,191,200,0.5)', 'rgba(140,129,105,0.5)', 'rgba(234,191,255,0.5)', 'rgba(172,230,195,0.5)',
+                    'rgba(86,105,115,0.5)', 'rgba(115,86,94,0.5)', 'rgba(230,195,172,0.5)', 'rgba(255,234,191,0.5)', 'rgba(124,140,105,0.5)', 'rgba(51,26,43,0.5)',
+                    'rgba(191,96,172,0.5)', 'rgba(184,204,102,0.5)', 'rgba(153,87,77,0.5)', 'rgba(96,134,191,0.5)', 'rgba(230,115,145,0.5)', 'rgba(255,145,128,0.5)', 
+                    'rgba(229,161,115,0.5)', 'rgba(22,58,89,0.5)', 'rgba(85,89,22,0.5)', 'rgba(127,83,32,0.5)', 'rgba(80,179,45,0.5)', 'rgba(18,51,13,0.5)', 'rgba(64,16,22,0.5)',
+                    'rgba(22,16,64,0.5)', 'rgba(86,29,115,0.5)', 'rgba(54,98,217,0.5)', 'rgba(255,191,64,0.5)', 'rgba(61,182,242,0.5)', 'rgba(126,57,230,0.5)', 'rgba(51,38,13,0.5)', 
+                    'rgba(178,0,95,0.5)', 'rgba(0,128,85,0.5)', 'rgba(26,0,191,0.5)', 'rgba(255,0,238,0.5)', 'rgba(178,0,0,0.5)', 'rgba(0,202,217,0.5)', 'rgba(0,230,153,0.5)', 
+                    'rgba(0,255,34,0.5)', 'rgba(204,0,54,0.5)', 'rgba(102,0,14,0.5)', 'rgba(229,92,0,0.5)', 'rgba(0,107,115,0.5)', 'rgba(77,0,51,0.5)', 'rgba(204,255,0,0.5)', 
+                    'rgba(140,112,0,0.5)', 'rgba(12,89,0,0.5)')
+      
+      rgbcols <- c('rgb(45,51,38)', 'rgb(87,77,102)', 'rgb(255,191,200)', 'rgb(140,129,105)', 'rgb(234,191,255)', 'rgb(172,230,195)', 'rgb(86,105,115)', 
+                   'rgb(115,86,94)', 'rgb(230,195,172)', 'rgb(255,234,191)', 'rgb(124,140,105)', 'rgb(51,26,43)', 'rgb(191,96,172)', 'rgb(184,204,102)', 
+                   'rgb(153,87,77)', 'rgb(96,134,191)', 'rgb(230,115,145)', 'rgb(255,145,128)', 'rgb(229,161,115)', 'rgb(22,58,89)', 'rgb(85,89,22)', 
+                   'rgb(127,83,32)', 'rgb(80,179,45)', 'rgb(18,51,13)', 'rgb(64,16,22)', 'rgb(22,16,64)', 'rgb(86,29,115)', 'rgb(54,98,217)', 'rgb(255,191,64)',
+                   'rgb(61,182,242)', 'rgb(126,57,230)', 'rgb(51,38,13)', 'rgb(178,0,95)', 'rgb(0,128,85)', 'rgb(26,0,191)', 'rgb(255,0,238)', 'rgb(178,0,0)', 
+                   'rgb(0,202,217)', 'rgb(0,230,153)', 'rgb(0,255,34)', 'rgb(204,0,54)', 'rgb(102,0,14)', 'rgb(229,92,0)', 'rgb(0,107,115)', 'rgb(77,0,51)', 
+                   'rgb(204,255,0)', 'rgb(140,112,0)', 'rgb(12,89,0)')
+      
+      
+      # Color by
+      if (input$rcm.colorBy == 'Group') {
+        colsa <- rgbcolsa[id]
+        cols <- rgbcols[id]
+      } else {
+        colsa <- rgbcolsa
+        cols <- rgbcols
+      }
+      
+      ## Create the plot
+      p.sc <- plot_ly(df)
+      if ((input$rcm.chart.type == 'Individual Simulations')) {
+        ## Add all Simulations
+        if (is.null(input$rowsRcm)) {
+          for (rcm in rcms) {
+            i <- which(is.element(rcms,rcm))
+            #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
+            leg.name <- paste(paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','gcm_rip','rcm')])),collapse = ' '),
+                              paste(substr(lev[id[i]],1,5),'...',sep=''),
+                              sep = ' ')
+            grp.name <- paste('Group',id[i],sep='')
+            
+            if (is.element(input$rcm.colorBy, c('None','---')))
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
+                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name,
+                                      marker = list(color = ",i,", symbol = 3,size = 12,opacity = 0.7,line = list(width = 2,color = '#FFFFFF')))",sep='')))
+            else
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
+                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name,
+                                      marker = list(color = cols[",i,"], symbol = 3,size = 12,opacity=0.7,line = list(width = 2,color = '#FFFFFF')))",sep='')))
+            
+          }
+          ## Highlight selected Simulations in tab:models
+        } else {
+          im <- input$rowsRcm
+          for (i in 1:length(im)) {
+            leg.name <- paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','gcm_rip','rcm')])),collapse = ' ')
+            grp.name <- paste('Group',id[i],sep='')
+            rcm <- rcms[i]
+            if (is.element(input$rcm.colorBy, c('None','---')))
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
+                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name,
+                                      marker = list(color = ",i,", symbol = 3,size = 12,opacity = 0.7,line = list(width = 1)))",sep='')))
+            else
+              eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
+                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      showlegend = TRUE, legendgroup = grp.name,
+                                      marker = list(color = cols[im[",i,"]], symbol = 3,size = 12,opacity=0.7,line = list(width = 1))",sep='')))
+          }
+          }
+          } 
+      
+      if (length(df$dpr) > 1 | length(df$dtas) > 1)
+        p.sc <-  p.sc  %>%  layout(shapes = list(list(name = 'Env. 90% of all sim',type = 'rect',
+                                                      xref = 'x', x0 = quantile(df$dtas[-length(df$dtas)],probs = 0.05,na.rm = TRUE), x1 = quantile(df$dtas[-length(df$dtas)],0.95,na.rm=TRUE),
+                                                      yref = 'y', y0 = quantile(df$dpr[-length(df$dpr)],0.05,na.rm=TRUE), y1 = quantile(df$dpr[-length(df$dpr)],0.95,na.rm=TRUE),
+                                                      fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
+                                                      opacity = 0.4),
+                                                 list(name = 'Env. of all sim.',type = 'rect',
+                                                      xref = 'x', x0 = min(df$dtas[-length(df$dtas)],na.rm=TRUE), x1 = max(df$dtas[-length(df$dtas)],na.rm=TRUE),
+                                                      yref = 'y', y0 = min(df$dpr[-length(df$dpr)],na.rm=TRUE), y1 = max(df$dpr[-length(df$dpr)],na.rm=TRUE),
+                                                      fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
+                                                      opacity = 0.3)))
+      
+      if ((input$rcm.chart.type == 'Ensemble of All Simulations') | (input$rcm.chart.type == "Both - Ensemble & Individual Simulations"))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+      #}
+      
+      if (input$rcm.legend.sc == 'Display') {
+        p.sc <- p.sc %>% add_trace(x = ~mean(df$dtas[-length(df$dpr)]),y = ~ mean(df$dpr[-length(df$dpr)]),type = 'scatter',mode = 'markers',
+                                   name = 'Ens. Mean', hoverinfo = 'text+x+y',text='Ens. Mean',showlegend = TRUE,
+                                   marker = list(color = 'rgb(255,127,80)', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
+        
+        p.sc <- p.sc %>% add_trace(x = df$dtas[length(df$dtas)],y = df$dpr[length(df$dpr)],type = 'scatter',mode = 'markers',
+                                   name = 'ERAINT', hoverinfo = 'text+x+y',text='ERAINT',showlegend = TRUE,
+                                   marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
+      } else {
+        p.sc <- p.sc %>% add_trace(x = ~mean(df$dtas[-length(df$dpr)]),y = ~ mean(df$dpr[-length(df$dpr)]),type = 'scatter',mode = 'markers',
+                                   name = 'Ens. Mean', hoverinfo = 'text+x+y',text='Ens. Mean',showlegend = FALSE,
+                                   marker = list(color = 'rgb(255,127,80)', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
+        
+        p.sc <- p.sc %>% add_trace(x = df$dtas[length(df$dtas)],y = df$dpr[length(df$dpr)],type = 'scatter',mode = 'markers',
+                                   name = 'ERAINT', hoverinfo = 'text+x+y',text='ERAINT',showlegend = FALSE,
+                                   marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
+      }
+      if (input$rcm.outputValues == 'Bias') {
+        ylab <- 'Bias (absolute) in annual means of regioanl temperature values [deg. C]'
+        xlab <- 'Bias (relative) in annual means of regioanl precitation values [%]'
+      } else if (input$rcm.outputValues == 'Bias') {
+        ylab <- 'RMSE (absolute) in annual means of regioanl temperature values [deg. C]'
+        xlab <- 'RMSE (relative) in annual means of regioanl precitation values [%]'
+      } else if (input$rcm.outputValues == 'Anomaly') {
+        ylab <- 'Anomaly (absolute) in annual means of regioanl temperature values [deg. C]'
+        xlab <- 'Anomaly (relative) in annual means of regioanl precitation values [%]'
+      } else if (input$rcm.outputValues == 'Change') {
+        ylab <- 'Change (absolute) in annual means of regioanl temperature values [deg. C]'
+        xlab <- 'Change (relative) in annual means of regioanl precitation values [%]'
+      } else  {
+        ylab <- 'Annual means of regioanl temperature values [deg. C]'
+        xlab <- 'Annual means of regional precitation values [mm/month]'
+      }
+      
+      
+      
+      p.sc <- p.sc %>% layout(
+        paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
+        xaxis = list(title = ylab,
+                     gridcolor = 'rgb(255,255,255)',
+                     showgrid = TRUE,
+                     showline = FALSE,
+                     showticklabels = TRUE,
+                     tickcolor = 'rgb(127,127,127)',
+                     ticks = 'outside',
+                     zeroline = TRUE),
+        yaxis = list(title = xlab,
+                     gridcolor = 'rgb(255,255,255)',
+                     showgrid = TRUE,
+                     showline = FALSE,
+                     showticklabels = TRUE,
+                     tickcolor = 'rgb(127,127,127)',
+                     ticks = 'outside',
+                     zeroline = TRUE))
+      
+      if (input$rcm.legend.sc == 'Hide')
+        p.sc <- p.sc %>% layout(showlegend = FALSE)
+      else
+        p.sc <- p.sc %>% layout(showlegend = TRUE)
+      #rcm.dtdp$elementId <- NULL
+      # rcm.dtdp
+      p.sc$elementId <- NULL
+      p.sc
+          })
+    
+    
+    output$rcm.scatter.data <- DT::renderDataTable({
+      
+      rcm.meta.pr <- rcm.meta.pr.reactive()
+      dpr <- rcm.sc.pr.reactive()
+      rcms <- names(dpr)
+      if (input$rcm.outputValues == 'Bias')
+        dpr <- ((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]) * 100
+      else if (input$rcm.outputValues == 'RMSE') {
+        dpr <- sqrt((((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]))^2) * 100
+      } else if (input$rcm.outputValues == 'Anomaly') {
+        DF <- t(dpr)
+        dpr <- as.data.frame(t(DF - rowMeans(DF)))
+      } else if (input$rcm.outputValues == 'Change') {
+        dpr <- ((dpr - rcm.sc.pr.present())/ rcm.sc.pr.present()) * 100
+      } 
+      
+      rcm.meta.tas <- rcm.meta.tas.reactive()
+      
+      dtas <- rcm.sc.tas.reactive()
+      if (input$rcm.outputValues == 'Bias')
+        dtas <- dtas - dtas[,dim(dtas)[2]]
+      else if (input$rcm.outputValues == 'RMSE') {
+        dtas <- sqrt((dtas-dtas[,dim(dtas)[2]])^2)
+      } else if (input$rcm.outputValues == 'Anomaly') {
+        DF <- t(dtas)
+        dtas <- as.data.frame(t(DF - rowMeans(DF)))
+      } else if (input$rcm.outputValues == 'Change') {
+        dtas <- dtas - rcm.sc.tas.present()
+      }
+      
+      if (!is.null(input$rowsRcm))
+        if (input$rcm.sim.sc == 'Selected Simulations') {
+          dpr <- dpr[input$rowsRcm,]
+          dtas <- dtas[input$rowsRcm,]
+          rcm.meta.tas <- rcm.meta.tas[input$rowsRcm,]
+          rcm.meta.pr <- rcm.meta.pr[input$rowsRcm,]
+          rcms <- rcms[input$rowsRcm]
+        } 
+      
+      rcm.name <- function(i) {
+        rcmi <- rcm.meta.pr[i,c('gcm','gcm_rip','rcm')]
+        rcmi[is.na(rcmi)] <- ''
+        return(paste(as.character(as.matrix(rcmi)),collapse = '_'))
+      }
+      inst.name <- function(i) {
+        rcmi <- rcm.meta.pr[i,c('model_id')]
+        rcmi[is.na(rcmi)] <- ''
+        return(paste(as.character(as.matrix(rcmi)),collapse = '_'))
+      }
+      rcmall <- c(sapply(1:dim(rcm.meta.pr)[1],rcm.name),'ERAINT')
+      rcm.inst <- c(sapply(1:dim(rcm.meta.pr)[1],inst.name),'ERAINT')
+      
+      df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),dpr = as.numeric(round(colMeans(dpr),digits = 2)),
+                       rcm.name = rcmall, inst.name = rcm.inst,stringsAsFactors = FALSE)
+      
+      caption <- paste('Annual means of monthly estimates of both regional temperature (deg. C) and precipitation (mm/month) assuming an 
+                       intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+                       The climate models and their corresponding runs are listed in the second and third columns, respectively. 
+                       The last row in the table shows the estimated values from the referance data set (last row).',
+                       sep= ' ')
+      
+      if (input$rcm.outputValues == 'Bias') {
+        caption <- paste('Annual means of Biases in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
+                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second and third columns, respectively. 
+                         The bias is computed as the deviation from the referance data set (last row).',
+                         sep= ' ')
+      } else if (input$rcm.outputValues == 'RMSE'){
+        caption <- paste('Annual means of RMSE in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
+                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second and third columns, respectively. 
+                         The RMSE is computed as the square root mean of deviations from the referance data set (last row).',
+                         sep= ' ')
+        
+      } else if (input$rcm.outputValues == 'Change'){
+        caption <- paste('Annual means of Changes in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
+                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+                         The climate models and their corresponding runs are listed in the second column, respectively. 
+                         The RMSE is computed as the square root mean of deviations from the referance data set (last row).',
+                         sep= ' ')
+        
+      }
+      
+      #df.format <- t(round(df,digits = 1))
+      #colnames(df.format) <- month.abb
+      df.format <- data.frame(N = c(1:dim(df)[1]), 
+                              Model = df[,3], 
+                              Temperature = df[,1],
+                              Preciptiation = df[,2],
+                              stringsAsFactors = FALSE)
+      
+      DT::datatable(df.format,
+                    caption = caption, 
+                    selection = list(mode = 'multiple',target = 'row'), 
+                    extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'), #'Responsive',
+                    rownames=FALSE,
+                    options=list(dom = 'Bfrtip',
+                                 buttons = c('colvis',
+                                             'selectAll','selectNone',
+                                             'copy', 'csv','excel', 'print'),
+                                 searching = T,
+                                 pageLength = 30,
+                                 searchHighlight = FALSE,
+                                 colReorder = TRUE,
+                                 fixedHeader = FALSE,
+                                 filter = 'top',
+                                 paging    = TRUE,
+                                 deferRender = TRUE,
+                                 scroller = TRUE,
+                                 scrollX = TRUE, 
+                                 scrollY = 800,
+                                 select.style = 'os'
+                    )
+      )
+    })
+    
+    
+    
     ## --- Weather Stations menuitem output ---
     ### Metadata tab
     
@@ -2217,12 +3058,12 @@ function(input, output,session) {
       DT::datatable(as.data.frame(sta.meta(),stringsAsFactors = FALSE),
                     selection = list(mode = 'multiple',target = 'row'), 
                     callback = JS("table.on('click.dt', function() {
-                                   table.select.style( 'os' );                                  
+                                  table.select.style( 'os' );                                  
                                   $(this).toggleClass('selected');                               
                                   var rowData = table.rows('.selected',0).indexes();
                                   var rowidx = table.cells( rowData, 0 ).data().toArray();                               
                                   Shiny.onInputChange('rows4',rowidx);
-                    });"),
+    });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'), #'Responsive',
                     rownames=FALSE,
                     options=list(dom = 'Bfrtip',
@@ -2243,7 +3084,7 @@ function(input, output,session) {
                                  select.style = 'os'
                     )
       )
-    })
+      })
     
     ### Map the stations
     output$station.map <- renderLeaflet({
@@ -2304,9 +3145,9 @@ function(input, output,session) {
       DT::datatable(df.obs,
                     selection = 'multiple', 
                     callback = JS("table.on('click.dt', function() {
-                            $(this).toggleClass('selected');
-                            Shiny.onInputChange('rows2',table.rows('.selected').indexes().toArray());
-                    });"),
+                                  $(this).toggleClass('selected');
+                                  Shiny.onInputChange('rows2',table.rows('.selected').indexes().toArray());
+    });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Select'),
                     rownames=FALSE,
                     options=list(dom = 'Bfrtip',
@@ -2326,15 +3167,15 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-    })
+      })
     
     output$rea.table <- DT::renderDataTable({
       DT::datatable(rcm.meta.all,
                     selection = 'multiple', 
                     callback = JS("table.on('click.dt', function() {
-                            $(this).toggleClass('selected');
-                            Shiny.onInputChange('rows5',table.rows('.selected').indexes().toArray());
-                    });"),
+                                  $(this).toggleClass('selected');
+                                  Shiny.onInputChange('rows5',table.rows('.selected').indexes().toArray());
+    });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller','Responsive','Select'),
                     rownames=FALSE,
                     options=list(dom = 'Bfrtip',
@@ -2366,9 +3207,9 @@ function(input, output,session) {
       DT::datatable(data.frame(Models=models.45),  
                     selection = 'multiple', 
                     callback = JS("table.on('click.dt', function() {
-                            $(this).toggleClass('selected');
-                            Shiny.onInputChange('rows',table.rows('.selected').data().toArray());
-                    });"),
+                                  $(this).toggleClass('selected');
+                                  Shiny.onInputChange('rows',table.rows('.selected').data().toArray());
+    });"),
                     extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller'),
                     rownames=FALSE,
                     options=list(dom = 'Bfrtip',
@@ -2385,7 +3226,7 @@ function(input, output,session) {
                                  scrollX = TRUE,
                                  scrollY = 800
                     ))
-    }) #options = list(pageLength=20)})
+      }) #options = list(pageLength=20)})
     
     output$shopcart <- renderInfoBox({
       infoBox(
@@ -2503,77 +3344,78 @@ function(input, output,session) {
       #             pch=as.character(seq(length(dtas))),cex=1.5,lwd=1.5,new=FALSE)
     })
     
-    output$scatter.cc2 <- renderPlotly({
-      season <- switch(input$season7,
-                       'Annual (All seasons)'='ann',
-                       'Winter (DJF)'=c('dec','jan','feb'),
-                       'Spring (MAM)'=c('mar','apr','may'),
-                       'Summer (JJA)'=c('jun','jul','aug'),
-                       'Autumn (SON)'=c('sep','oct','nov'))
-      #'annual mean'='ann','winter'='djf','spring'='mam',
-      #'summer'='jja','autumn'='son')
-      period <- switch(tolower(as.character(input$period)),
-                       "2071-2100"='ff',
-                       "2021-2050"='nf')
-      
-      gcms <- names(stats$tas$ff)
-      if(tolower(input$region)=="global") {
-        coord <- list(lon=c(-180,180),lat=c(-90,90))
-        dtas <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
-          stats$tas[[period]][[gcm]][["mean"]][[s]])) - 
-            mean(sapply(season, function(s)
-              stats$tas$present[[gcm]][["mean"]][[s]])))
-        dpr <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
-          stats$pr[[period]][[gcm]][["mean"]][[s]])) - 
-            mean(sapply(season, function(s)
-              stats$pr$present[[gcm]][["mean"]][[s]])))
-        #dtas <- sapply(gcms, function(gcm) stats$tas[[period]][[gcm]][["mean"]][[season]] - 
-        #                 stats$tas$present[[gcm]][["mean"]][[season]]) 
-        #dpr <- sapply(gcms, function(gcm) stats$pr[[period]][[gcm]][["mean"]][[season]] - 
-        #                stats$pr$present[[gcm]][["mean"]][[season]])
-      } else {
-        #i.srex <- which(srex$name==input$region)
-        region <- 'ALA' #srex$label[i.srex]
-        dtas <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
-          stats$tas[[period]][[gcm]][[region]][["mean"]][[s]])) - 
-            mean(sapply(season, function(s) 
-              stats$tas$present[[gcm]][[region]][["mean"]][[s]])))
-        dpr <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
-          stats$pr[[period]][[gcm]][[region]][["mean"]][[s]])) - 
-            mean(sapply(season, function(s) 
-              stats$pr$present[[gcm]][[region]][["mean"]][[s]])))
-        #dtas <- sapply(gcms, function(gcm) stats$tas[[period]][[gcm]][[region]][["mean"]][[season]] - 
-        #                stats$tas$present[[gcm]][[region]][["mean"]][[season]])
-        #dpr <- sapply(gcms, function(gcm) stats$pr[[period]][[gcm]][[region]][["mean"]][[season]] - 
-        #                                  stats$pr$present[[gcm]][[region]][["mean"]][[season]])
-      }
-      im <- as.numeric(gsub(":.*","",input$gcms))
-      
-      d <- data.frame(var1 = dtas, var2 = dpr*(60*60*24))
-      # colnames(d) <- c('Temperature Change','Precipitation Change')
-      p <- plot_ly(d, x = ~var1, y = ~var2, type = 'scatter', color = paste('gcms',1:9), 
-                   # Hover text:
-                   text = ~paste("Model N : ", im, '$<br> Score:', 2),
-                   marker = list(size = 15, symbol = 'cross-open-dot',
-                                 color = colscal(n=9),
-                                 line = list(color = col2rgb('grey40'))),
-                   mode = 'markers') 
-      
-      p <- p %>%
-        layout(title = paste(toupper(input$im), 
-                             "Climate Change signal realtive to the base period modeled by ", sep =' '),
-               xaxis = list(title = "Temperature Change [deg. C]"),
-               yaxis = list(title = "Precipitation Change [%]"))  
-      p  
-      
-      # scatterplot(dtas,dpr*(60*60*24),ix=NULL,xlim=input$tlim,ylim=input$plim,
-      #             xlab="Temperature change (deg C)",ylab="Precipitation change (mm/day)",
-      #             main=paste("Climate change assuming RCP4.5\npresent day (1981-2010) to",input$period),
-      #             show.legend=FALSE,im=im,
-      #             legend=seq(length(dtas)),pal=NULL,#pal="cat",pch=21,
-      #             pch=as.character(seq(length(dtas))),cex=1.5,lwd=1.5,new=FALSE)
-    })
-    
+    #' output$gcm.scatter <- renderPlotly({
+    #'   browser()
+    #'   season <- switch(input$gcm.season,
+    #'                    'Annual (All seasons)'='ann',
+    #'                    'Winter (DJF)'=c('dec','jan','feb'),
+    #'                    'Spring (MAM)'=c('mar','apr','may'),
+    #'                    'Summer (JJA)'=c('jun','jul','aug'),
+    #'                    'Autumn (SON)'=c('sep','oct','nov'))
+    #'   #'annual mean'='ann','winter'='djf','spring'='mam',
+    #'   #'summer'='jja','autumn'='son')
+    #'   period <- switch(tolower(as.character(input$period)),
+    #'                    "2071-2100"='ff',
+    #'                    "2021-2050"='nf')
+    #'   
+    #'   gcms <- names(stats$tas$ff)
+    #'   if(tolower(input$region)=="global") {
+    #'     coord <- list(lon=c(-180,180),lat=c(-90,90))
+    #'     dtas <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
+    #'       stats$tas[[period]][[gcm]][["mean"]][[s]])) - 
+    #'         mean(sapply(season, function(s)
+    #'           stats$tas$present[[gcm]][["mean"]][[s]])))
+    #'     dpr <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
+    #'       stats$pr[[period]][[gcm]][["mean"]][[s]])) - 
+    #'         mean(sapply(season, function(s)
+    #'           stats$pr$present[[gcm]][["mean"]][[s]])))
+    #'     #dtas <- sapply(gcms, function(gcm) stats$tas[[period]][[gcm]][["mean"]][[season]] - 
+    #'     #                 stats$tas$present[[gcm]][["mean"]][[season]]) 
+    #'     #dpr <- sapply(gcms, function(gcm) stats$pr[[period]][[gcm]][["mean"]][[season]] - 
+    #'     #                stats$pr$present[[gcm]][["mean"]][[season]])
+    #'   } else {
+    #'     #i.srex <- which(srex$name==input$region)
+    #'     region <- 'ALA' #srex$label[i.srex]
+    #'     dtas <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
+    #'       stats$tas[[period]][[gcm]][[region]][["mean"]][[s]])) - 
+    #'         mean(sapply(season, function(s) 
+    #'           stats$tas$present[[gcm]][[region]][["mean"]][[s]])))
+    #'     dpr <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
+    #'       stats$pr[[period]][[gcm]][[region]][["mean"]][[s]])) - 
+    #'         mean(sapply(season, function(s) 
+    #'           stats$pr$present[[gcm]][[region]][["mean"]][[s]])))
+    #'     #dtas <- sapply(gcms, function(gcm) stats$tas[[period]][[gcm]][[region]][["mean"]][[season]] - 
+    #'     #                stats$tas$present[[gcm]][[region]][["mean"]][[season]])
+    #'     #dpr <- sapply(gcms, function(gcm) stats$pr[[period]][[gcm]][[region]][["mean"]][[season]] - 
+    #'     #                                  stats$pr$present[[gcm]][[region]][["mean"]][[season]])
+    #'   }
+    #'   im <- as.numeric(gsub(":.*","",input$gcms))
+    #'   
+    #'   d <- data.frame(var1 = dtas, var2 = dpr*(60*60*24))
+    #'   # colnames(d) <- c('Temperature Change','Precipitation Change')
+    #'   p <- plot_ly(d, x = ~var1, y = ~var2, type = 'scatter', color = paste('gcms',1:9), 
+    #'                # Hover text:
+    #'                text = ~paste("Model N : ", im, '$<br> Score:', 2),
+    #'                marker = list(size = 15, symbol = 'cross-open-dot',
+    #'                              color = colscal(n=9),
+    #'                              line = list(color = col2rgb('grey40'))),
+    #'                mode = 'markers') 
+    #'   
+    #'   p <- p %>%
+    #'     layout(title = paste(toupper(input$im), 
+    #'                          "Climate Change signal realtive to the base period modeled by ", sep =' '),
+    #'            xaxis = list(title = "Temperature Change [deg. C]"),
+    #'            yaxis = list(title = "Precipitation Change [%]"))  
+    #'   p  
+    #'   
+    #'   # scatterplot(dtas,dpr*(60*60*24),ix=NULL,xlim=input$tlim,ylim=input$plim,
+    #'   #             xlab="Temperature change (deg C)",ylab="Precipitation change (mm/day)",
+    #'   #             main=paste("Climate change assuming RCP4.5\npresent day (1981-2010) to",input$period),
+    #'   #             show.legend=FALSE,im=im,
+    #'   #             legend=seq(length(dtas)),pal=NULL,#pal="cat",pch=21,
+    #'   #             pch=as.character(seq(length(dtas))),cex=1.5,lwd=1.5,new=FALSE)
+    #' })
+    #' 
     # output$map <- renderPlot({
     #   if(tolower(input$region)=="global") {
     #     region <- list(lon=c(-180,-180,180,180,-180),lat=c(-90,90,90,-90,-90))
@@ -2596,7 +3438,7 @@ function(input, output,session) {
     # }, width=200,height=200*0.6)#width=250, height=175)
     
     
-  })
+        })
   
   observe(priority = -1,{
     showNotification(paste("Selected Simulations are : ",paste((input$rowsGcm),collapse = '/')),type = 'message')
@@ -2607,12 +3449,12 @@ function(input, output,session) {
       footer = modalButton("Accept"),
       title = "Disclaimer",
       tags$h4("This web application is a prototype and provides a straighforward and simple evaluation of the quality of climate models in simulating 
-      basic climatic features such as the seasoanl cycle of mean air temperature and precipitation over various 
-      regions in the world. This prototype is developed through the C3S DECM project and is the copyright of the Norwegian Meteorological Institute (2018).
-      By clicking on 'Dismiss' you accept the terms of use. Any feedbacks are welcome!"),
+              basic climatic features such as the seasoanl cycle of mean air temperature and precipitation over various 
+              regions in the world. This prototype is developed through the C3S DECM project and is the copyright of the Norwegian Meteorological Institute (2018).
+              By clicking on 'Accept' you accept the terms of use in the 'Framework Agreement for Copernicus services'. Any feedbacks are welcome!"),
       tags$h5('email to abdelkader@met.no or send your feedback from the following website'), tags$a(href= 'https://climatedatasite.net','https://climatedatasite.net')
-    ))
-  )
+      ))
+    )
   observeEvent(input$gcm.groupBy,{
     if (!is.element(input$gcm.groupBy,c('None','---')))
       updateSelectInput(inputId = "gcm.chart.type",session = session,
@@ -2646,7 +3488,39 @@ function(input, output,session) {
   })
   
   
-}
+  txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+  
+  txtTips <- tags$h5('You can modify the type of output from the "Settings & Outputs" box and choose between options of showing individual simulations, envelope of the ensemble model simulations, or box plots. They let you show anomalies and group/colour the results according to the metadata. “Individual Simulations” allow double-click on specific climate models listed in the legend or the metadata table to isolate one or a group of simulations.')
+  
+  txtMoreTips <- tags$h5('Other options include zooming in/out, comparing simulations, and downloading the graphic. The types of evaluation includes the mean seasonal cycle of the mean as well as the spatial standard deviation or correlation, and you can download the data and further details about the simulations by selecting the tabs labelled “Data” or “Metadata”. The evaluation shown here are for multi-model ensemble of CMIP5 RCP4.5 simulations.')
+  
+  txtRemember <- tags$h5('These simulations are based on models and data to represent the climate system. Those models are in turn based on coarse resolution, different parameterization schemes and simplifications of physical processes which systematically lead to deviations (biases) from the reference data.')
+  
+  output$figcaption = renderInfoBox({
+    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+  })
+  
+  
+  output$figTips = renderInfoBox({
+    infoBox('Tips on how to modify the chart to meet your needs!',txtTips, icon = shiny::icon("info-sign", lib = "glyphicon"),color = 'orange')
+  })
+  
+  output$figMoreTips = renderInfoBox({
+    infoBox('More Tips on how to use the chart!',txtMoreTips, icon = shiny::icon("plus-sign", lib = "glyphicon"),color = 'light-blue')
+  })
+  
+  output$figRemember = renderInfoBox({
+    infoBox('Recommendations on how to use the chart!',txtRemember, icon = shiny::icon("asterisk", lib = "glyphicon"),color = 'red')
+  })
+  
+  
+  txtTable <- tags$h5('Monthly estimates of regional temperature assuming an intermediate emission scenarios for the present (1981-2010) averaged over Global region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the referance data set (Observation)')
+  
+  output$tabcaption = renderInfoBox({
+    infoBox('How to read the table!',txtTable, icon = shiny::icon("table"),color = 'orange')
+  })
+  
+    }
 
 
 

@@ -19,6 +19,69 @@ function(input, output,session) {
   
   data(Oslo)
   
+  # Model explorer
+  data("metaextract")
+  M <- data.frame(list(Project=meta$project_id,
+                       Experiment=meta$experiment_id,
+                       GCM=meta$gcm,
+                       RIP=meta$gcm_rip, 
+                       RCM=meta$rcm, 
+                       VAR=meta$var,
+                       Unit=meta$unit, 
+                       Resolution=paste(meta$resolution,"deg / monthly"),
+                       Domain=paste(gsub(","," - ",meta$lon),"E"," / ",paste(gsub(","," - ",meta$lat)),"N",sep=""), 
+                       Years=gsub(",","-",gsub("-[0-9]{2}","",meta$dates)), 
+                       URL=meta$url))
+  
+  filterSim <- function(project,exp,gcm,run,rcm,var,dates,url) {
+    #browser()
+    if (project != "none")
+      M <- subset(M,subset = M$Project==project)
+    if (input$exp != "none") 
+      M <- subset(M,subset = M$Experiment == exp)
+    if (input$gcm != "none")
+      M <- subset(M,subset = M$GCM == gcm)
+    if (input$run != "none")
+      M <- subset(M,subset = M$RIP == run)
+    if (input$rcm != "none") 
+      M <- subset(M, M$RCM == rcm)
+    if (input$var != "none") 
+      M <- subset(M,subset = M$VAR == var)
+    if (input$dates != "none")
+      M <- subset(M,subset = M$Years == dates)
+    if (input$url != "none")
+      M <- subset(M,subset = M$URL==url)
+    return(M)
+  }
+  
+  filter.sim <- reactive({
+    return(filterSim(input$project,input$exp,input$gcm,input$run,input$rcm,input$var,input$dates,input$url))
+  })
+  
+  observe({
+    output$browser <- DT::renderDataTable({
+      #browser()
+      x <- filter.sim()
+      dat <- x %>% mutate(URL = sprintf(paste0("<a href='", URL,"' target='_blank'>Get data</a>")))
+      DT::datatable(dat,escape = FALSE)#,selection = 'single',options = list(), style="bootstrap")
+    })
+  })
+  
+  output$glossary <- DT::renderDataTable({
+    DT::datatable(
+      rbind(c('Project','Name of the project that run the simulations'),
+            c('GCM','Global Climate Model or General Circulation Model'),
+            c('RIP','Realisation, initialisation method, and physics version of a GCM'),
+            c('RCM','Regional Climate Model'),
+            c('tas','Near-surface air temperature'),
+            c('pr','Precipitation'),
+            c('Resolution','A rough estimate of the horizontal resolution'),
+            c('CMIP5','Climate Model Intercomparison Program - Phase 5'),
+            c('CORDEX','Coordinated Regional Climate Downscaling Experiment')),
+      colnames = c('Abbreviation','Description'),options = list(dom = 't'), 
+      caption='Glossary and variable names',style="bootstrap")
+  })
+  
   output$plot <- renderPlot(plot(Oslo, map.show = FALSE, new = FALSE))
   
   output$hist <- renderPlot(
@@ -893,7 +956,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-  })
+    })
     
     output$prob.cc <- renderPlot({
       z <- c(as.numeric(z.reactive()))
@@ -950,7 +1013,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-})
+    })
     
     ## Global Climate Models Menu item ---      
     ## Metadata table
@@ -995,7 +1058,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-})
+    })
     
     output$gcm.meta.pr <- DT::renderDataTable({
       gcm.meta.pr <- gcm.meta.pr.reactive()
@@ -1032,7 +1095,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-  })
+    })
     
     output$gcm.meta.all <- DT::renderDataTable({
       ## Metadata table
@@ -1063,7 +1126,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-      })
+    })
     
     ## RCMs tablets 
     
@@ -1101,7 +1164,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-      })
+    })
     
     output$rcm.meta.pr <- DT::renderDataTable({
       ## Metadata table
@@ -1136,7 +1199,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-      })
+    })
     
     output$rcm.meta.all <- DT::renderDataTable({
       ## Metadata table
@@ -1172,7 +1235,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-      })
+    })
     
     ## Define reions
     output$gcm.region <- renderLeaflet({
@@ -1373,58 +1436,58 @@ function(input, output,session) {
                                       colors = colsa[im[",i,"]], hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }
-          }
+        }
         if (!is.null(df$ref))
           p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-          } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
-            
-            p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
-                            line = list(color = 'transparent'),
-                            showlegend = TRUE, name = 'High') %>%
-              add_trace(y = ~low, type = 'scatter', mode = 'lines', 
-                        fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
-                        showlegend = TRUE, name = 'Low') %>%
-              add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',name = 'Ens. Mean',
-                        line = list(color='rgb(255,127,80)'), showlegend = TRUE,
-                        name = 'Average') 
-            
-            
-            if (!is.null(df$ref))
-              p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', showlegend = TRUE,
-                                         line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-            
-            p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
-            
-            if (input$gcm.legend.sc == 'Hide')
-              p.sc <- p.sc %>% layout(showlegend = FALSE)
-            
-          } else if (grepl('box',tolower(input$gcm.chart.type))) {
-            p.sc <- plot_ly(df, type = 'box')
-            
-            month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
-            col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
-                         'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
-                         'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
-                         'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
-                         'rgb(166,206,227)')
-            for (i in 1:12) {
-              leg.name <- month.abb[i]
-              leg.grp <- month.grp[i]
-              eval(parse(text = paste("p.sc <- p.sc %>% 
+      } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
+        
+        p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
+                        line = list(color = 'transparent'),
+                        showlegend = TRUE, name = 'High') %>%
+          add_trace(y = ~low, type = 'scatter', mode = 'lines', 
+                    fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
+                    showlegend = TRUE, name = 'Low') %>%
+          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',name = 'Ens. Mean',
+                    line = list(color='rgb(255,127,80)'), showlegend = TRUE,
+                    name = 'Average') 
+        
+        
+        if (!is.null(df$ref))
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', showlegend = TRUE,
+                                     line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
+        
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        
+        if (input$gcm.legend.sc == 'Hide')
+          p.sc <- p.sc %>% layout(showlegend = FALSE)
+        
+      } else if (grepl('box',tolower(input$gcm.chart.type))) {
+        p.sc <- plot_ly(df, type = 'box')
+        
+        month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+        col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                     'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                     'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                     'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                     'rgb(166,206,227)')
+        for (i in 1:12) {
+          leg.name <- month.abb[i]
+          leg.grp <- month.grp[i]
+          eval(parse(text = paste("p.sc <- p.sc %>% 
                                       add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
                                       type = 'box', boxpoints = 'all',
                                       legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color=col.grp[",i,"],opacity=0.6),
                                       name = leg.name,showlegend =TRUE)",sep='')))
-              if (!is.null(df$ref))
-                p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
-                                           line = list(color = 'black', dash = 'dash', width = 2),
-                                           legendgroup = leg.grp,
-                                           showlegend = TRUE)
-            } 
-          }
+          if (!is.null(df$ref))
+            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
+                                       line = list(color = 'black', dash = 'dash', width = 2),
+                                       legendgroup = leg.grp,
+                                       showlegend = TRUE)
+        } 
+      }
       # Add these lines to modify colors in box plot
       # marker = list(color = 'rgb(135,206,250'),
       # line = list(color = 'rgb(135,206,250'),
@@ -1461,7 +1524,7 @@ function(input, output,session) {
         p.sc <- p.sc %>% layout(showlegend = TRUE)
       p.sc$elementId <- NULL
       p.sc
-        })
+    })
     
     output$gcm.sc.pr <- renderPlotly({
       gcm.meta.pr <- gcm.meta.pr.reactive()
@@ -1572,54 +1635,54 @@ function(input, output,session) {
                                       line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }            
           
-          }
+        }
         
         if (!is.null(df$ref))
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
-          p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
-                          line = list(color = 'transparent'),name = 'High',showlegend = TRUE) %>%
-            add_trace(y = ~low, type = 'scatter', mode = 'lines',showlegend = TRUE,
-                      fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),name = 'Low') %>%
-            add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',line = list(color='rgb(135,206,250)'),
-                      name = 'Ens. Mean',showlegend = TRUE) 
-          
-          if (!is.null(df$ref))
-            p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
-                                       line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-          
-          p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
-          
-          if (input$gcm.legend.sc == 'Hide') 
-            p.sc <- p.sc %>% layout(showlegend = FALSE)
-          
-        } else if (grepl('box',tolower(input$gcm.chart.type))) {
-          p.sc <- plot_ly(df, type = 'box')
-          
-          month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
-          col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
-                       'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
-                       'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
-                       'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
-                       'rgb(166,206,227)')
-          for (i in 1:12) {
-            leg.name <- month.abb[i]
-            leg.grp <- month.grp[i]
-            eval(parse(text = paste("p.sc <- p.sc %>% 
+      } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
+        p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
+                        line = list(color = 'transparent'),name = 'High',showlegend = TRUE) %>%
+          add_trace(y = ~low, type = 'scatter', mode = 'lines',showlegend = TRUE,
+                    fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),name = 'Low') %>%
+          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',line = list(color='rgb(135,206,250)'),
+                    name = 'Ens. Mean',showlegend = TRUE) 
+        
+        if (!is.null(df$ref))
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+                                     line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
+        
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        
+        if (input$gcm.legend.sc == 'Hide') 
+          p.sc <- p.sc %>% layout(showlegend = FALSE)
+        
+      } else if (grepl('box',tolower(input$gcm.chart.type))) {
+        p.sc <- plot_ly(df, type = 'box')
+        
+        month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+        col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                     'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                     'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                     'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                     'rgb(166,206,227)')
+        for (i in 1:12) {
+          leg.name <- month.abb[i]
+          leg.grp <- month.grp[i]
+          eval(parse(text = paste("p.sc <- p.sc %>% 
                                     add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
                                     type = 'box', boxpoints = 'all',
                                     legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
                                     line = list(color=col.grp[",i,"],opacity=0.6),
                                     name = leg.name,showlegend =TRUE)",sep='')))
-            if (!is.null(df$ref))
-              p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
-                                         line = list(color = 'black', dash = 'dash', width = 2),
-                                         legendgroup = leg.grp,
-                                         showlegend = TRUE) 
-          } 
-        }
+          if (!is.null(df$ref))
+            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
+                                       line = list(color = 'black', dash = 'dash', width = 2),
+                                       legendgroup = leg.grp,
+                                       showlegend = TRUE) 
+        } 
+      }
       
       if (input$gcm.outputValues == 'Bias')  
         ylab <- "Bias in simulated regional precipitation [%]"
@@ -1654,7 +1717,7 @@ function(input, output,session) {
       
       p.sc$elementId <- NULL
       p.sc
-        })
+    })
     
     output$gcm.sc.tas.data <- DT::renderDataTable({
       
@@ -1924,8 +1987,8 @@ function(input, output,session) {
                                       showlegend = TRUE, legendgroup = grp.name,
                                       marker = list(color = cols[im[",i,"]], symbol = 3,size = 12,opacity=0.7,line = list(width = 1))",sep='')))
           }
-          }
-          } 
+        }
+      } 
       
       if (length(df$dpr) > 1 | length(df$dtas) > 1)
         p.sc <-  p.sc  %>%  layout(shapes = list(list(name = 'Env. 90% of all sim',type = 'rect',
@@ -1961,19 +2024,19 @@ function(input, output,session) {
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       }
       if (input$gcm.outputValues == 'Bias') {
-        ylab <- 'Bias (absolute) in annual means of regioanl temperature values [deg. C]'
-        xlab <- 'Bias (relative) in annual means of regioanl precitation values [%]'
+        ylab <- 'Bias (absolute) in annual means of regional temperature values [deg. C]'
+        xlab <- 'Bias (relative) in annual means of regional precitation values [%]'
       } else if (input$gcm.outputValues == 'Bias') {
-        ylab <- 'RMSE (absolute) in annual means of regioanl temperature values [deg. C]'
-        xlab <- 'RMSE (relative) in annual means of regioanl precitation values [%]'
+        ylab <- 'RMSE (absolute) in annual means of regional temperature values [deg. C]'
+        xlab <- 'RMSE (relative) in annual means of regional precitation values [%]'
       } else if (input$gcm.outputValues == 'Anomaly') {
-        ylab <- 'Anomaly (absolute) in annual means of regioanl temperature values [deg. C]'
-        xlab <- 'Anomaly (relative) in annual means of regioanl precitation values [%]'
+        ylab <- 'Anomaly (absolute) in annual means of regional temperature values [deg. C]'
+        xlab <- 'Anomaly (relative) in annual means of regional precitation values [%]'
       } else if (input$gcm.outputValues == 'Change') {
-        ylab <- 'Change (absolute) in annual means of regioanl temperature values [deg. C]'
-        xlab <- 'Change (relative) in annual means of regioanl precitation values [%]'
+        ylab <- 'Change (absolute) in annual means of regional temperature values [deg. C]'
+        xlab <- 'Change (relative) in annual means of regional precitation values [%]'
       } else  {
-        ylab <- 'Annual means of regioanl temperature values [deg. C]'
+        ylab <- 'Annual means of regional temperature values [deg. C]'
         xlab <- 'Annual means of regional precitation values [mm/month]'
       }
       
@@ -2006,7 +2069,7 @@ function(input, output,session) {
       # gcm.dtdp
       p.sc$elementId <- NULL
       p.sc
-          })
+    })
     
     
     output$gcm.scatter.data <- DT::renderDataTable({
@@ -2282,55 +2345,55 @@ function(input, output,session) {
                                       colors = colsa[im[",i,"]], hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }
-          }
+        }
         if (!is.null(df$ref))
           p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-          } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
-            
-            p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
-                            line = list(color = 'transparent'),
-                            showlegend = FALSE, name = 'High') %>%
-              add_trace(y = ~low, type = 'scatter', mode = 'lines',
-                        fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
-                        showlegend = FALSE, name = 'Low') %>%
-              add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                        line = list(color='rgb(255,127,80)'),
-                        name = 'Average') 
-            
-            
-            if (!is.null(df$ref))
-              p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
-                                         line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-            
-            
-            
-          } else if (grepl('box',tolower(input$rcm.chart.type))) {
-            p.sc <- plot_ly(df, type = 'box')
-            
-            month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
-            col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
-                         'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
-                         'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
-                         'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
-                         'rgb(166,206,227)')
-            for (i in 1:12) {
-              leg.name <- month.abb[i]
-              leg.grp <- month.grp[i]
-              eval(parse(text = paste("p.sc <- p.sc %>% 
+      } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
+        
+        p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
+                        line = list(color = 'transparent'),
+                        showlegend = FALSE, name = 'High') %>%
+          add_trace(y = ~low, type = 'scatter', mode = 'lines',
+                    fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
+                    showlegend = FALSE, name = 'Low') %>%
+          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
+                    line = list(color='rgb(255,127,80)'),
+                    name = 'Average') 
+        
+        
+        if (!is.null(df$ref))
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
+                                     line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
+        
+        
+        
+      } else if (grepl('box',tolower(input$rcm.chart.type))) {
+        p.sc <- plot_ly(df, type = 'box')
+        
+        month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+        col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                     'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                     'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                     'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                     'rgb(166,206,227)')
+        for (i in 1:12) {
+          leg.name <- month.abb[i]
+          leg.grp <- month.grp[i]
+          eval(parse(text = paste("p.sc <- p.sc %>% 
                                       add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
                                       type = 'box', boxpoints = 'all',
                                       legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color=col.grp[",i,"],opacity=0.6),
                                       name = leg.name,showlegend =TRUE)",sep='')))
-              if (!is.null(df$ref))
-                p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
-                                           line = list(color = 'black', dash = 'dash', width = 2),
-                                           legendgroup = leg.grp,
-                                           showlegend = TRUE)
-            } 
-          }
+          if (!is.null(df$ref))
+            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
+                                       line = list(color = 'black', dash = 'dash', width = 2),
+                                       legendgroup = leg.grp,
+                                       showlegend = TRUE)
+        } 
+      }
       # Add these lines to modify colors in box plot
       # marker = list(color = 'rgb(135,206,250'),
       # line = list(color = 'rgb(135,206,250'),
@@ -2367,7 +2430,7 @@ function(input, output,session) {
         p.sc <- p.sc %>% layout(showlegend = TRUE)
       p.sc$elementId <- NULL
       p.sc
-        })
+    })
     output$rcm.sc.tas <- rcm.sc.tas
     output$hydro.sc.tas <- rcm.sc.tas
     
@@ -2479,52 +2542,52 @@ function(input, output,session) {
                                       line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }            
           
-          }
+        }
         
         if (!is.null(df$ref))
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
-          p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
-                          line = list(color = 'transparent'),
-                          showlegend = FALSE, name = 'High') %>%
-            add_trace(y = ~low, type = 'scatter', mode = 'lines',
-                      fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),
-                      showlegend = FALSE, name = 'Low') %>%
-            add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                      line = list(color='rgb(135,206,250)'),
-                      name = 'Average') 
-          
-          if (!is.null(df$ref))
-            p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
-                                       line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-          
-        } else if (grepl('box',tolower(input$rcm.chart.type))) {
-          p.sc <- plot_ly(df, type = 'box')
-          
-          month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
-          col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
-                       'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
-                       'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
-                       'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
-                       'rgb(166,206,227)')
-          for (i in 1:12) {
-            leg.name <- month.abb[i]
-            leg.grp <- month.grp[i]
-            eval(parse(text = paste("p.sc <- p.sc %>% 
+      } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
+        p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
+                        line = list(color = 'transparent'),
+                        showlegend = FALSE, name = 'High') %>%
+          add_trace(y = ~low, type = 'scatter', mode = 'lines',
+                    fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),
+                    showlegend = FALSE, name = 'Low') %>%
+          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
+                    line = list(color='rgb(135,206,250)'),
+                    name = 'Average') 
+        
+        if (!is.null(df$ref))
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+                                     line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
+        
+      } else if (grepl('box',tolower(input$rcm.chart.type))) {
+        p.sc <- plot_ly(df, type = 'box')
+        
+        month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+        col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                     'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                     'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                     'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                     'rgb(166,206,227)')
+        for (i in 1:12) {
+          leg.name <- month.abb[i]
+          leg.grp <- month.grp[i]
+          eval(parse(text = paste("p.sc <- p.sc %>% 
                                     add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
                                     type = 'box', boxpoints = 'all',
                                     legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
                                     line = list(color=col.grp[",i,"],opacity=0.6),
                                     name = leg.name,showlegend =TRUE)",sep='')))
-            if (!is.null(df$ref))
-              p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
-                                         line = list(color = 'black', dash = 'dash', width = 2),
-                                         legendgroup = leg.grp,
-                                         showlegend = TRUE) 
-          } 
-        }
+          if (!is.null(df$ref))
+            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
+                                       line = list(color = 'black', dash = 'dash', width = 2),
+                                       legendgroup = leg.grp,
+                                       showlegend = TRUE) 
+        } 
+      }
       
       if (input$rcm.outputValues == 'Bias')  
         ylab <- "Bias in simulated regional precipitation [%]"
@@ -2559,7 +2622,7 @@ function(input, output,session) {
       
       p.sc$elementId <- NULL
       p.sc
-        })
+    })
     output$rcm.sc.pr <- rcm.sc.pr
     output$hydro.sc.pr <- rcm.sc.pr
     
@@ -2846,8 +2909,8 @@ function(input, output,session) {
                                       showlegend = TRUE, legendgroup = grp.name,
                                       marker = list(color = cols[im[",i,"]], symbol = 3,size = 12,opacity=0.7,line = list(width = 1))",sep='')))
           }
-          }
-          } 
+        }
+      } 
       
       if (length(df$dpr) > 1 | length(df$dtas) > 1)
         p.sc <-  p.sc  %>%  layout(shapes = list(list(name = 'Env. 90% of all sim',type = 'rect',
@@ -2883,19 +2946,19 @@ function(input, output,session) {
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       }
       if (input$rcm.outputValues == 'Bias') {
-        ylab <- 'Bias (absolute) in annual means of regioanl temperature values [deg. C]'
-        xlab <- 'Bias (relative) in annual means of regioanl precitation values [%]'
+        ylab <- 'Bias (absolute) in annual means of regional temperature values [deg. C]'
+        xlab <- 'Bias (relative) in annual means of regional precitation values [%]'
       } else if (input$rcm.outputValues == 'Bias') {
-        ylab <- 'RMSE (absolute) in annual means of regioanl temperature values [deg. C]'
-        xlab <- 'RMSE (relative) in annual means of regioanl precitation values [%]'
+        ylab <- 'RMSE (absolute) in annual means of regional temperature values [deg. C]'
+        xlab <- 'RMSE (relative) in annual means of regional precitation values [%]'
       } else if (input$rcm.outputValues == 'Anomaly') {
-        ylab <- 'Anomaly (absolute) in annual means of regioanl temperature values [deg. C]'
-        xlab <- 'Anomaly (relative) in annual means of regioanl precitation values [%]'
+        ylab <- 'Anomaly (absolute) in annual means of regional temperature values [deg. C]'
+        xlab <- 'Anomaly (relative) in annual means of regional precitation values [%]'
       } else if (input$rcm.outputValues == 'Change') {
-        ylab <- 'Change (absolute) in annual means of regioanl temperature values [deg. C]'
-        xlab <- 'Change (relative) in annual means of regioanl precitation values [%]'
+        ylab <- 'Change (absolute) in annual means of regional temperature values [deg. C]'
+        xlab <- 'Change (relative) in annual means of regional precitation values [%]'
       } else  {
-        ylab <- 'Annual means of regioanl temperature values [deg. C]'
+        ylab <- 'Annual means of regional temperature values [deg. C]'
         xlab <- 'Annual means of regional precitation values [mm/month]'
       }
       
@@ -2928,7 +2991,7 @@ function(input, output,session) {
       # rcm.dtdp
       p.sc$elementId <- NULL
       p.sc
-          })
+    })
     
     
     output$rcm.scatter.data <- DT::renderDataTable({
@@ -3084,7 +3147,7 @@ function(input, output,session) {
                                  select.style = 'os'
                     )
       )
-      })
+    })
     
     ### Map the stations
     output$station.map <- renderLeaflet({
@@ -3167,7 +3230,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-      })
+    })
     
     output$rea.table <- DT::renderDataTable({
       DT::datatable(rcm.meta.all,
@@ -3226,7 +3289,7 @@ function(input, output,session) {
                                  scrollX = TRUE,
                                  scrollY = 800
                     ))
-      }) #options = list(pageLength=20)})
+    }) #options = list(pageLength=20)})
     
     output$shopcart <- renderInfoBox({
       infoBox(
@@ -3438,7 +3501,7 @@ function(input, output,session) {
     # }, width=200,height=200*0.6)#width=250, height=175)
     
     
-        })
+  })
   
   observe(priority = -1,{
     showNotification(paste("Selected Simulations are : ",paste((input$rowsGcm),collapse = '/')),type = 'message')
@@ -3453,8 +3516,8 @@ function(input, output,session) {
               regions in the world. This prototype is developed through the C3S DECM project and is the copyright of the Norwegian Meteorological Institute (2018).
               By clicking on 'Accept' you accept the terms of use in the 'Framework Agreement for Copernicus services'. Any feedbacks are welcome!"),
       tags$h5('email to abdelkader@met.no or send your feedback from the following website'), tags$a(href= 'https://climatedatasite.net','https://climatedatasite.net')
-      ))
-    )
+    ))
+  )
   observeEvent(input$gcm.groupBy,{
     if (!is.element(input$gcm.groupBy,c('None','---')))
       updateSelectInput(inputId = "gcm.chart.type",session = session,
@@ -3490,29 +3553,78 @@ function(input, output,session) {
   
   txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black dashed line shows the seasonal cycle from reanalysis data used as reference.')   
   
-  txtTips <- tags$h5('You can modify the type of output from the "Settings & Outputs" box and choose between options of showing individual simulations, envelope of the ensemble model simulations, or box plots. They let you show anomalies and group/colour the results according to the metadata. “Individual Simulations” allow double-click on specific climate models listed in the legend or the metadata table to isolate one or a group of simulations.')
-  
-  txtMoreTips <- tags$h5('Other options include zooming in/out, comparing simulations, and downloading the graphic. The types of evaluation includes the mean seasonal cycle of the mean as well as the spatial standard deviation or correlation, and you can download the data and further details about the simulations by selecting the tabs labelled “Data” or “Metadata”. The evaluation shown here are for multi-model ensemble of CMIP5 RCP4.5 simulations.')
-  
-  txtRemember <- tags$h5('These simulations are based on models and data to represent the climate system. Those models are in turn based on coarse resolution, different parameterization schemes and simplifications of physical processes which systematically lead to deviations (biases) from the reference data.')
-  
-  output$figcaption = renderInfoBox({
+  # GCM info text output
+  output$figcaption.gcm.sc.tas = renderInfoBox({
+    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black dashed line shows the seasonal cycle from reanalysis data used as reference.')   
     infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
+  output$figcaption.gcm.sc.pr = renderInfoBox({
+    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+  })
+  output$figcaption.gcm.scatter = renderInfoBox({
+    txt <- tags$h5('Interactive Scatter Plot showing surface air mean temperature VS mean monthly sums of precipitaiton. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulations. 
+                   The black star shows the corresponding values from reanalysis data used as reference (ERAINT).')   
+    infoBox('How to read the scatter plot!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+  })
   
-  output$figTips = renderInfoBox({
+  # RCM info text output
+  output$figcaption.rcm.sc.tas = renderInfoBox({
+    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+  })
+  
+  output$figcaption.rcm.sc.pr = renderInfoBox({
+    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+  })
+  output$figcaption.rcm.scatter = renderInfoBox({
+    txt <- tags$h5('Interactive Scatter Plot showing surface air mean temperature VS mean monthly sums of precipitaiton. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulations. 
+                   The black star shows the corresponding values from reanalysis data used as reference (ERAINT).')   
+    infoBox('How to read the scatter plot!',txt, icon = shiny::icon("line-chart-o"),color = 'olive')
+  })
+  
+  # Text info
+  txtTips <- tags$h5('You can modify the type of output from the "Settings & Outputs" box and choose between options of showing individual simulations, envelope of the ensemble model simulations, or box plots. They let you show anomalies and group/colour the results according to the metadata. “Individual Simulations” allow double-click on specific climate models listed in the legend or the metadata table to isolate one or a group of simulations.')
+  txtMoreTips <- tags$h5('Other options include zooming in/out, comparing simulations, and downloading the graphic. The types of evaluation includes the mean seasonal cycle of the mean as well as the spatial standard deviation or correlation, and you can download the data and further details about the simulations by selecting the tabs labelled “Data” or “Metadata”. The evaluation shown here are for multi-model ensemble of CMIP5 RCP4.5 simulations.')
+  txtRemember <- tags$h5('These simulations are based on models and data to represent the climate system. Those models are in turn based on coarse resolution, different parameterization schemes and simplifications of physical processes which systematically lead to deviations (biases) from the reference data.')
+  
+  figTips = renderInfoBox({
     infoBox('Tips on how to modify the chart to meet your needs!',txtTips, icon = shiny::icon("info-sign", lib = "glyphicon"),color = 'orange')
   })
   
-  output$figMoreTips = renderInfoBox({
+  figMoreTips = renderInfoBox({
     infoBox('More Tips on how to use the chart!',txtMoreTips, icon = shiny::icon("plus-sign", lib = "glyphicon"),color = 'light-blue')
   })
   
-  output$figRemember = renderInfoBox({
+  figRemember = renderInfoBox({
     infoBox('Recommendations on how to use the chart!',txtRemember, icon = shiny::icon("asterisk", lib = "glyphicon"),color = 'red')
   })
   
+  output$figTips.gcm.tas <- figTips
+  output$figMoreTips.gcm.tas <- figMoreTips
+  output$figRemember.gcm.tas <- figRemember
+  
+  output$figTips.gcm.pr <- figTips
+  output$figMoreTips.gcm.pr <- figMoreTips
+  output$figRemember.gcm.pr <- figRemember
+  
+  output$figTips.gcm.scatter <- figTips
+  output$figMoreTips.gcm.scatter <- figMoreTips
+  output$figRemember.gcm.scatter <- figRemember
+  
+  output$figTips.rcm.tas <- figTips
+  output$figMoreTips.rcm.tas <- figMoreTips
+  output$figRemember.rcm.tas <- figRemember
+  
+  output$figTips.rcm.pr <- figTips
+  output$figMoreTips.rcm.pr <- figMoreTips
+  output$figRemember.rcm.pr <- figRemember
+  
+  output$figTips.rcm.scatter <- figTips
+  output$figMoreTips.rcm.scatter <- figMoreTips
+  output$figRemember.rcm.scatter <- figRemember
   
   txtTable <- tags$h5('Monthly estimates of regional temperature assuming an intermediate emission scenarios for the present (1981-2010) averaged over Global region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the referance data set (Observation)')
   
@@ -3520,7 +3632,8 @@ function(input, output,session) {
     infoBox('How to read the table!',txtTable, icon = shiny::icon("table"),color = 'orange')
   })
   
-    }
+}
+
 
 
 

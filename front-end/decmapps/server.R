@@ -1990,18 +1990,53 @@ function(input, output,session) {
         }
       } 
       
-      if (length(df$dpr) > 1 | length(df$dtas) > 1)
-        p.sc <-  p.sc  %>%  layout(shapes = list(list(name = 'Env. 90% of all sim',type = 'rect',
-                                                      xref = 'x', x0 = quantile(df$dtas[-length(df$dtas)],probs = 0.05,na.rm = TRUE), x1 = quantile(df$dtas[-length(df$dtas)],0.95,na.rm=TRUE),
-                                                      yref = 'y', y0 = quantile(df$dpr[-length(df$dpr)],0.05,na.rm=TRUE), y1 = quantile(df$dpr[-length(df$dpr)],0.95,na.rm=TRUE),
-                                                      fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-                                                      opacity = 0.4),
-                                                 list(name = 'Env. of all sim.',type = 'rect',
-                                                      xref = 'x', x0 = min(df$dtas[-length(df$dtas)],na.rm=TRUE), x1 = max(df$dtas[-length(df$dtas)],na.rm=TRUE),
-                                                      yref = 'y', y0 = min(df$dpr[-length(df$dpr)],na.rm=TRUE), y1 = max(df$dpr[-length(df$dpr)],na.rm=TRUE),
-                                                      fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-                                                      opacity = 0.3)))
-      
+      if (length(df$dpr) > 1 | length(df$dtas) > 1) {
+        # p.sc <-  p.sc  %>%  layout(shapes = list(list(name = 'Env. 90% of all sim',type = 'circle',
+        #                                              xref = 'x', x0 = quantile(df$dtas[-length(df$dtas)],probs = 0.05,na.rm = TRUE), x1 = quantile(df$dtas[-length(df$dtas)],0.95,na.rm=TRUE),
+        #                                              yref = 'y', y0 = quantile(df$dpr[-length(df$dpr)],0.05,na.rm=TRUE), y1 = quantile(df$dpr[-length(df$dpr)],0.95,na.rm=TRUE),
+        #                                              fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
+        #                                              opacity = 0.4),
+        #                                         list(name = 'Env. of all sim.',type = 'circle',
+        #                                              xref = 'x', x0 = min(df$dtas[-length(df$dtas)],na.rm=TRUE), x1 = max(df$dtas[-length(df$dtas)],na.rm=TRUE),
+        #                                              yref = 'y', y0 = min(df$dpr[-length(df$dpr)],na.rm=TRUE), y1 = max(df$dpr[-length(df$dpr)],na.rm=TRUE),
+        #                                              fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
+        #                                              opacity = 0.3)))
+        #browser()
+        dfe.70 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.6827,draw = FALSE)
+        dfe.95 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9545,draw = FALSE)
+        dfe.99 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9973,draw = FALSE)
+        p.sc <- p.sc %>% 
+          add_polygons(x = dfe.99[,1],y = dfe.99[,2] , name = '99% Confidence Level',
+                       fillcolor = 'rgba(255,127,80,0.5)',
+                       line = list(color = 'rgba(255,127,80,0.6)'),
+                       opacity = 0.5) %>%
+          add_polygons(x = dfe.95[,1],y = dfe.95[,2] , name = '95% Confidence Level',
+                       fillcolor = 'rgba(255,127,80,0.6)',
+                       line = list(color = 'rgba(255,127,80,0.7)'),
+                       opacity = 0.7) %>% 
+          add_polygons(x = dfe.70[,1],y = dfe.70[,2] , name = '70% Confidence Level',
+                       fillcolor = 'rgba(255,127,80,0.7)',
+                       line = list(color = 'rgba(255,127,80,0.8)'),
+                       opacity = 0.8) 
+      }
+      # p.sc <- p.sc  %>% layout(shapes = list(list(name = 'Env. of all sim.',type = 'circle',
+      #                                             xref = 'x', 
+      #                                             x0 = mean(df$dtas[-length(df$dtas)],na.rm=TRUE) - sd(df$dtas[-length(df$dtas)],na.rm=TRUE), 
+      #                                             x1 = mean(df$dtas[-length(df$dtas)],na.rm=TRUE) + sd(df$dtas[-length(df$dtas)],na.rm=TRUE),
+      #                                             yref = 'y', 
+      #                                             y0 = mean(df$dpr[-length(df$dpr)],na.rm=TRUE) - sd(df$dpr[-length(df$dpr)],na.rm=TRUE), 
+      #                                             y1 = mean(df$dpr[-length(df$dpr)],na.rm=TRUE) + sd(df$dpr[-length(df$dpr)],na.rm=TRUE),
+      #                                             fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
+      #                                             opacity = 0.4),
+      #                                        list(name = 'Env. of all sim.',type = 'circle',
+      #                                             xref = 'x', 
+      #                                             x0 = mean(df$dtas[-length(df$dtas)],na.rm=TRUE) - 2 * sd(df$dtas[-length(df$dtas)],na.rm=TRUE), 
+      #                                             x1 = mean(df$dtas[-length(df$dtas)],na.rm=TRUE) + 2 * sd(df$dtas[-length(df$dtas)],na.rm=TRUE),
+      #                                             yref = 'y', 
+      #                                             y0 = mean(df$dpr[-length(df$dpr)],na.rm=TRUE) - 2 * sd(df$dpr[-length(df$dpr)],na.rm=TRUE), 
+      #                                             y1 = mean(df$dpr[-length(df$dpr)],na.rm=TRUE) + 2 * sd(df$dpr[-length(df$dpr)],na.rm=TRUE),
+      #                                             fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
+      #                                             opacity = 0.3)))
       if ((input$gcm.chart.type == 'Ensemble of All Simulations') | (input$gcm.chart.type == "Both - Ensemble & Individual Simulations"))
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
       #}
@@ -2912,17 +2947,35 @@ function(input, output,session) {
         }
       } 
       
-      if (length(df$dpr) > 1 | length(df$dtas) > 1)
-        p.sc <-  p.sc  %>%  layout(shapes = list(list(name = 'Env. 90% of all sim',type = 'rect',
-                                                      xref = 'x', x0 = quantile(df$dtas[-length(df$dtas)],probs = 0.05,na.rm = TRUE), x1 = quantile(df$dtas[-length(df$dtas)],0.95,na.rm=TRUE),
-                                                      yref = 'y', y0 = quantile(df$dpr[-length(df$dpr)],0.05,na.rm=TRUE), y1 = quantile(df$dpr[-length(df$dpr)],0.95,na.rm=TRUE),
-                                                      fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-                                                      opacity = 0.4),
-                                                 list(name = 'Env. of all sim.',type = 'rect',
-                                                      xref = 'x', x0 = min(df$dtas[-length(df$dtas)],na.rm=TRUE), x1 = max(df$dtas[-length(df$dtas)],na.rm=TRUE),
-                                                      yref = 'y', y0 = min(df$dpr[-length(df$dpr)],na.rm=TRUE), y1 = max(df$dpr[-length(df$dpr)],na.rm=TRUE),
-                                                      fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-                                                      opacity = 0.3)))
+      if (length(df$dpr) > 1 | length(df$dtas) > 1) {
+        # p.sc <-  p.sc  %>%  layout(shapes = list(list(name = 'Env. 90% of all sim',type = 'circle',
+        #                                               xref = 'x', x0 = quantile(df$dtas[-length(df$dtas)],probs = 0.05,na.rm = TRUE), x1 = quantile(df$dtas[-length(df$dtas)],0.95,na.rm=TRUE),
+        #                                               yref = 'y', y0 = quantile(df$dpr[-length(df$dpr)],0.05,na.rm=TRUE), y1 = quantile(df$dpr[-length(df$dpr)],0.95,na.rm=TRUE),
+        #                                               fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
+        #                                               opacity = 0.4),
+        #                                          list(name = 'Env. of all sim.',type = 'circle',
+        #                                               xref = 'x', x0 = min(df$dtas[-length(df$dtas)],na.rm=TRUE), x1 = max(df$dtas[-length(df$dtas)],na.rm=TRUE),
+        #                                               yref = 'y', y0 = min(df$dpr[-length(df$dpr)],na.rm=TRUE), y1 = max(df$dpr[-length(df$dpr)],na.rm=TRUE),
+        #                                               fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
+        #                                               opacity = 0.3)))
+        
+        dfe.70 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.6827,draw = FALSE)
+        dfe.95 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9545,draw = FALSE)
+        dfe.99 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9973,draw = FALSE)
+        p.sc <- p.sc %>% 
+          add_polygons(x = dfe.99[,1],y = dfe.99[,2] , name = '99% Confidence Level',
+                       fillcolor = 'rgba(255,127,80,0.5)',
+                       line = list(color = 'rgba(255,127,80,0.6)'),
+                       opacity = 0.5) %>%
+          add_polygons(x = dfe.95[,1],y = dfe.95[,2] , name = '95% Confidence Level',
+                       fillcolor = 'rgba(255,127,80,0.6)',
+                       line = list(color = 'rgba(255,127,80,0.7)'),
+                       opacity = 0.7) %>% 
+          add_polygons(x = dfe.70[,1],y = dfe.70[,2] , name = '70% Confidence Level',
+                       fillcolor = 'rgba(255,127,80,0.7)',
+                       line = list(color = 'rgba(255,127,80,0.8)'),
+                       opacity = 0.8)  
+      }
       
       if ((input$rcm.chart.type == 'Ensemble of All Simulations') | (input$rcm.chart.type == "Both - Ensemble & Individual Simulations"))
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
@@ -3550,6 +3603,17 @@ function(input, output,session) {
     tags$iframe(src="http://157.249.177.25:3838/BarentsAtlas/",width = '100%', height = '950')
   })
   
+  # GCM info text output
+  output$simulation = renderInfoBox({
+    txt <- tags$h5('The climate simulations constitue a representation of possible climate outcomes and are based on 
+                   climate models that are run on different temporal and spatial scales to provide the best representation
+                   of the climate signal over a region of interest and for a specific time horizon (past, present, or future). 
+                   The climate simulations evaluated here are based on climate model ouptuts 
+                   collected from the Climate Model Intercomparison Project - Phase5 (CMIP5), the Coordinated Regional Climate Downscaling Experiment over Europe (EURO-CORDEX),
+                   and the Empirical-Statistical Downcaling project (ESD) at the Norwegian Meteorolocial Institute to produce the best estimates of 
+                   global/regional/local climate signal that in turn can be used in impact studies.')   
+    infoBox('What Climate Simulations evaluated here !',txt, icon = shiny::icon("table"),color = 'olive')
+  })
   
   txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black dashed line shows the seasonal cycle from reanalysis data used as reference.')   
   

@@ -21,7 +21,7 @@ Y <- metaextract(x,verbose=verbose)
 ## Calculate statistics for CMIP5 data
 opt <- list(ref.cmip="era",ref.cordex="eobs",verbose=TRUE,it=c(1981,2010),
             nfiles="all",continue=FALSE,mask="coords.txt",help=FALSE,
-            path="/lustre/storeA/users/kajsamp/Data/ClimExpl")
+            path="cmip")
 
 # Download reference data
 for (varid in c("tas","pr")) {

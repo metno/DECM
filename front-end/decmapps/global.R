@@ -272,17 +272,17 @@ varscore <- function(x) {
 
 # Scatter plot data ...
 stats <- NULL
-load("~/shiny/DECM/back-end/data/statistics.cmip.era.tas.1981-2010.rda")
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.era.tas.1981-2010.rda")
 stats$tas$present <- store
-load("~/shiny/DECM/back-end/data/statistics.cmip.tas.2021-2050.rda")
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.tas.2021-2050.rda")
 stats$tas$nf <- store
-load("~/shiny/DECM/back-end/data/statistics.cmip.tas.2071-2100.rda")
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.tas.2071-2100.rda")
 stats$tas$ff <- store
-load("~/shiny/DECM/back-end/data/statistics.cmip.era.pr.1981-2010.rda")
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.era.pr.1981-2010.rda")
 stats$pr$present <- store
-load("~/shiny/DECM/back-end/data/statistics.cmip.pr.2021-2050.rda")
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.pr.2021-2050.rda")
 stats$pr$nf <- store
-load("~/shiny/DECM/back-end/data/statistics.cmip.pr.2071-2100.rda")
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.pr.2071-2100.rda")
 stats$pr$ff <- store
 
 # regions <- function(type=c("srex","prudence"),region=NULL) {
@@ -474,10 +474,101 @@ region.names <- c("Global", srex$name)
 #   "Southern Topical Pacific","Pacific Islands region[3]",
 #   "West Indian Ocean")
 
+# function to be used to combine META data with IPCC table
+merge.meta.ipcc <- function(meta = meta, ipcc = IPCC.AR5.Table.9.A.1) {
+  meta$model_id <- gsub('\\.','-',meta$model_id)
+  ipcc$Model.Name <- gsub('\\.','-',IPCC.AR5.Table.9.A.1$Model.Name)
+  ipcc$Model.Name <- gsub('\\(','-',ipcc$Model.Name)
+  ipcc$Model.Name <- gsub('\\)','',ipcc$Model.Name)
+  
+  for (i in 1:dim(meta)[1]) {
+    igcm <- meta$model_id[i]
+    #cat(i,igcm)
+    #cat(sep='\n')
+    id <- which(is.element(tolower(ipcc$Model.Name),tolower(igcm)))
+    if (length(id) > 0) 
+      y <- ipcc[id,]
+    else {
+      y <- data.frame(t(rep(NA,dim(ipcc)[2])), stringsAsFactors = TRUE)
+      colnames(y) <- colnames(ipcc)
+    } 
+    
+    if (i ==1) 
+      X <- cbind(meta[i,],y)
+    else 
+      X <- rbind(X,cbind(meta[i,],y))
+  }
+  invisible(X)
+}
+
+## Load metadata for GCMs
 load('data/metaextract_v2.rda')
+data(package = 'esd','IPCC.AR5.Table.9.A.1')
+
+IPCC.AR5.Table.9.A.1$Horizontal.Resolution <- cmipgcmresolution()
+
 meta <- as.data.frame(meta)
 META <- meta[,c('source','experiment','institute_id','model_id','parent_experiment_rip','realization','longname','variable','units','timeunit',
                 'resolution','longitude','latitude',"experiment_id",'dim1','index','calendar','creation_date',
                 'tracking_id','physics_version','forcing','reference','contact','comment','table_id','file')]
+
 gcm.meta.tas <- subset(META, subset = (source == 'CMIP5') & (variable == 'tas'))
+gcm.meta.tas <- merge.meta.ipcc(meta = gcm.meta.tas,ipcc = IPCC.AR5.Table.9.A.1)
+
+load('data/metaextract_pr.rda')
+meta <- as.data.frame(meta)
+META <- meta[,c('source','experiment','institute_id','model_id','parent_experiment_rip','realization','longname','variable','units','timeunit',
+                'resolution','longitude','latitude',"experiment_id",'dim1','index','calendar','creation_date',
+                'tracking_id','physics_version','forcing','reference','contact','comment','table_id','file')]
+
 gcm.meta.pr <- subset(META, subset = (source == 'CMIP5') & (variable == 'pr'))
+gcm.meta.pr <- merge.meta.ipcc(gcm.meta.pr,IPCC.AR5.Table.9.A.1)
+
+# Common meta data for all variables
+modelrip.tas <- paste(gcm.meta.tas$institute_id,gcm.meta.tas$model_id,gcm.meta.tas$parent_experiment_rip,gcm.meta.tas$realization)
+modelrip.pr <- paste(gcm.meta.pr$institute_id,gcm.meta.pr$model_id,gcm.meta.pr$parent_experiment_rip,gcm.meta.pr$realization)
+id <- intersect(modelrip.pr,modelrip.tas)
+
+id.tas <- which(is.element(modelrip.tas[!duplicated(modelrip.tas)],id))
+# Some of the attributes are duplicated for precipitation 
+id.pr <- which(is.element(modelrip.pr[!duplicated(modelrip.pr)],id)) 
+
+# Extract common simulations between variables
+gcm.meta.all <- subset(gcm.meta.tas, subset = is.element(modelrip.tas[!duplicated(modelrip.tas)],id))
+gcm.meta.all <- merge.meta.ipcc(gcm.meta.all,IPCC.AR5.Table.9.A.1)
+gcm.meta.all <- gcm.meta.all[,-c(7,8,9,10)]
+
+# ---- RCMs -------
+## Load meta data for RCMs
+data(package = 'DECM','metaextract')
+meta <- as.data.frame(meta)
+META <- meta[,c('project_id','gcm','gcm_rip','rcm','longname','var','longname','unit','frequency','dates',
+                'resolution','lon','lon_unit','lat','lat_unit',
+                'frequency','creation_date','url')]
+
+rcm.meta.tas <- subset(META, subset = (project_id == 'CORDEX') & (var == 'tas'))
+
+rcm.meta.pr <- subset(META, subset = (project_id == 'CORDEX') & (var == 'pr'))
+
+rcm.meta.all <- rcm.meta.pr[,-c(5:8,15)]
+  
+# RCM statistics ...
+rcms <- NULL
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.eobs.tas.1981-2010.rda")
+store$eobs.tas$corr <- store$eobs.tas$mean
+store$eobs.tas$corr <- rep(1,13)
+rcms$tas$present <- store
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.tas.2021-2050.rda")
+rcms$tas$nf <- store
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.tas.2071-2100.rda")
+rcms$tas$ff <- store
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.eobs.pr.1981-2010.rda")
+store$eobs.pr$corr <- rep(1,13)
+rcms$pr$present <- store
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.pr.2021-2050.rda")
+rcms$pr$nf <- store
+load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.pr.2071-2100.rda")
+rcms$pr$ff <- store
+
+
+

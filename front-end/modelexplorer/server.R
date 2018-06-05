@@ -18,13 +18,13 @@ M <- data.frame(list(project_id=meta$project_id, experiment_id=meta$experiment_i
 
 ## load and expand commonEOFs
 ceof.all <- NULL
-data("ceof.gcm.tas.annual")
+load("/home/ubuntu/git/DECM/back-end/data/ceof.gcm.tas.annual.rda")
 ceof.all$tas$CMIP5 <- ceof
-data("ceof.gcm.pr.annual")
+load("/home/ubuntu/git/DECM/back-end/data/ceof.gcm.pr.annual.rda")
 ceof.all$pr$CMIP5 <- ceof
-data("ceof.rcm.tas.annual")
+load("/home/ubuntu/git/DECM/back-end/data/ceof.rcm.tas.annual.rda")
 ceof.all$tas$CORDEX <- ceof
-data("ceof.rcm.pr.annual")
+load("/home/ubuntu/git/DECM/back-end/data/ceof.rcm.pr.annual.rda")
 ceof.all$pr$CORDEX <- ceof
 ceof <- ceof.all
 rm("ceof.all"); gc(reset=TRUE)

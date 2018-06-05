@@ -80,8 +80,8 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
                                          cdo.mean(gcm.file,period,monthly=TRUE))
     if(!is.null(reference)) {
       store[[store.name]]$global$corr <- 
-          c(cdo.gridcor(gcm.file,ref.file,period),
-            cdo.gridcor(gcm.file,ref.file,period,monthly=TRUE))
+        c(cdo.gridcor(gcm.file,ref.file,period),
+          cdo.gridcor(gcm.file,ref.file,period,monthly=TRUE))
     }
     for(j in 1:length(srex.regions)) {
       getPolCoords(j,shape=shape,destfile=mask)
@@ -118,12 +118,15 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
   return(store)
 }
 
-calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), variable="tas", 
-                                        nfiles=5, path.gcm=NULL, continue=TRUE, verbose=FALSE) {
+calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), variable="tas", path.rcm=NULL, verbose=FALSE, mask="PrudenceCoords.txt")
+{
   
-  region <- read.csv(find.file("RegionSpecifications.csv"))
-  region.id <- as.character(region$Code)
+  path.rcm="/home/ubuntu/git/DECM/back-end/data/EUR-44_CORDEX/"
+  prudence <- read.csv("/home/ubuntu/git/DECM/back-end/data/PRUDENCE_regions/RegionSpecifications.csv")
+  prudence.regions <- as.character(prudence$Code)
+  
   if(max(period)>2015) reference <- NULL
+  
   if(!is.null(reference)) {
     store.file <- paste("statistics.cordex", reference, variable, paste(period, collapse="-"), "rda", sep=".")
   } else {
@@ -131,44 +134,71 @@ calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), v
   }
   
   store <- list()
-  if(file.exists(store.file)) load(store.file)
-  
+
   if(!is.null(reference)) {
-    ref.file <- getReference(reference,variable)
-    reference.raster <- raster(ref.file)
+    ref.file <- switch(paste(reference, variable, sep = "."), 
+                       eobs.tas = "tg_0.50deg_reg_small_v16.0_ymon.nc", eobs.pr = "rr_0.50deg_reg_small_v16.0_ymon.nc")
+    ref.file <- paste(path.rcm,ref.file,sep="")
     
     store.name <- paste(reference,variable,sep=".")
-    store[[store.name]]$spatial.sd <- c(cdo.spatSd(ref.file,period), 
-                                        cdo.spatSd(ref.file,period,monthly=TRUE))
-    store[[store.name]]$mean <- c(cdo.mean(ref.file,period), 
-                                  cdo.mean(ref.file,period,monthly=TRUE))
+    store[[store.name]]$europe$spatial.sd <- c(cdo.spatSdymon(ref.file), 
+                                               cdo.spatSdymon(ref.file,monthly=TRUE))
+    store[[store.name]]$europe$mean <- c(cdo.meanymon(ref.file), 
+                                         cdo.meanymon(ref.file,monthly=TRUE))
+    
+    for(i in 1:length(prudence.regions)) {
+      getPrudenceCoords(prudence=prudence,region=i,destfile=mask)
+      store[[ store.name ]][[ prudence.regions[i] ]]$spatial.sd <- 
+        c(cdo.spatSdymon(ref.file,mask=mask), 
+          cdo.spatSdymon(ref.file,mask=mask,monthly=TRUE))
+      store[[ store.name ]][[ prudence.regions[i] ]]$mean <- 
+        c(cdo.meanymon(ref.file,mask=mask), 
+          cdo.meanymon(ref.file,mask=mask,monthly=TRUE))
+    }
   }
   
-  ngcm <- length(cordex.urls(varid=variable))
-  start <- 1
-  if(continue && file.exists(store.file))
-    start <- as.numeric(tail(sub('.*\\.', '', names(store), perl=TRUE),n=1))+1
-  if(nfiles=="all") {
-    end <- ngcm
-  } else {
-    end <- min(start+nfiles-1,ngcm) 
-  }
-  
-  for(i in start:end){
-    X <- getRCMs(select=i, varid=variable, path=path.gcm)
-    gcm.file <- X[[1]]$filename
-    store.name <- paste("rcm",i,sep=".")
-    store[[store.name]]$spatial.sd <- c(cdo.spatSd(gcm.file,period),
-                                        cdo.spatSd(gcm.file,period,monthly=TRUE))
-    store[[store.name]]$mean <- c(cdo.mean(gcm.file,period),
-                                  cdo.mean(gcm.file,period,monthly=T))
-    if(!is.null(reference)) store[[store.name]]$corr <- 
-      c(cdo.gridcor(gcm.file,ref.file,period),
-        cdo.gridcor(gcm.file,ref.file,period,monthly=TRUE))
+  for(m in 0:15){
+    rcm.file <- paste(path.rcm,"masked_ymonmean_",paste(period, collapse="-"),"_",variable,"_EUR-44_cordex_rcp45_mon_0",sprintf("%02d", m),".nc",sep="")
+    store.name <- paste("rcm",m,sep=".")
+    store[[store.name]]$europe$spatial.sd <- c(cdo.spatSdymon(rcm.file),
+                                               cdo.spatSdymon(rcm.file,monthly=TRUE))
+    store[[store.name]]$europe$mean <- c(cdo.meanymon(rcm.file),
+                                  cdo.meanymon(rcm.file,monthly=T))
+    
+    for(i in 1:length(prudence.regions)) {
+      getPrudenceCoords(prudence=prudence,region=i,destfile=mask)
+      store[[ store.name ]][[ prudence.regions[i] ]]$spatial.sd <- 
+        c(cdo.spatSdymon(rcm.file,mask=mask), 
+          cdo.spatSdymon(rcm.file,mask=mask,monthly=TRUE))
+      store[[ store.name ]][[ prudence.regions[i] ]]$mean <- 
+        c(cdo.meanymon(rcm.file,mask=mask), 
+          cdo.meanymon(rcm.file,mask=mask,monthly=TRUE))
+    }
+    
+    if(!is.null(reference)) {
+      values <- as.numeric(c(system(paste("cdo -output -fldcor -timmean",rcm.file,ref.file),intern=T),
+                             system(paste("cdo -output -fldcor",rcm.file,ref.file),intern=T)))
+      names(values) <-     c("ann", "jan", "feb", "mar", "apr", "may", "jun", 
+                             "jul", "aug", "sep", "oct", "nov", "dec")              
+      store[[store.name]]$europe$corr <- values
+      
+      
+      for(i in 1:length(prudence.regions)) {
+        getPrudenceCoords(prudence=prudence,region=i,destfile="PrudenceCoords.txt")
+        values <- as.numeric(c(system(paste("cdo -output -fldcor -maskregion,PrudenceCoords.txt -timmean",rcm.file,ref.file),intern=T),
+                               system(paste("cdo -output -fldcor -maskregion,PrudenceCoords.txt",rcm.file,ref.file),intern=T)))
+        names(values) <-     c("ann", "jan", "feb", "mar", "apr", "may", "jun", 
+                               "jul", "aug", "sep", "oct", "nov", "dec")              
+        store[[store.name]][[ prudence.regions[i] ]]$corr <- values
+        
+      }
+    }
+    
     save(file=store.file,store)
-    gc()
-    if(i==ngcm) return(store)
+    # gc()
+    # if(m==15) return(store)
   }
+
   return(store)
 }
 
@@ -198,13 +228,13 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   if(verbose) print("calculate.rmse.cmip")
   shfile <- find.file("referenceRegions.shp")[1]
   shape <-  get.shapefile(shfile, with.path = TRUE)
-
+  
   store <- list()
   store.file <- paste("statistics.cmip", reference, variable, paste(period, collapse="-"),
                       "rda", sep=".")
   #if(is.character(find.file(store.file)[1])) store.file <- find.file(store.file)[1]
   if(file.exists(store.file)) load(store.file)
-
+  
   ## Pre-process reference file if necessary
   ref.file <- getReference(reference,variable)
   if(is.null(path)) {
@@ -218,7 +248,7 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   if(!is.character(find.file(ref.mulc)[1])) ref.mulc <- file.path(path,ref.mulc)
   ref.mon.file <- paste(reference,"monmean",variable,"nc",sep=".")
   if(!is.character(find.file(ref.mon.file)[1])) ref.mon.file <- file.path(path,ref.mon.file)
-
+  
   if(variable=="pr") {
     if(!file.exists(ref.mulc)) cdo.command("mulc",1000,ref.file,ref.mulc)
   } else {
@@ -227,7 +257,7 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   
   if(!file.exists(ref.mon.file)) {
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
-             infile=ref.mulc,outfile=ref.mon.file)
+                infile=ref.mulc,outfile=ref.mon.file)
   }
   ref <- coredata(retrieve(ref.mon.file))
   
@@ -240,7 +270,7 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   lon <- longitude(ref)
   lat <- latitude(ref)
   weights <- calculate.mon.weights(lon,lat)
- 
+  
   ## Check which files are processed
   ngcm <- length(cmip5.urls(varid=variable))
   start <- 1
@@ -273,7 +303,7 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
         c(12,length(longitude(gcm)),length(latitude(gcm)))
       store[[store.name]][[region]]$rms <- 
         sqrt(sum(weights*(gcm.masked-ref.masked)^2,na.rm=TRUE)/
-             sum(weights[!is.na(gcm.masked)]))
+               sum(weights[!is.na(gcm.masked)]))
     }
     file.remove(gcm.mon.file)
   }
@@ -295,7 +325,7 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
 calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variable="tas", nfiles=4,
                                   continue=TRUE, verbose=FALSE, path=NULL, path.gcm=NULL) {
   if(verbose) print("calculate.rmse.cordex")
-
+  
   store <- list()
   store.file <- paste("statistics.cordex", reference, variable, paste(period, collapse="-"),
                       "rda", sep=".")

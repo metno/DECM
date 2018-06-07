@@ -114,7 +114,7 @@ dashboardPage(skin = 'red',
                                window.dataLayer = window.dataLayer || [];
                                function gtag(){dataLayer.push(arguments);}
                                gtag('js', new Date());
-                               gtag('config', 'UA-108282573-4');
+                               gtag('config', 'UA-108282573-4', { 'anonymize_ip': true });
                                </script>"
                 )),
                 

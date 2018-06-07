@@ -124,6 +124,10 @@ calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), v
   path.rcm="/home/ubuntu/git/DECM/back-end/data/EUR-44_CORDEX/"
   prudence <- read.csv("/home/ubuntu/git/DECM/back-end/data/PRUDENCE_regions/RegionSpecifications.csv")
   prudence.regions <- as.character(prudence$Code)
+
+  country_shape <- get.shapefile("TM_WORLD_BORDERS-0.3.shp")
+  country.regions <- as.character(country_shape$ISO3)
+
   
   if(max(period)>2015) reference <- NULL
   
@@ -155,6 +159,26 @@ calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), v
         c(cdo.meanymon(ref.file,mask=mask), 
           cdo.meanymon(ref.file,mask=mask,monthly=TRUE))
     }
+
+    for(i in which(country_shape$REGION==150 & country_shape$AREA > 50*50)) { #All European countries with more than 2500km^2
+      pol.coords <- coordinates(country_shape@polygons[[i]]@Polygons[[1]])
+      write(t(pol.coords),file="countrycoord.txt",ncolumns = 2)
+
+      for (p in 1:length(shape@polygons[[i]]@Polygons))
+      {
+        pol.coords <- coordinates(country_shape@polygons[[i]]@Polygons[[p]])
+        write("&",file="countrycoord.txt",append=T)
+	write(t(pol.coords),file="countrycoord.txt",ncolumns = 2,append=T)
+      }
+
+      store[[ store.name ]][[ country.regions[i] ]]$spatial.sd <-
+        c(cdo.spatSdymon(ref.file,mask="countrycoord.txt"),
+          cdo.spatSdymon(ref.file,mask="countrycoord.txt",monthly=TRUE))
+      store[[ store.name ]][[ country.regions[i] ]]$mean <-
+        c(cdo.meanymon(ref.file,mask="countrycoord.txt"),
+          cdo.meanymon(ref.file,mask="countrycoord.txt",monthly=TRUE))
+    }
+
   }
   
   for(m in 0:15){
@@ -174,6 +198,26 @@ calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), v
         c(cdo.meanymon(rcm.file,mask=mask), 
           cdo.meanymon(rcm.file,mask=mask,monthly=TRUE))
     }
+
+    for(i in which(country_shape$REGION==150 & country_shape$AREA > 50*50)) { #All European countries with more than 2500km^2
+      pol.coords <- coordinates(country_shape@polygons[[i]]@Polygons[[1]])
+      write(t(pol.coords),file="countrycoord.txt",ncolumns = 2)
+
+      for (p in 1:length(shape@polygons[[i]]@Polygons))
+      {
+        pol.coords <- coordinates(country_shape@polygons[[i]]@Polygons[[p]])
+        write("&",file="countrycoord.txt",append=T)
+        write(t(pol.coords),file="countrycoord.txt",ncolumns = 2,append=T)
+      }
+
+      store[[ store.name ]][[ country.regions[i] ]]$spatial.sd <-
+        c(cdo.spatSdymon(rcm.file,mask="countrycoord.txt"),
+          cdo.spatSdymon(rcm.file,mask="countrycoord.txt",monthly=TRUE))
+      store[[ store.name ]][[ country.regions[i] ]]$mean <-
+        c(cdo.meanymon(rcm.file,mask="countrycoord.txt"),
+          cdo.meanymon(rcm.file,mask="countrycoord.txt",monthly=TRUE))
+    }
+
     
     if(!is.null(reference)) {
       values <- as.numeric(c(system(paste("cdo -output -fldcor -timmean",rcm.file,ref.file),intern=T),
@@ -191,6 +235,26 @@ calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), v
                                "jul", "aug", "sep", "oct", "nov", "dec")              
         store[[store.name]][[ prudence.regions[i] ]]$corr <- values
         
+      }
+
+      for(i in which(country_shape$REGION==150 & country_shape$AREA > 50*50)) { #All European countries with more than 2500km^2
+
+        pol.coords <- coordinates(country_shape@polygons[[i]]@Polygons[[1]])
+        write(t(pol.coords),file="countrycoord.txt",ncolumns = 2)
+
+	for (p in 1:length(shape@polygons[[i]]@Polygons))
+        {
+          pol.coords <- coordinates(country_shape@polygons[[i]]@Polygons[[p]])
+          write("&",file="countrycoord.txt",append=T)
+          write(t(pol.coords),file="countrycoord.txt",ncolumns = 2,append=T)
+        }
+
+        values <- as.numeric(c(system(paste("cdo -output -fldcor -maskregion,countrycoord.txt -timmean",rcm.file,ref.file),intern=T),
+                               system(paste("cdo -output -fldcor -maskregion,countrycoord.txt",rcm.file,ref.file),intern=T)))
+        names(values) <-     c("ann", "jan", "feb", "mar", "apr", "may", "jun",
+                               "jul", "aug", "sep", "oct", "nov", "dec")
+        store[[store.name]][[ country.regions[i] ]]$corr <- values
+
       }
     }
     

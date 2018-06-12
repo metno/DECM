@@ -9,6 +9,7 @@ library(esd)
 library(leaflet)
 library(raster)
 library(rgdal)
+library(rgeos)
 library(plotly)
 library(shinydashboard)
 library(car)
@@ -570,5 +571,45 @@ rcms$pr$nf <- store
 load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.pr.2071-2100.rda")
 rcms$pr$ff <- store
 
+regions.all <- list('Europe',
+                    'National Regions' = c(
+                      'ALB - Albania',                                
+                      'BIH - Bosnia and Herzegovina',                  
+                      'BGR - Bulgaria',                                
+                      'DNK - Denmark',                                 
+                      'IRL - Ireland',                                 
+                      'EST - Estonia',                                 
+                      'AUT - Austria',                                 
+                      'CZE - Czech Republic',                          
+                      'FIN - Finland',                                 
+                      'FRA - France',                                  
+                      'DEU - Germany',                                 
+                      'GRC - Greece',                                  
+                      'HRV - Croatia',                                 
+                      'HUN - Hungary',                                 
+                      'ISL - Iceland',                                 
+                      'ITA - Italy',                                   
+                      'LVA - Latvia',                                  
+                      'BLR -  Belarus',                                 
+                      'LTU -  Lithuania',                               
+                      'SVK - Slovakia',                                
+                      'MKD - The former Yugoslav Republic of Macedonia',
+                      'NLD - Netherlands',                             
+                      'NOR - Norway',                                  
+                      'POL - Poland',                                  
+                      'PRT - Portugal',                                
+                      'ROU - Romania',                                 
+                      'MDA - Republic of Moldova',                     
+                      'RUS - Russia',                                  
+                      'ESP - Spain',                                   
+                      'SWE - Sweden',                                  
+                      'CHE - Switzerland',                             
+                      'GBR - United Kingdom',
+                      'UKR - Ukraine'),
+                      'PRUDENCE Regions' = c('BI - British Isles','IP - Iberian Peninsula','FR - FRANCE','ME - Mid Europe','SC - Scandinavia','AL - ALPS','MD - Mediterranean','EA - Eastern Europe')
+)    
+
+#setwd('/home/ubuntu/git/DECM/back-end/data/TM_WORLD_BORDERS-0.3/')
+afg <- readOGR(dsn = '/home/ubuntu/git/DECM/back-end/data/TM_WORLD_BORDERS-0.3/', layer = "TM_WORLD_BORDERS-0.3",verbose = FALSE, stringsAsFactors = FALSE)
 
 

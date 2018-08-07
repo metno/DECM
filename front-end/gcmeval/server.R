@@ -139,8 +139,6 @@ shinyServer(function(input, output) {
         weightedranks_all[mod,score] <- (seasweightvec %*% seas_varweightedranks[mod,,score,] %*% regweightvec)
       }
     }
-    weightedranks_all <- apply(weightedranks_all,2,rank)
-    
     
     #weight metrics
     metweightvec <- as.numeric(c(input$wmbias,input$wmsd,input$wmsc,input$wmcmpi))

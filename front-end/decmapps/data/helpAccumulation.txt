@@ -1,0 +1,3 @@
+When calculating SPI and SPEI, both precipitation and potential evapotranspiration are typically accumulated over longer-than-monthly time window. For example, 3-month accumulated precipitation for December contains the precipitation sum of October-Novermber-December. <br> <br>
+
+Using different accumulation periods enables to hightlight the potential impact of drought or wet periods to sectors, which have different response time scales. For example, agriculture is affected by precipitation anomalies at relatively short time scales (1-6 months), while streamflow, reservoirs and groundwater are affected precipitation deficit or surplus over periods up to 24 months or even longer. <br> <br>

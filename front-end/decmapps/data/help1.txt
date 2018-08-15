@@ -1,0 +1,8 @@
+Standardized precipitation index (SPI) is a meteorological drought index,
+which describes how much precipitation (P) - possibly accumulated over a number of months -
+differs from the median value in a reference period in the units of stadard deviation.
+\n
+Standardized precipitation and evapotranspiration index (SPEI) is similar
+to SPI but is based on the difference between the accumulated precipitation
+and potential evapotranspiration (PET) P-PET. Thus, SPEI incorporates the effect
+of temperature variations to water availability indirectly in its calculations.

@@ -3,7 +3,6 @@
 function(input, output,session) {
   
   ## Messages / Notifications / Tasks
-  
   notData <- reactive({
     gcm.meta <- gcm.meta.tas.reactive()
     if (!is.null(input$rowsGcm)) {
@@ -497,7 +496,7 @@ function(input, output,session) {
   #   return(isolate(Y))  
   # })
   # 
-  gcm.sc.vals <- function(param,region,period,stat) {
+  gcm.sc.vals <- function(param,region,period,stat){
     ## 
     if (param == 'tas')
       gcms <- names(stats$tas$ff)
@@ -3095,14 +3094,14 @@ function(input, output,session) {
       
       if (input$gcm.outputValues == 'Absolute')
         
-        caption <- paste('Monthly estimates of regional preciptiation assuming an 
+        caption <- paste('Monthly estimates of regional precipitation assuming an 
                          intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The last row in the table shows the estimated values from the referance data set (Observation).',
                          sep= ' ')
       else if (input$gcm.outputValues == 'Anomaly') {
         df <- df - colMeans(df)
-        caption <- paste('Monthly anomalies in estimated regional preciptiation assuming an 
+        caption <- paste('Monthly anomalies in estimated regional precipitation assuming an 
                          intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The last row in the table shows the estimated values from the referance data set (Observation).',
@@ -5840,6 +5839,7 @@ function(input, output,session) {
       ps$elementId <- NULL
       ps
     })
+    
     # station time series table output
     output$station.data <- DT::renderDataTable(server = TRUE, {
       sta.obs <- attr(loc.reactive(),'station')
@@ -6532,8 +6532,300 @@ function(input, output,session) {
                         choices = c('Mean','Standard Deviation','Spatial Correlation')) 
     
   })
+
+
+#-------------------------------------------------------
+# O. Räty 09.08.2018  
+# Added server side code used in the drought example
+# Needs to be harmonized with the rest of the code!
   
-    }
+  observeEvent(input$showHelp1,{
+    showNotification("Choose the drought indicator", action = NULL, duration = NULL, type = "message")
+    #    showModal(modalDialog(title = "Test", "Choose the drought indicator", easyClose = T))
+    
+  })
+  
+  output$DesignBox2 <- renderText({
+    paste(toupper(input$index),", multi-model mean of ",tolower(names(category)[which(category==input$category)]),
+          ", ",input$scale,"-month aggregation, ",
+          names(statistic)[which(statistic==input$statistic)],sep="")
+  })
+  
+  output$map.spi <- renderLeaflet({
+    leaflet(options = leafletOptions(minZoom = 3, maxZoom = 6)) %>%
+      addProviderTiles(providers$Esri.WorldStreetMap,
+                       #addProviderTiles(providers$Stamen.TonerLite,
+                       options = providerTileOptions(noWrap = TRUE)) %>%
+      addTiles(group = "OSM", layerId = 0) %>%
+      setView( lng = 15, lat = 45, zoom = 4 ) %>%
+      setMaxBounds(lng1 = -40, lat1 = 0, lng2 = 70, lat2 = 80) %>%
+      onRender(
+        "function(el,x){
+        this.on('mousemove', function(e) {
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
+        var coord = [lat, lng];
+        Shiny.onInputChange('hover_coordinates', coord)
+        });
+        this.on('mouseout', function(e) {
+        Shiny.onInputChange('hover_coordinates', null)
+        })
+  }"
+      )
+    })
+  
+  observeEvent(input$map_click,{
+    leafletProxy("map.spi") %>%
+      clearPopups() %>%
+      addPopups(lng = input$hover_coordinates[2], lat = input$hover_coordinates[1], 
+                popup = paste("lon = ",round(input$hover_coordinates[2],2),"lat = ",round(input$hover_coordinates[1]),2))
+  })
+  
+  # Generate map layers from the database
+  observeEvent(input$submit.spi, {
+    path <- "/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/"
+    referenceFile <- paste(path,paste(paste(input$index, "statistics", input$scale, "mon", input$category, 
+                                 "1981-2010", sep = "_"), "rda",sep="."),sep="")
+    env <- reactiveFileReader(intervalMillis = 1000, session = session, filePath = referenceFile, LoadToEnvironment)
+    reference <- lapply(env()[[names(env())[1]]], "[[", input$statistic)
+    
+    scenarioFile <- paste(path,paste(paste(input$index, "statistics", input$scale, "mon", input$category, 
+                                "2021-2050", sep = "_"),"rda",sep="."),sep="")
+    env <- reactiveFileReader(intervalMillis = 1000, session = session, filePath = scenarioFile, LoadToEnvironment)
+    scenario1 <-  lapply(env()[[names(env())[1]]], "[[", input$statistic)
+    
+    scenarioFile <- paste(path,paste(paste(input$index, "statistics", input$scale, "mon", input$category, 
+                                "2071-2100", sep = "_"),"rda",sep="."),sep="")
+    env <- reactiveFileReader(intervalMillis = 1000, session = session, filePath = scenarioFile, LoadToEnvironment)
+    scenario2 <-  lapply(env()[[names(env())[1]]], "[[", input$statistic)
+    
+    reactiveData$brickReference <- processToRasterBrick(reference)#,input$statistic)
+    reactiveData$brickScenario1 <- processToRasterBrick(scenario1)#,input$statistic)
+    reactiveData$brickScenario2 <- processToRasterBrick(scenario2)#,input$statistic)
+    
+    meanReference <- mean(reactiveData$brickReference)
+    meanScenario1 <- mean(reactiveData$brickScenario1)
+    meanScenario2 <- mean(reactiveData$brickScenario2)
+    
+    meanChange1 <- meanScenario1 - meanReference
+    meanChange2 <- meanScenario2 - meanReference
+    
+    reactiveMapVars$palAbs <- getRasterPalette(raster::stack(meanReference,meanScenario1,meanScenario2), type = "bin")
+    reactiveMapVars$palChange <- getRasterPalette(raster::brick(meanChange1,meanChange2), type = "bin")
+    
+    reactiveMapVars$groups <- c("1981-2010", "2021-2050", "2071-2100", sprintf('Change, 1981-2010 \u2192 2021-2050'),
+                                sprintf('Change, 1981-2010 \u2192 2071-2100'))
+    
+    leafletProxy("map.spi") %>%
+      clearShapes() %>%
+      clearControls() %>%
+      clearValues() %>%
+      clearImages() %>%
+      addRasterImage(meanReference, group = reactiveMapVars$groups[1], layerId = 1, 
+                     colors = reactiveMapVars$palAbs$pal, opacity = 0.9) %>%
+      addRasterImage(meanScenario1, group = reactiveMapVars$groups[2], layerId = 2,
+                     colors = reactiveMapVars$palAbs$pal, opacity = 0.9) %>%
+      addRasterImage(meanScenario2, group = reactiveMapVars$groups[3], layerId = 2,
+                     colors = reactiveMapVars$palAbs$pal, opacity = 0.9) %>%
+      addRasterImage(meanChange1, group = reactiveMapVars$groups[4], layerId = 3,
+                     colors = reactiveMapVars$palChange$pal, opacity = 0.9) %>%
+      addRasterImage(meanChange2, group = reactiveMapVars$groups[5], layerId = 3,
+                     colors = reactiveMapVars$palChange$pal, opacity = 0.9) %>%
+      addLegend(position = "bottomleft", pal = reactiveMapVars$palAbs$pal, title = input$statistic, 
+                values = reactiveMapVars$palAbs$range, group = reactiveMapVars$groups[2]) %>%
+      addLegend(position = "bottomleft", pal = reactiveMapVars$palChange$pal, title = paste("Change in",input$statistic,sep=" "),
+                values = reactiveMapVars$palChange$range, group = reactiveMapVars$groups[3]) %>%
+      addDrawToolbar(
+        targetGroup = "draw",
+        circleOptions = F, #disable certain drawing tools for now
+        markerOptions = F,
+        polylineOptions = F, 
+        circleMarkerOptions = F,
+        singleFeature = T, #Can draw only single feature at time
+        editOptions = editToolbarOptions(selectedPathOptions = selectedPathOptions())
+      ) %>%
+      addLayersControl(
+        baseGroups = reactiveMapVars$groups,
+        options = layersControlOptions(collapsed = FALSE)
+      )
+    
+  })
+  
+  # Binding of the legend to the baseGroup not implemented in leaflet yet.
+  # Below is a hack, which tries to achieve this (with poor results so far).
+  
+  # legHelper <- reactive({
+  #   if(length(input$map_groups)>1 & all(!is.null(reactiveMapVars$groups))){
+  #     return(c(input$map_groups, reactiveMapVars$groups))
+  #     print("here")
+  #   } else{
+  #     return(NULL)
+  #     print("there")
+  #   }
+  # })
+  # 
+  # observeEvent(legHelper(), ignoreNULL = T, ignoreInit = F, {
+  #   print(isolate(input$map.spi_groups))
+  #   map <- leafletProxy("map") %>%
+  #   clearControls() %>%
+  #   clearValues()
+  #   thisGroup <- which(input$map_groups != "OSM" & input$map_groups != "draw")
+  #   if(input$map.spi_groups[thisGroup] == reactiveMapVars$groups[1]){
+  #     map %>% addLegend(position = "bottomleft", pal = reactiveMapVars$palAbs$pal, 
+  #                         values = reactiveMapVars$palAbs$range, group = reactiveMapVars$groups[1])
+  #   }else if(input$map.spi_groups[thisGroup] == reactiveMapVars$groups[2]){
+  #     map %>% addLegend(position = "bottomleft", pal = reactiveMapVars$palAbs$pal, 
+  #                         values = reactiveMapVars$palAbs$range, group = reactiveMapVars$groups[2])
+  #   }else if(input$map.spi_groups[thisGroup] == reactiveMapVars$groups[3]){
+  #     map %>% addLegend(position = "bottomleft", pal = reactiveMapVars$palChange$pal, 
+  #                         values = reactiveMapVars$palChange$range, group = reactiveMapVars$groups[3])
+  #   }
+  # })
+  
+  #Box plot testing, r
+  boxPlotInput <- reactive({
+    
+    reference <- updateRegion(
+      data = reactiveData$brickReference,
+      polygon_coordinates = input$map.spi_draw_new_feature$geometry$coordinates[[1]]
+    )
+    
+    scenario1 <- updateRegion(
+      data = reactiveData$brickScenario1,
+      polygon_coordinates = input$map.spi_draw_new_feature$geometry$coordinates[[1]]
+    )
+    
+    scenario2 <- updateRegion(
+      data = reactiveData$brickScenario2,
+      polygon_coordinates = input$map.spi_draw_new_feature$geometry$coordinates[[1]]
+    )
+    
+    change1 <- scenario1-reference
+    change2 <- scenario2-reference
+    set <- c(rep("Reference",length(reference)),rep("Scenario 2021-2050",length(scenario1)), 
+             rep("Scenario 2071-2100",length(scenario2)), rep("Change 2021-2050",length(change1)),
+             rep("Change 2071-2100",length(change1)))
+    output <- data.frame(Type = set, Value = c(reference, scenario1, scenario2, change1, change2))
+    output$Type <- factor(output$Type, levels = c("Reference","Scenario 2021-2050","Scenario 2071-2100",
+                                                  "Change 2021-2050", "Change 2071-2100"))
+    return(output)
+  })
+  
+  output$plotBoxStatistics <- renderPlotly({
+    plot_ly(boxPlotInput(), x = ~Type, y = ~Value, type = "box", boxpoints = "all", jitter = 0)
+    
+  })
+  
+  
+  #Scatter plot input
+  scatterPlotInput <- reactive({
+    
+    refX <- updateRegion(
+      data = baseData[["tas"]]$ref,
+      polygon_coordinates = input$map.spi_draw_new_feature$geometry$coordinates[[1]]
+    )
+    
+    refY <- updateRegion(
+      data = baseData[["pr"]]$ref,
+      polygon_coordinates = input$map.spi_draw_new_feature$geometry$coordinates[[1]]
+    )
+    
+    xChange1 <- updateRegion(
+      data = baseData[["tas"]]$scen1,
+      polygon_coordinates = input$map.spi_draw_new_feature$geometry$coordinates[[1]]
+    ) - refX
+    
+    yChange1 <- 100*(updateRegion(
+      data = baseData[["pr"]]$scen1,
+      polygon_coordinates = input$map.spi_draw_new_feature$geometry$coordinates[[1]]
+    ) - refY)/refY
+    
+    xChange2 <- updateRegion(
+      data = baseData[["tas"]]$scen2,
+      polygon_coordinates = input$map.spi_draw_new_feature$geometry$coordinates[[1]]
+    ) - refX
+    
+    yChange2 <- 100*(updateRegion(
+      data = baseData[["pr"]]$scen2,
+      polygon_coordinates = input$map.spi_draw_new_feature$geometry$coordinates[[1]]
+    ) - refY)/refY
+    
+    output <- list(xChange1 = xChange1, yChange1 = yChange1, xChange2 = xChange2, yChange2 = yChange2)
+    
+    return(output)
+  })
+  
+  #Scatter plot  
+  output$plotScatterStatistics <- renderPlotly({
+    indData <- boxPlotInput()
+    axisData <- scatterPlotInput()
+    
+    data1 <- data.frame(data = indData$Value[which(indData$Type=="Change 2021-2050")], x = axisData$xChange1, y = axisData$yChange1)
+    data2 <- data.frame(data = indData$Value[which(indData$Type=="Change 2071-2100")], x = axisData$xChange2, y = axisData$yChange2)
+    limits1 <- rep(ceiling(max(abs(min(data1$data)),abs(max(data1$data)))))*c(-1,1)
+    limits2 <- rep(ceiling(max(abs(min(data1$data)),abs(max(data1$data)))))*c(-1,1)
+    symbols <- seq(nrow(data1))
+    
+    titleOpts1 <- list(title = paste("Change in",input$statistic,",",sprintf('1981-2010 \u2192 2021-2050'),sep=" "),
+                       size = 12
+    ) 
+    xAxisopts1 <- list(title = paste(sprintf('Temperature change (\u2103),  1981-2010 \u2192 2021-2050'), sep = " "),
+                       size = 16)
+    yAxisopts1 <- list(title = paste("Precipitation change (%),",sprintf('1981-2010 \u2192 2021-2050'), sep = " "),
+                       size = 16)
+    
+    p1 <- plot_ly(data1, x = ~x, y = ~y,
+                  type = "scatter",
+                  mode = "markers",
+                  showlegend = F,
+                  marker = list(
+                    symbol = symbols,
+                    size = 10,
+                    color = ~data,
+                    reversescale =T,
+                    cmin = limits1[1],
+                    cmax = limits1[2]
+                  ),
+                  text = ~paste("Change: ", data)) %>%
+      layout(xaxis = xAxisopts1, yaxis = yAxisopts1, title = titleOpts1)
+    
+    titleOpts2 <- list(title = paste("Change in",input$statistic,",",sprintf('Change, 2071-2100 \u2192 2071-2100'),sep=" "),
+                       size = 16
+    ) 
+    xAxisopts2 <- list(title = paste(sprintf('Temperature change (\u2103), 1981-2010 \u2192 2071-2100'), sep = " "),
+                       size = 16)
+    yAxisopts2 <- list(title = paste("Precipitation change (%),",sprintf('1981-2010 \u2192 2071-2100'), sep = " "),
+                       size = 16)
+    p2 <- plot_ly(data2, x = ~x, y = ~y,
+                  type = "scatter",
+                  mode = "markers",
+                  showlegend = F,
+                  marker = list(
+                    symbol = symbols,
+                    size = 10,
+                    color = ~data,
+                    reversescale =T,
+                    cmin = limits2[1],
+                    cmax = limits2[2],
+                    colorbar = list(
+                      len = 1,
+                      y = 0.5,
+                      ticks = "outside",
+                      title = paste("Change in", input$statistic, sep = " "),
+                      titlefont = list(
+                        size = 16
+                      ),
+                      titleside = "top"
+                    )
+                  ),
+                  text = ~paste("Change: ", data)) %>%
+      layout(xaxis = xAxisopts2, yaxis = yAxisopts2, title = titleOpts2) 
+    
+    subplot(p1,p2, margin = 0.04, titleY = T, titleX = T)    
+
+  })
+  
+}
 
 
 

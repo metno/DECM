@@ -1,0 +1,11 @@
+Content of this folder:
+
+1. calc_SPI.R: an R script for calculating the SPI and SPEI
+2. spi_category_changes.R: calculates the basic statistics for specific index categories
+3. plot_spi_spei_all_statistics.R: an example script for visualising the calculated statistics
+4. pr_metadata.rda: a small subset of meta data extracted from precipitation files. Hopefully helps to identify the used models.
+5. spi...rda: files containing the basic statistics calculated from SPI (for definitions and naming convention, see the google document)
+6. spei...rda: same as above but for SPEI  
+
+lsmask.nc: Land-sea mask used to define land grid boxes (land area fraction > 50% of the grid box area)
+sftl...nc: Land surface fraction in SMHI-RCA used to define the land-sea mask (lsmask.nc). The same file is used for all RCMs.

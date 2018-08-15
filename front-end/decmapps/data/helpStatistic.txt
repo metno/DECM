@@ -1,0 +1,5 @@
+Three simple statistics have been calculated to illustrate the properties of, and changes in, SPI and SPEI time series: <br> <br>
+  1. Number of months belonging to a certain severity category/categories <br> <br> 
+  2. Number of events within a certain category/categories <br> <br>
+  3. Mean length of events within a certain category/categories
+  

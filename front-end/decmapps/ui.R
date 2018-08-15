@@ -3,7 +3,9 @@
 # table view of the generated distribution
 
 library(shinydashboard)
+source("global.R") # Needs to be sourced for now 
 data("metaextract")
+
 M <- data.frame(list(Project=meta$project_id,Experiment=meta$experiment_id,GCM=meta$gcm,
                      RIP=meta$gcm_rip, RCM=meta$rcm, VAR=meta$var, Unit=meta$unit, Resolution=paste(meta$resolution,"deg"),
                      Domain=paste(gsub(","," - ",meta$lon),"E"," / ",paste(gsub(","," - ",meta$lat)),"N",sep=""), 
@@ -16,16 +18,6 @@ dashboardPage(skin = 'red',
                                       tags$style(".main-header {height: 60px}"),
                                       tags$style(".main-header .logo {height: 60px}")
                               ),
-                              # tags$li(a(href = 'http://www.copernicus.eu/',
-                              #           img(src = 'https://climatedatasite.net/wp-content/uploads/2018/02/copernicus-logo.png',
-                              #               title = "Copernicus", height = "30px"),
-                              #           title = "Copernicus website"),
-                              #         class = "dropdown"),
-                              # tags$li(a(href = 'https://climate.copernicus.eu/',
-                              #           img(src = 'https://climatedatasite.net/wp-content/uploads/2018/02/c3s-logo.png',
-                              #               title = "Climate Change Service", height = "30px"),
-                              #           title = "Climate Change Service"),
-                              #         class = "dropdown"),
                               tags$li(a(href = 'https://climate.copernicus.eu/data-evaluation-climate-models',
                                         img(src = 'https://climatedatasite.net/wp-content/uploads/2018/02/banner_c3s.png',
                                             title = "DECM website", height = "40px"),
@@ -55,11 +47,14 @@ dashboardPage(skin = 'red',
                                           #menuSubItem("test iframe", tabName = "score1"),
                                           #menuSubItem("Individual Model", tabName = "score4"),
                                           menuSubItem("Changes in Climate", tabName = "score5"),
-                                          menuSubItem("Models' Spread (Cf. External App.)", href = 'https://esdlab.met.no/gcmeval/')),
-                                 #menuSubItem("Storm tracks", href = 'http://157.249.177.25:3838/Storms/'),
-                                 #menuSubItem("Individual Location", tabName = "score7"),
-                                 #menuSubItem("Comparator", tabName = "score8")),
-                                 menuItem("Data Users", tabName = 'pu',startExpanded = TRUE,
+                                          menuSubItem("Drought example", tabName = "drought"),
+                                          menuSubItem("Models' Spread (Cf. External App.)", href = 'https://esdlab.met.no/gcmeval/')
+                                          #menuSubItem("Storm tracks", href = 'http://157.249.177.25:3838/Storms/'),
+                                          #menuSubItem("Individual Location", tabName = "score7"),
+                                          #menuSubItem("Comparator", tabName = "score8")),
+                                 ),
+
+                                 menuItem("Data Users", tabName = 'du',startExpanded = TRUE,
                                           menuSubItem("Global Climate Models", tabName = "gcms"),
                                           menuSubItem("Regional Climate Models", tabName = "rcms"),
                                           menuSubItem("Models' Ranks (Cf. External App.)", href = 'https://esdlab.met.no/gcmeval/')
@@ -80,7 +75,8 @@ dashboardPage(skin = 'red',
                                           menuSubItem("Disaster Risk Reduction", tabName = "disaster"),
                                           menuSubItem("Coastal Areas", tabName = "coastareas"),
                                           menuSubItem("Defense", tabName = "defense"),
-                                          menuSubItem("Cities and Urban areas", tabName = "cities")),
+                                          menuSubItem("Cities and Urban areas", tabName = "cities")
+                                 ),
                                  menuItem("Settings and filtering", tabName = "du", startExpanded = FALSE,
                                           sliderInput("dates7", "Years",min=1900, max=2099,
                                                       step = 5, value= c(1900,2099),
@@ -1252,64 +1248,176 @@ tabItem(tabName = "score5",
           )
         )
         ),
+
+tabItem(tabName = "drought", #OR 140818 Added the drought example under product users 
+        fluidPage(
+          p(),
+
+          fluidRow(
+            column(12,
+                   box(width = '100%',
+                       status = 'danger',#Testing different ways to show help information for the user
+                       title = "1. Controls",
+                       solidHeader = T,
+                       collapsible = T,
+                       
+                       div(style="font-size: 20px; display:inline-block; vertical-align:top; width:50%;",
+                           selectInput(inputId = "index",
+                                       label = c("Select the drought index",
+                                                 helpPopup(title = "",
+                                                           content = paste(readLines("/homeappl/home/oraty/appl_taito/R/DECM/front-end/decmapps/data/helpIndex.txt"),collapse = ""),
+                                                           placement='right',
+                                                           trigger='hover'
+                                                 )
+                                       ),
+                                       choices = index
+                           )
+                       ),
+                       
+                       bsTooltip(id = "index", title = "Click to reveal the available options",
+                                 placement = "left", trigger = "hover"),
+                       
+                       # div(style="display:inline-block",
+                       #     actionButton("showHelp1", "?", style = 'padding:0px; font-size:25px; vertical-align:-148%; height: 40px; width: 40px;')),
+                       div(style="font-size: 20px; display:inline-block; vertical-align:baseline; width:50%;",
+                           selectInput(inputId = "category",
+                                       label = c("Select the category",
+                                                 helpPopup(title = "",
+                                                           content = paste(readLines("/homeappl/home/oraty/appl_taito/R/DECM/front-end/decmapps/data/helpCategory.txt"),collapse = "\n"),
+                                                           placement='right',
+                                                           trigger='hover'
+                                                 )
+                                       ),
+                                       choices = category
+                           )
+                       ),
+                       
+                       # div(style="font-size: 20px; display:inline-block; vertical-align:top; width:50%;",
+                       #     selectInput(inputId = "period",
+                       #                 label = "Select the period",
+                       #                 choices = period
+                       #     )
+                       # ),
+                       
+                       div(style="font-size: 20px; display:inline-block; vertical-align:top; width:50%;",
+                           selectInput(inputId = "statistic",
+                                       label = c("Select statistic",
+                                                 helpPopup(title = "",
+                                                           content = paste(readLines("/homeappl/home/oraty/appl_taito/R/DECM/front-end/decmapps/data/helpStatistic.txt"),collapse = "\n"),
+                                                           placement='right',
+                                                           trigger='hover'
+                                                 )
+                                       ),
+                                       choices = statistic)
+                       ),
+                       
+                       div(style="font-size: 20px; display:inline-block; vertical-align:top; width:50%;",
+                           selectInput(inputId = "scale",
+                                       label = c("Select temporal aggregation",
+                                                 helpPopup(title = "",
+                                                           content = paste(readLines("/homeappl/home/oraty/appl_taito/R/DECM/front-end/decmapps/data/helpAccumulation.txt"),collapse = "\n"),
+                                                           placement='right',
+                                                           trigger='hover'
+                                                 )
+                                       ),
+                                       choices = scale)
+                       ),
+                       
+                       div(actionButton("submit.spi", "Submit", style = 'padding:4px; font-size:20px; height: 40px;'))
+                   ),
+                   box(
+                     width = "100%",
+                     title = "2. Map display",#textOutput("DesignBox2"),
+                     solidHeader = T,
+                     status = 'danger',
+                     leafletOutput("map.spi", width = "100%", height = "800")
+                     # absolutePanel(class = "panel panel-default", fixed = TRUE,
+                     #             draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
+                     #             width = 330, height = "auto",
+                     #
+                     #             h2("Regional information, individual models")
+                     # )
+                   ),
+                   box( side = "left",
+                        selected = "Scatter plot",
+                        width = "100%",
+                        solidHeader = T,
+                        status = "danger",
+                        title = tags$p('3. Statistics, user-defined region'),
+                        tabsetPanel(
+                          tabPanel(title = "Box plot",
+                                   plotlyOutput("plotBoxStatistics")
+                          ),
+                          tabPanel(title = "Scatter plot",
+                                   plotlyOutput("plotScatterStatistics")
+                          )
+                        )
+                   )
+            )
+          )
+        )
+        
+),
+
+
 tabItem(tabName = "hydro",
         fluidPage(
           p(),
           fluidRow(
-            column(12,
+            column(width = 12,
                    box(width = '100%', solidHeader = TRUE, status = 'danger',
                        tags$figcaption('The EURO-CORDEX domain',
                                        tags$a(href = 'http://cordex.org/domains/cordex-region-euro-cordex/',"Read more")),
                        tags$a(href = 'https://figshare.com/s/7b678c0f92c43f8e0aeb',"Demo video"),
-                       column(12,selectInput("rcm.region", label = NULL, 
+                       column(12,selectInput("rcm.region", label = NULL,
                                              choices = regions.all,
-                                             selected = "Europe",width = '100%')),
+                                             selected = "Europe", width = '100%')),
                        #leafletOutput('rcm.region',width = '100%',height = 500),
-                       title = tags$p('1. Select a region (e.g. EURO-CORDEX definition)'), 
+                       title = tags$p('1. Select a region (e.g. EURO-CORDEX definition)'),
                        collapsible = TRUE, collapsed = TRUE))
           ),
           fluidRow(
             column(12,
                    box(width = '100%', solidHeader = TRUE, status = 'danger',
-                       selectInput("rcm.period", label = "Period", 
+                       selectInput("rcm.period", label = "Period",
                                    choices = c("Present (1981-2010)","Near Future (2021-2050)",
                                                "Far Future (2071-2100)"),
                                    selected = "Present",width = '100%'),
-                       selectInput("rcm.chart.type", label = "Chart Output", 
+                       selectInput("rcm.chart.type", label = "Chart Output",
                                    choices = c("Individual Simulations",
                                                "Ensemble of All Simulations",
                                                "Box Plots of All Simulations"),
                                    selected = "Ensemble of All Simulations",width = '100%'),
-                       selectInput("rcm.sim.sc", label = "Simulations", 
+                       selectInput("rcm.sim.sc", label = "Simulations",
                                    choices = c("All simulations","Selected Simulations","Both (not yet implemented)"),
                                    selected = "All simulations",width = '100%'),
-                       selectInput("rcm.legend.sc", label = "Legend", 
+                       selectInput("rcm.legend.sc", label = "Legend",
                                    choices = c("Display","Hide"),
                                    selected = "Hide Legend",width = '100%'),
                        selectInput("rcm.groupBy", label = "Group By", choices = c('None','---',names(rcm.meta.tas)),
                                    selected = 'None',width = '100%'),
-                       selectInput("rcm.colorBy", label = "Color By", 
+                       selectInput("rcm.colorBy", label = "Color By",
                                    choices = c('None','---','Group'),
                                    selected = 'None',width = '100%'),
-                       selectInput("rcm.outputValues", label = "Displayed values", 
+                       selectInput("rcm.outputValues", label = "Displayed values",
                                    choices = c('Absolute','Anomaly','Bias','Change'),
                                    selected = 'Absolute',width = '100%'),
-                       selectInput("rcm.stat", label = "Statistics", 
+                       selectInput("rcm.stat", label = "Statistics",
                                    choices = c('Mean','Standard Deviation',
                                                'Correlation')),
-                       selectInput("rcm.var", label = "Variables", 
+                       selectInput("rcm.var", label = "Variables",
                                    choices = c('Individual','Synchronised'),
                                    selected = 'Synchronised',width = '100%'),
-                       title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'), 
+                       title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'),
                        collapsible = TRUE, collapsed = TRUE))
           ),
           fluidRow(
             column(12,
                    box(width = '100%', solidHeader = TRUE, status = 'danger',
                        tabsetPanel(
-                         tabPanel("Projected Precipitaiton",p(),
+                         tabPanel("Projected Precipitation",p(),
                                   # tags$figcaption('The interactive figure shows the projected precipitation simulated by the selected set of simulations assuming the intermediate emission scenario (RCP4.5).
-                                  #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
+                                  #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc.
                                   #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
                                   #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),
                                   plotlyOutput("hydro.sc.pr",width = '100%',height = '900'))
@@ -1320,16 +1428,17 @@ tabItem(tabName = "hydro",
           fluidRow(
             column(12,
                    box(width = '100%', solidHeader = TRUE, status = 'danger',
+                       title = tags$p('4. Drought'),
+                       collapsible = TRUE, collapsed = TRUE,
                        tabsetPanel(
                          tabPanel("Projected temperature",p(),
                                   # tags$figcaption('The interactive figure shows the projected temperature simulated by the selected set of simulations assuming the intermediate emission scenario (RCP4.5).
-                                  #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
+                                  #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc.
                                   #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
                                   #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),
                                   plotlyOutput("hydro.sc.tas",width = '100%',height = '900'))
-                       ),
-                       title = tags$p('4. Drought'), 
-                       collapsible = TRUE, collapsed = TRUE)
+                       )
+                  )
             )
           ),
           fluidRow(
@@ -1354,6 +1463,9 @@ tabItem(tabName = "hydro",
                    )
         
           ),
+
+# Stop here 
+
 tabItem(tabName = "agriculture",
         fluidPage(
           p(),

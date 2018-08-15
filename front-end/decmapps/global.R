@@ -14,6 +14,10 @@ library(plotly)
 library(shinydashboard)
 library(car)
 library(DECM)
+library(htmlwidgets) #O. Räty 09.09.2018
+library(shinyjqui) #O. Räty 09.09.2018  This package allows to drag popups within the prototype window
+library(shinyBS) #O. Räty 09.09.2018  Provides the tooltip functionality
+library(leaflet.extras) # O. Räty 09.09.2018 This package contains the drawing tools for leaflet
 #library(fields)
 
 #if ('RgoogleMaps' %in% installed.packages()) install.packages('RgoogleMaps')
@@ -272,91 +276,22 @@ varscore <- function(x) {
 }
 
 # Scatter plot data ...
-stats <- NULL
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.era.tas.1981-2010.rda")
-stats$tas$present <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.tas.2021-2050.rda")
-stats$tas$nf <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.tas.2071-2100.rda")
-stats$tas$ff <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.era.pr.1981-2010.rda")
-stats$pr$present <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.pr.2021-2050.rda")
-stats$pr$nf <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.pr.2071-2100.rda")
-stats$pr$ff <- store
+# stats <- NULL
+# load("/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/statistics.cmip.era.tas.1981-2010.rda")
+# stats$tas$present <- store
+# load("/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/statistics.cmip.tas.2021-2050.rda")
+# stats$tas$nf <- store
+# load("/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/statistics.cmip.tas.2071-2100.rda")
+# stats$tas$ff <- store
+# load("/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/statistics.cmip.era.pr.1981-2010.rda")
+# stats$pr$present <- store
+# load("/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/statistics.cmip.pr.2021-2050.rda")
+# stats$pr$nf <- store
+# load("/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/statistics.cmip.pr.2071-2100.rda")
+# stats$pr$ff <- store
 
-# regions <- function(type=c("srex","prudence"),region=NULL) {
-#   if(is.null(type) | length(type)>1) region <- NULL
-#   if(is.null(type) | "srex" %in% tolower(type)) {
-#     f <- "~/shiny/DECM/front-end/dpdt/referenceRegions.shp"#find.file("referenceRegions.shp")
-#     x <- get.shapefile(f,with.path=TRUE)
-#     ivec <- 1:nrow(x)
-#     if(!is.null(region)) {
-#       if(is.numeric(region)) {
-#         ivec <- region
-#       } else if(region %in% x$LAB) {
-#         ivec <- sapply(region, function(y) which(y==x$LAB))
-#       } else if(region %in% x$NAME) {
-#         ivec <- sapply(region, function(y) which(y==x$NAME))
-#       } else {
-#         print(paste("Unknown region",region))
-#       }
-#     }
-#     y <- list(name=as.character(x$NAME[ivec]), 
-#               label=as.character(x$LAB[ivec]), 
-#               usage=as.character(x$USAGE[ivec]),
-#               type=rep("srex",length(ivec)),
-#               coords=lapply(ivec, function(i) t(coordinates(x@polygons[[i]]@Polygons[[1]]))))
-#     #west=sapply(ivec, function(i) xmin(extent(x[i,]))),
-#     #east=sapply(ivec, function(i) xmax(extent(x[i,]))),
-#     #south=sapply(ivec, function(i) ymin(extent(x[i,]))),
-#     #north=sapply(ivec, function(i) ymax(extent(x[i,]))))
-#   } else {
-#     y <- NULL
-#   }
-#   if(is.null(type) | "prudence" %in% tolower(type)) {
-#     f <- "RegionSpecifications.csv"#find.file("RegionSpecifications.csv")
-#     x <- read.table(f,sep=",")
-#     ivec <- 2:nrow(x)
-#     names <- as.character(x[2:nrow(x),1])
-#     labels <- as.character(x[2:nrow(x),2])
-#     if(!is.null(region)) {
-#       if(is.numeric(region)) {
-#         ivec <- region
-#       } else if(region %in% labels) {
-#         ivec <- sapply(region, function(y) which(y==labels)+1)
-#       } else if(region %in% names) {
-#         ivec <- sapply(region, function(y) which(y==names)+1)
-#       } else {
-#         print(paste("Unknown region",region))
-#       }
-#     }
-#     prudence <- list(name=as.character(x[ivec,1]),
-#                      label=as.character(x[ivec,2]),
-#                      usage=rep("land",length(ivec)),
-#                      type=rep("prudence",length(ivec)),
-#                      coords=lapply(ivec, function(i) 
-#                        t(matrix(sapply(c(4,5,5,4,4,6,6,7,7,6), 
-#                                        function(j) factor2numeric(x[i,j])),
-#                                 nrow=5,ncol=2))))
-#     #west=as.numeric(x[2:nrow(x),4]),
-#     #east=as.numeric(x[2:nrow(x),5]),
-#     #south=as.numeric(x[2:nrow(x),6]),
-#     #north=as.numeric(x[2:nrow(x),7]))
-#     if(is.null(y)) {
-#       y <- prudence 
-#     } else {
-#       y <- mapply(c, y, prudence, SIMPLIFY=FALSE)
-#     }
-#   }
-#   invisible(y)
-# }
-
-#srex <- regions("srex")
 ## helpers.R
 ## Help functions for the shiny app "dpdt"
-
 
 ## Function to get instute name from gcmnames
 getModel <- function(i) strsplit(x,split =' ')[[i]][2]
@@ -369,10 +304,11 @@ models.26 <- apply(as.matrix(1:length(gcmnames.26)),1, getModel)
 x <- gsub('_',' ', gcmnames.85)
 models.85 <- apply(as.matrix(1:length(gcmnames.85)),1, getModel)
 
-
+#-----------------------------------------------------------
 ### For the seasonal cycle menu Item
 
 ## Load statistics calculated with script 'calculate_statistics.R'
+# O. Räty 10.08.18 Why is stat read twice ?
 stats <- NULL
 data("statistics.cmip.era.tas.1981-2010")
 stats$tas$present <- store
@@ -387,6 +323,7 @@ stats$pr$nf <- store
 data("statistics.cmip.pr.2071-2100")
 stats$pr$ff <- store
 
+#-----------------------------------------------------------
 ## Help functions for the shiny app "seasoncycle"
 
 regions <- function(type=c("srex","prudence"),region=NULL) {
@@ -555,20 +492,20 @@ rcm.meta.all <- rcm.meta.pr[,-c(5:8,15)]
   
 # RCM statistics ...
 rcms <- NULL
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.eobs.tas.1981-2010.rda")
+load("/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/statistics.cordex.eobs.tas.1981-2010.rda")
 store$eobs.tas$corr <- store$eobs.tas$mean
 store$eobs.tas$corr <- rep(1,13)
 rcms$tas$present <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.tas.2021-2050.rda")
+load("/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/statistics.cordex.tas.2021-2050.rda")
 rcms$tas$nf <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.tas.2071-2100.rda")
+load("/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/statistics.cordex.tas.2071-2100.rda")
 rcms$tas$ff <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.eobs.pr.1981-2010.rda")
+load("/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/statistics.cordex.eobs.pr.1981-2010.rda")
 store$eobs.pr$corr <- rep(1,13)
 rcms$pr$present <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.pr.2021-2050.rda")
+load("/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/statistics.cordex.pr.2021-2050.rda")
 rcms$pr$nf <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.pr.2071-2100.rda")
+load("/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/statistics.cordex.pr.2071-2100.rda")
 rcms$pr$ff <- store
 
 regions.all <- list('Europe',
@@ -609,7 +546,185 @@ regions.all <- list('Europe',
                       'PRUDENCE Regions' = c('BI - British Isles','IP - Iberian Peninsula','FR - FRANCE','ME - Mid Europe','SC - Scandinavia','AL - ALPS','MD - Mediterranean','EA - Eastern Europe')
 )    
 
-#setwd('/home/ubuntu/git/DECM/back-end/data/TM_WORLD_BORDERS-0.3/')
-afg <- readOGR(dsn = '/home/ubuntu/git/DECM/back-end/data/TM_WORLD_BORDERS-0.3/', layer = "TM_WORLD_BORDERS-0.3",verbose = FALSE, stringsAsFactors = FALSE)
+#setwd('/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/TM_WORLD_BORDERS-0.3/')
+afg <- readOGR(dsn = '/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/TM_WORLD_BORDERS-0.3/', layer = "TM_WORLD_BORDERS-0.3",verbose = FALSE, stringsAsFactors = FALSE)
 
+#------------------------------------------------------------------------------------
+# Olle Räty 09.08.2018
+# Added helper functions 
 
+load_obj <- function(f)
+{
+  env <- new.env()
+  nm <- load(f, env)[1]
+  env[[nm]]
+}
+
+LoadToEnvironment <- function(RData, env=new.env()) {
+  load(RData, env)
+  return(env)
+}
+
+readTPr <- function(path = "/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/"){
+  TPrData <- list(tas = NA, pr = NA)# tasmax = NA, tasmin = NA, pr = NA)
+  
+  filesTas <- list.files(path = path, pattern = "tas_", full.names = T)
+  TPrData$tas$ref <- processToRasterBrick(load_obj(filesTas[grep("1981",filesTas)]))
+  TPrData$tas$scen1 <- processToRasterBrick(load_obj(filesTas[grep("2021",filesTas)]))
+  TPrData$tas$scen2 <- processToRasterBrick(load_obj(filesTas[grep("2071",filesTas)]))
+  
+  # filesTasmax <- list.files(path = path,pattern = "tasmax_", full.names = T)
+  # TPrData$tasmax$ref <- processToRasterBrick(load_obj(filesTasmax[grep("1981",filesTas)]))
+  # TPrData$tasmax$scen1 <- processToRasterBrick(load_obj(filesTasmax[grep("2021",filesTas)]))
+  # TPrData$tasmax$scen2 <- processToRasterBrick(load_obj(filesTasmax[grep("2071",filesTas)]))
+  # 
+  # filesTasmin <- list.files(path = path,pattern = "tasmin_", full.names = T)
+  # TPrData$tasmin$ref <- processToRasterBrick(load_obj(filesTasmin[grep("1981",filesTas)]))
+  # TPrData$tasmin$scen1 <- processToRasterBrick(load_obj(filesTasmin[grep("2021",filesTas)]))
+  # TPrData$tasmin$scen2 <- processToRasterBrick(load_obj(filesTasmin[grep("2071",filesTas)]))
+  # 
+  filesPr <- list.files(path = path,pattern = "pr_", full.names = T)
+  TPrData$pr$ref <- processToRasterBrick(load_obj(filesPr[grep("1981",filesTas)]))
+  TPrData$pr$scen1 <- processToRasterBrick(load_obj(filesPr[grep("2021",filesTas)]))
+  TPrData$pr$scen2 <- processToRasterBrick(load_obj(filesPr[grep("2071",filesTas)]))
+  
+  return(TPrData)
+}
+
+#Fow know, assume that the data is stored as lists of matrices
+processToRasterBrick <- function(data){ 
+  
+  #  print(param)
+  lon <- as.numeric(colnames(data[[1]]))
+  lat <- as.numeric(rownames(data[[1]]))
+  
+  rasterList <- lapply(data,raster)
+  rasterList <- lapply(lapply(rasterList, t),function(x) flip(x,"y"))
+  b <- brick(rasterList)
+  extent(b) <- c(min(lat),max(lat),min(lon),max(lon))
+  crs(b) <- sp::CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+  return(b)
+}
+
+updateRegion <- function(data, polygon_coordinates = NULL){
+  
+  if(is.null(polygon_coordinates)) return(0)
+  
+  p <- Polygon(do.call(rbind,lapply(polygon_coordinates,function(x){c(x[[1]][1],x[[2]][1])})))
+  ps <- Polygons(list(p),1)
+  sps <- SpatialPolygons(list(ps))
+  croppedData <- crop(data, extent(sps), snap = "out")    
+  refLat <- rasterToPoints(croppedData[[1]])[,2]
+  dataMeans <- cellStats(croppedData, weighted.mean, refLat, na.rm = T)
+  
+  # croppedScen <- crop(scenario, extent(sps), snap="out")    
+  # scenMeans <- cellStats(croppedScen, weighted.mean, refLat, na.rm = T)
+  # 
+  # meanChanges <- scenMeans-refMeans
+  
+  # set <- c(rep("Reference",length(refMeans)),rep("Scenario",length(scenMeans)), rep("Change",length(meanChanges)))
+  # output <- data.frame(dataMeans)
+  # output$Period <- factor(output$Period, levels = c("Reference","Scenario","Change"))
+  return(dataMeans)
+}
+
+getRasterPalette <- function(values, type = "bin", nBins = 9){
+  
+  colorsAbs <- c("#f0f9e8","#7bccc4","#0868ac")
+  colorsDiff <- c("#67001f","#fddbc7","#d1e5f0","#053061")
+  
+  range <- range(cellStats(values,range))
+  
+  if(range[1]<0){
+    range <- c(min(range[1],-range[2]), max(-range[1],range[2])) 
+    colors <- colorsDiff
+  }else{
+    range <- c(0,range[2])
+    colors <- colorsAbs
+  }
+  
+  if(type == "bin"){
+    paletteFun <- colorBin(colors, domain = range, bins = nBins, na.color = "transparent")
+  }else{
+    paletteFun <- colorNumeric(colors, domain = range, na.color = "transparent")
+  }
+  return(list(pal = paletteFun, values = range, bins = nBins))
+}
+
+#Copied from https://gist.github.com/jcheng5/5913297 with substantial modifications
+helpPopup <- function(title, content,
+                      placement=c('right', 'top', 'left', 'bottom'),
+                      trigger=c('click', 'hover', 'focus', 'manual')) {
+  tagList(
+    singleton(
+      tags$head(
+        tags$script("$(function() { 
+                      $(\"[data-toggle='popover']\").popover({container:'body'}); 
+                    })")
+      )
+    ),
+    tags$a(
+      href = "#", class = "btn btn-mini", `data-toggle` = "popover",
+      title = title, `data-content` = content, `data-animation` = TRUE, `data-html`="true",
+      `data-placement` = match.arg(placement, several.ok=TRUE)[1],
+      `data-trigger` = match.arg(trigger, several.ok=TRUE)[1],
+      
+      icon("question")
+    ),
+    tags$style(".popover-body{
+               font-size: 20px; 
+               max-width: 800px;
+               width: 100%;
+               white-space: nowrap;
+    }"),
+    tags$style(".popover {
+               font-size: 20px; 
+               max-width: 800px;
+    }")
+  )
+}
+
+# Choices for drop-down 1 (SPI or SPEI)
+index <- c(
+  "Standardized Precipitation Index (SPI)" = "spi",
+  "Standardized Precipitation and Evapotranspiration Index (SPEI)" = "spei"
+)
+
+# Choices for drop-down 2 (six categories used)
+category <- c(
+  "Extremely wet" = "EW",
+  "Very wet or wetter" = "EW_VW",
+#  "Moderately wet or wetter" = "EW_VW_MW",  
+#  "Moderately dry or drier" = "MD_SD_ED",
+  "Severely dry or drier" = "SD_ED",
+  "Extremely dry" = "ED"
+)
+
+# # Choices for drop-down 3 (period) NOT CURRENTLY USED
+# period <- c(
+#   "2021-2050" = "2021-2050",
+#   "2071-2100" = "2071-2100"
+# )
+
+# Choices for drop-down 3 (statistic)
+statistic <- c(
+  "Number of months" = "nMonths",
+  "Number of events" = "nEvents",
+  "Mean event length" = "meanEventLength"
+)
+
+# Choices for drop-down 4 (aggregation scale)
+scale <- c(
+  "6-month aggregation" = "6",
+  "12-month aggregation" = "12"
+)
+
+# Comment by O. Räty: reactive variables used to store the data in the drought example.
+# Perhaps some other way would be more optimal in the full scale application.
+
+reactiveMapVars <- reactiveValues()
+reactiveData <- reactiveValues()
+
+# Read T and P data used in the scatter plots. This data is basically a duplicate of 
+# already-existing data.
+baseData <- readTPr("/homeappl/home/oraty/appl_taito/R/DECM/back-end/data")

@@ -1,0 +1,11 @@
+SPI and SPEI values are divided into categories which describe
+different levels of wetness or dryness with respect to the median (scaled to zero). 
+<br>
+<br>
+The used categories are: <br> <br>
+  1. Extremely wet (EW) = values 2 standard deviations <i>above</i> the median <br> <br>
+  2. very wet or wetter (EW+VW) = values 1.5 standard deviations or more <i>above</i> the median <br> <br>
+  3. moderately wet or wetter (EW+VW+MW) = values 1.0 standard deviations or more <i>above</i> the median <br> <br>
+  4. moderately dry or drier (MD+SD+ED) = values 1.0 standard deviations or more <i>below</i> the median <br> <br>
+  5. severely dry or drier (SD+ED) = values 1.5 standard deviations or more <i>below</i> the median <br> <br>
+  6. extremely dry (EW+ VW) = values 2 standard deviations or more <i>below</i> the median <br>

@@ -84,10 +84,12 @@ createDateVector <- function(steps,units){
 
 pattern <- "spei"
 path <- "/wrk/oraty/DONOTREMOVE/DECM/CORDEX_monthly/"
-outPath <- paste("/wrk/oraty/DONOTREMOVE/DECM/SPEI/",toupper(pattern),sep="")
+outPath <- paste("/wrk/oraty/DONOTREMOVE/DECM/",toupper(pattern),sep="")
+setwd(outPath)
 
-categories <- c("EW","VW","MW","NN","MD","SD","ED","EW_VW_MW","EW_MW","MD_SD_ED","SD_ED")
-windows <- c(3,6,12)
+#categories <- c("EW","EW_VW","SD","SD_ED")
+categories <- c("EW","VW","MW","NN","MD","SD","ED","EW_VW_MW","EW_VW","MD_SD_ED","SD_ED")
+windows <- c(6)
 period <- c(1981,2010)
 
 for(category in categories){

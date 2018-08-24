@@ -1252,7 +1252,6 @@ tabItem(tabName = "score5",
 tabItem(tabName = "drought", #OR 140818 Added the drought example under product users 
         fluidPage(
           p(),
-
           fluidRow(
             column(12,
                    box(width = '100%',
@@ -1330,13 +1329,14 @@ tabItem(tabName = "drought", #OR 140818 Added the drought example under product 
                      title = "2. Map display",#textOutput("DesignBox2"),
                      solidHeader = T,
                      status = 'danger',
-                     leafletOutput("map.spi", width = "100%", height = "800")
-                     # absolutePanel(class = "panel panel-default", fixed = TRUE,
-                     #             draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
-                     #             width = 330, height = "auto",
-                     #
-                     #             h2("Regional information, individual models")
-                     # )
+                     leafletOutput("map.spi", width = "100%", height = "800"),
+                     tags$figcaption(textOutput("mapCaption")),
+                     tags$style(HTML("
+                       figcaption {
+                       padding-top: 0.5em;
+                       line-height: 1.1;
+                       font-size: 14pt;
+                     }"))
                    ),
                    box( side = "left",
                         selected = "Scatter plot",
@@ -1463,8 +1463,6 @@ tabItem(tabName = "hydro",
                    )
         
           ),
-
-# Stop here 
 
 tabItem(tabName = "agriculture",
         fluidPage(

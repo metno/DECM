@@ -28,7 +28,9 @@ option_list <- list(
   make_option(c("-p", "--package"), action = "store", type = "character",
               default = "SPEI", help = "Name of the selected RCM [default %default]"),
   make_option(c("-s", "--scale"), action = "store", type = "numeric",
-              default = 3, help = "Select the temporal aggregation scale in months [default %default]")
+              default = 3, help = "Select the temporal aggregation scale in months [default %default]"),
+  make_option(c("-m", "--mask"), action = "store", type = "character",
+              default = "/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/EUR-44_CORDEX/tg_0.50deg_reg_small_v16.0_ymon.nc", help = "file for the land-sea mask")
 )
 
 #--------------------------
@@ -198,7 +200,7 @@ calcSPI <- function(data, dates, refBounds, scale, package = "SPEI", distr = "ga
   inds <- which(!is.na(data[,,1]), arr.ind = T)
   
   for(row in 1:dim(inds)[1]){
-    print(row)
+#    print(row)
     
     if(package == "SPEI"){
       ts.object <- ts(as.double(data[inds[row,1],inds[row,2],]), frequency = 12, 
@@ -215,21 +217,6 @@ calcSPI <- function(data, dates, refBounds, scale, package = "SPEI", distr = "ga
     output[inds[row,1],inds[row,2],]<- removeInf(output[inds[row,1],inds[row,2],])
   }
   
-  # for(i in 1:output.dim[1]){
-  #   print(i)
-  #   for(j in 1:output.dim[2]){
-  #     if(any(is.na(data[i,j,]))){
-  #       output[i,j,] <- NA
-  #     }else{
-  #       ts.object <- ts(data[i,j,], frequency = 12, start = c(year(dates[1]),month(dates[1])))
-  #       tmp <- spi(ts.object, scale = scale, 
-  #                  ref.start = c(ref.start.year,ref.start.month), 
-  #                  ref.end = c(ref.end.year,ref.end.month))
-  #       output[i,j,] <- c(tmp$fitted)
-  #       output[i,j,]<- removeInf(output[i,j,])
-  #     }
-  #   }
-  # }
   return(output)
 }
 
@@ -272,7 +259,7 @@ calcSPEI <- function(data, dates, refBounds, scale, package = "SPEI", distr = "g
   
   for(row in 1:dim(inds)[1]){
     if(package == "SPEI"){
-      print("Using SPEI")
+#      print("Using SPEI")
       ts.object <- ts(as.double(data[inds[row,1],inds[row,2],]), frequency = 12, 
                       start = c(year(dates[1]),month(dates[1])))
       tmp <- spei(ts.object, scale = scale, fit = "ub-pwm",na.rm = T,
@@ -280,7 +267,7 @@ calcSPEI <- function(data, dates, refBounds, scale, package = "SPEI", distr = "g
                   ref.end = c(ref.end.year,ref.end.month), x = T)
       output[inds[row,1],inds[row,2],] <- c(tmp$fitted)
     }else if(package == "SCI"){
-      print("Using SCI")
+#      print("Using SCI")
       fit <- fitSCI(data[inds[row,1],inds[row,2],], first.mon = 1, time.scale = scale, 
                     distr = distr, p0 = F, start.fun.fix = T)
       output[inds[row,1],inds[row,2],] <- transformSCI(data[inds[row,1],inds[row,2],], first.mon = 1, obj = fit)
@@ -292,28 +279,6 @@ calcSPEI <- function(data, dates, refBounds, scale, package = "SPEI", distr = "g
     output[inds[row,1],inds[row,2],]<- removeInf(output[inds[row,1],inds[row,2],])
   }
   
-  # for(i in 1:output.dim[1]){
-  #   print(paste("lon",i))
-  #   for(j in 1:output.dim[2]){
-  #     if(any(is.na(data[i,j,]))){
-  #       output[i,j,] <- NA
-  #     }else{
-  #       ts.object <- ts(as.double(data[i,j,]), frequency = 12, start = c(year(dates[1]),month(dates[1])))
-  #       
-  #       if(package == "SPEI"){
-  #         tmp <- spei(ts.object, scale = scale, fit = "ub-pwm",na.rm = T,
-  #                     ref.start = c(ref.start.year,ref.start.month), 
-  #                     ref.end = c(ref.end.year,ref.end.month), x = T)
-  #         output[i,j,] <- c(tmp$fitted)
-  #       }else{
-  #         fit <- fitSCI(ts.object, first.mon = 1, time.scale = scale, distr = distr, p0 = F)
-  #         output[i,j,] <- transformSCI(data, first.mon = 1, obj = fit)
-  #       }
-  #       
-  #       output[i,j,]<- removeInf(output[i,j,])
-  #     }
-  #   }
-  # }
   return(output)
 }
 
@@ -362,7 +327,7 @@ createNcdf <- function(outName, dimNames, data, lon, lat, time, refTime, name, l
 }
 
 #-----------------------------------
-#Main loops are here
+#Main loops start here
 
 opt <- parse_args(OptionParser(option_list = option_list))
 if(opt$verbose){
@@ -375,13 +340,12 @@ reference <- c(1981,2010)
 scale <- opt$scale
 package <- opt$package
 index <- opt$index
+lsmask <- opt$mask
 
 path <- "/wrk/oraty/DONOTREMOVE/DECM/CORDEX_monthly" #Change if needed
 pr.files <- list.files(path, full.names = T, pattern = "pr_")
 tasmin.files <- list.files(path, full.names = T, pattern = "tasmin_")
 tasmax.files <- list.files(path, full.names = T, pattern = "tasmax_")
-mask.file <- list.files(path, full.names = T, pattern = "sftlf_")
-lsmask <- paste(path,"lsmask.nc",sep="/")
 ls.id <- nc_open(lsmask)
 
 for(i in 1:length(pr.files)){
@@ -400,12 +364,12 @@ for(i in 1:length(pr.files)){
   lon <- ncvar_get(pr.id,"longitude")  
   lat <- ncvar_get(pr.id,"latitude")  
   
-  ls.lon <- ncvar_get(ls.id,"lon")  
-  ls.lat <- ncvar_get(ls.id,"lat")  
+  ls.lon <- ncvar_get(ls.id,"longitude")  
+  ls.lat <- ncvar_get(ls.id,"latitude")  
   lon.ind <- match(lon,ls.lon)
   lat.ind <- match(lat,ls.lat)
-  ls.mask <- ncvar_get(ls.id,"lsmask")[lon.ind,lat.ind] 
-  ls.mask[ls.mask==0] <- NA
+  ls.mask <- ncvar_get(ls.id,"tg")[lon.ind,lat.ind,1] 
+#  ls.mask[ls.mask==0] <- NA
   
   inds <- which(!is.na(ls.mask),arr.ind = T)
   pr.tmp <- ncvar_get(pr.id,varid="pr")*86400
@@ -456,41 +420,3 @@ for(i in 1:length(pr.files)){
   createNcdf(outName, dimNames, output, lon, lat, time = timeSteps, refTime = refTime, name, long_name, scale)
   nc_close(pr.id)
 }
-
-
-# #Original package
-# test <- calcSPI(pr[100,30,],dates,refBounds,scale)$fitted
-# test.SPEI <- calcSPEI(dPrec[100,30,],dates,refBounds,scale)$fitted
-# 
-# #SCI package
-# tmp <- fitSCI(pr[100,30,], first.mon = 1, time.scale = scale, distr = "gamma", p0 = T)
-# test2 <- ts(transformSCI(pr[100,30,], first.mon = 1, obj = tmp), start = c(year(dates[1]),month(dates[1])), frequency = 12)
-# 
-# tmp.SPEI <- fitSCI(dPrec[100,30,], first.mon = 1, time.scale = scale, distr = "gev", p0 = F)
-# test2.SPEI <- ts(transformSCI(dPrec[100,30,], first.mon = 1, obj = tmp.SPEI), start = c(year(dates[1]),month(dates[1])), frequency = 12)
-
-# #Observed quantiles
-# ecdf.orig <- ecdf(pr[100,30,])
-# ecdf.vals <- qnorm(ecdf.orig(pr[100,30,]))
-# ecdf.orig.SPEI <- ecdf(dPrec[100,30,])
-# ecdf.vals.SPEI <- qnorm(ecdf.orig.SPEI(dPrec[100,30,]))
-# 
-# #Plot SPI qq plots
-# plot(sort(test),sort(ecdf.vals[3:1788]),type = "l",ylim = c(-4,4), xlim = c(-4,4))
-# lines(sort(test2),sort(ecdf.vals[3:1788]),col = "red")
-# abline(0,1,lty= 2)
-# 
-# plot(sort(test.SPEI),sort(ecdf.vals.SPEI[3:1788]),type = "l",ylim = c(-4,4), xlim = c(-4,4))
-# lines(sort(test2.SPEI),sort(ecdf.vals.SPEI[3:1788]),col = "red")
-# abline(0,1,lty= 2)
-# 
-# #Shapiro tests
-# shapiro.test(test)
-# shapiro.test(test2)
-# inds <- which(!is.na(ls.mask),arr.ind = T)
-# for(i in 1:dim(inds)[1]){
-#   ecdf.orig <- ecdf(pr[inds[i,1],inds[i,2],])
-#   ecdf.vals <- qnorm(ecdf.orig(pr[inds[i,1],inds[i,2],]))
-#   shapiro.test(old.SPEI[inds[i,1],inds[i,2],])
-#   cramer.test(old.SPEI[inds[i,1],inds[i,2],],ecdf.vals[3:1788])
-# }

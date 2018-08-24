@@ -565,6 +565,7 @@ LoadToEnvironment <- function(RData, env=new.env()) {
   return(env)
 }
 
+
 readTPr <- function(path = "/homeappl/home/oraty/appl_taito/R/DECM/back-end/data/"){
   TPrData <- list(tas = NA, pr = NA)# tasmax = NA, tasmin = NA, pr = NA)
   
@@ -719,7 +720,7 @@ scale <- c(
   "12-month aggregation" = "12"
 )
 
-# Comment by O. Räty: reactive variables used to store the data in the drought example.
+# O. Räty: reactive variables used to store the data in the drought example.
 # Perhaps some other way would be more optimal in the full scale application.
 
 reactiveMapVars <- reactiveValues()

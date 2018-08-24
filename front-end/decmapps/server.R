@@ -6545,10 +6545,20 @@ function(input, output,session) {
     
   })
   
-  output$DesignBox2 <- renderText({
-    paste(toupper(input$index),", multi-model mean of ",tolower(names(category)[which(category==input$category)]),
-          ", ",input$scale,"-month aggregation, ",
-          names(statistic)[which(statistic==input$statistic)],sep="")
+  output$mapCaption <- renderText({
+    
+    if(input$statistic == "nMonths"){
+      stat <- paste("the number of",tolower(names(category)[which(category==input$category)]),"months")
+    }else if(input$statistic == "nEvent"){
+      stat <- paste("the number of",tolower(names(category)[which(category==input$category)]),"events")
+    }else{
+      stat <- paste("the average length of",tolower(names(category)[which(category==input$category)]),"events")
+    }
+    
+    first <- paste(paste("The map shows the 16-model mean of",
+                   stat,
+                   "calculated from",
+                   names(index)[which(index == input$index)],sep = " "),".", sep = "")
   })
   
   output$map.spi <- renderLeaflet({
@@ -6557,8 +6567,8 @@ function(input, output,session) {
                        #addProviderTiles(providers$Stamen.TonerLite,
                        options = providerTileOptions(noWrap = TRUE)) %>%
       addTiles(group = "OSM", layerId = 0) %>%
-      setView( lng = 15, lat = 45, zoom = 4 ) %>%
-      setMaxBounds(lng1 = -40, lat1 = 0, lng2 = 70, lat2 = 80) %>%
+      setView( lng = 15, lat = 55, zoom = 4 ) %>%
+      setMaxBounds(lng1 = -50, lat1 = -10, lng2 = 80, lat2 = 90) %>%
       onRender(
         "function(el,x){
         this.on('mousemove', function(e) {
@@ -6574,10 +6584,10 @@ function(input, output,session) {
       )
     })
   
-  observeEvent(input$map_click,{
+  observeEvent(input$map.spi_click,{
     leafletProxy("map.spi") %>%
       clearPopups() %>%
-      addPopups(lng = input$hover_coordinates[2], lat = input$hover_coordinates[1], 
+      addPopups(lng = input$hover_coordinates[2], lat = input$hover_coordinates[1],
                 popup = paste("lon = ",round(input$hover_coordinates[2],2),"lat = ",round(input$hover_coordinates[1]),2))
   })
   
@@ -6708,11 +6718,15 @@ function(input, output,session) {
     output <- data.frame(Type = set, Value = c(reference, scenario1, scenario2, change1, change2))
     output$Type <- factor(output$Type, levels = c("Reference","Scenario 2021-2050","Scenario 2071-2100",
                                                   "Change 2021-2050", "Change 2071-2100"))
+    print(output)
     return(output)
   })
   
   output$plotBoxStatistics <- renderPlotly({
-    plot_ly(boxPlotInput(), x = ~Type, y = ~Value, type = "box", boxpoints = "all", jitter = 0)
+    boxInput <- boxPlotInput()
+    symbols <- seq(which(boxInput$Type=="Change 2021-2050"))
+    p <- plot_ly(boxInput,x = ~Type, y = ~Value, type = 'box', boxpoints = "all", jitter = 0,
+                marker = list(symbols = symbols))
     
   })
   

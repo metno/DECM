@@ -6549,7 +6549,7 @@ function(input, output,session) {
     
     if(input$statistic == "nMonths"){
       stat <- paste("the number of",tolower(names(category)[which(category==input$category)]),"months")
-    }else if(input$statistic == "nEvent"){
+    }else if(input$statistic == "nEvents"){
       stat <- paste("the number of",tolower(names(category)[which(category==input$category)]),"events")
     }else{
       stat <- paste("the average length of",tolower(names(category)[which(category==input$category)]),"events")
@@ -6641,9 +6641,13 @@ function(input, output,session) {
                      colors = reactiveMapVars$palChange$pal, opacity = 0.9) %>%
       addRasterImage(meanChange2, group = reactiveMapVars$groups[5], layerId = 3,
                      colors = reactiveMapVars$palChange$pal, opacity = 0.9) %>%
-      addLegend(position = "bottomleft", pal = reactiveMapVars$palAbs$pal, title = input$statistic, 
+      addLegend(position = "bottomleft", 
+                pal = reactiveMapVars$palAbs$pal, 
+                title = names(statistic[which(statistic == input$statistic)]), 
                 values = reactiveMapVars$palAbs$range, group = reactiveMapVars$groups[2]) %>%
-      addLegend(position = "bottomleft", pal = reactiveMapVars$palChange$pal, title = paste("Change in",input$statistic,sep=" "),
+      addLegend(position = "bottomleft", 
+                pal = reactiveMapVars$palChange$pal, 
+                title = paste("Change in the", tolower(names(statistic[which(statistic == input$statistic)])), sep = "<br>"),
                 values = reactiveMapVars$palChange$range, group = reactiveMapVars$groups[3]) %>%
       addDrawToolbar(
         targetGroup = "draw",

@@ -174,7 +174,7 @@ ranking.all <- function(varid="tas",Regions=list("global","Amazon [AMZ:7]"),Seas
 
 ranking.weighted <- function(regionwm1="global",regionwm2="Amazon [AMZ:7]",wmreg1=1,wmreg2=1,
                           wmdt=1,wmdp=1,wmann=1,wmdjf=1,wmmam=1,wmjja=1,wmson=1,
-                          wmbias=1,wmsd=1,wmsc=1,wmcmpi=1,n.gcm=11) {
+                          wmbias=1,wmsd=1,wmsc=1,wmcmpi=1) {
   
   Regionlist <- list(regionwm1,regionwm2)
   Regionlist <- Regionlist[which(Regionlist != "---")]
@@ -205,12 +205,10 @@ ranking.weighted <- function(regionwm1="global",regionwm2="Amazon [AMZ:7]",wmreg
   metweightvec <- as.numeric(c(wmbias,wmsd,wmsc,wmcmpi))
   weightedrank_all <- rank(weightedranks_all %*% metweightvec)
   
-  best <- order(weightedrank_all)[1:n.gcm]
-  
   return(weightedrank_all)
 }
 
-spread <- function(varid="tas",season="ann",region="global",period="ff",gcms=NULL) {
+spread <- function(varid="tas",season="ann",region="global",period="ff",im=NULL) {
   X <- switch(varid, tas=stats$tas, pr=stats$pr)
   if(tolower(region=="global")) {
     region <- "global"
@@ -222,22 +220,23 @@ spread <- function(varid="tas",season="ann",region="global",period="ff",gcms=NUL
     season <- switch(season,"ann"="ann", "djf" = c("dec","jan","feb"), "mam"=c("mar","apr","may"),
                      "jja" = c("jun","jul","aug"), "son"=c("sep","oct","nov"))
   }
-  if(is.null(gcms)) gcms <- names(X)[grepl("gcm",names(X))]
-  dX <- diff(range(sapply(gcms, function(gcm) mean(sapply(season, function(s)
+  gcms <- names(X[[period]])[grepl("gcm",names(X[[period]]))]
+  if(is.null(im)) im <- 1:length(gcms)
+  dX <- diff(range(sapply(gcms[im], function(gcm) mean(sapply(season, function(s)
             X[[period]][[gcm]][[region]][["mean"]][[s]])) - 
               mean(sapply(season, function(s) 
-                X$present[[gcm]][[region]][["mean"]][[s]]))),na.rm=T))
+                X$present[[gcm]][[region]][["mean"]][[s]]))),na.rm=TRUE))
   return(dX)
 }
 
-spread.all <- function(varid="tas",Regions=c("global","Amazon [AMZ:7]"),Seasons=list("ann","djf","mam","jja","son"),gcms=NULL) {
+spread.all <- function(varid="tas",Regions=list("global","Amazon [AMZ:7]"),Seasons=list("ann","djf","mam","jja","son"),im=NULL) {
   Periods <- c("nf","ff")
   dX <- array(NA,c(length(Seasons),length(Periods),length(Regions)))
   dX.gcms <- array(NA,c(length(Seasons),length(Periods),length(Regions)))
   for (si in 1:length(Seasons)) {
     for (peri in 1:length(Periods)) {
       for (ri in 1:length(Regions)) {
-        dX[si,peri,ri] <- spread(varid=varid,season=Seasons[[si]],region=Regions[ri],period=Periods[peri],gcms=gcms)
+        dX[si,peri,ri] <- spread(varid=varid,season=Seasons[[si]],region=Regions[[ri]],period=Periods[peri],im=im)
       }
     }
   }
@@ -246,20 +245,18 @@ spread.all <- function(varid="tas",Regions=c("global","Amazon [AMZ:7]"),Seasons=
 
 spread.weighted <- function(regionwm1="global",regionwm2="Amazon [AMZ:7]",wmreg1=1,wmreg2=1,
                             wmdt=1,wmdp=1,wmann=1,wmdjf=1,wmmam=1,wmjja=1,wmson=1,
-                            wmbias=1,wmsd=1,wmsc=1,wmcmpi=1,gcms=NULL,n.gcm=11) {
+                            wmbias=1,wmsd=1,wmsc=1,wmcmpi=1,im=NULL) {
   
   Regionlist <- list(regionwm1,regionwm2)
   Regionlist <- Regionlist[which(Regionlist != "---")]
   
-  if(is.null(gcms)) gcms <- gcmnames[sample(1:length(gcmnames),11,replace=FALSE)]
-  
   regweightvec <- as.numeric(c(wmreg1,input$wmreg2))
   regweightvec[which(list(regionwm1,regionwm2) != "---")] 
   
-  dtasSpread <- spread.all(varid="tas",Regions=Regionlist,gcms=NULL)
-  dtasSelSpread <- spread.all(varid="tas",Regions=Regionlist,gcms=gcms)
-  dprSpread <- spread.all(varid="pr",Regions=Regionlist,gcms=NULL)
-  dprSelSpread <- spread.all(varid="pr",Regions=Regionlist,gcms=gcms)
+  dtasSpread <- spread.all(varid="tas",Regions=Regionlist,im=NULL)
+  dtasSelSpread <- spread.all(varid="tas",Regions=Regionlist,im=im)
+  dprSpread <- spread.all(varid="pr",Regions=Regionlist,im=NULL)
+  dprSelSpread <- spread.all(varid="pr",Regions=Regionlist,im=im)
   
   dtasRelSpread <- dtasSelSpread/dtasSpread
   dprRelSpread <- dprSelSpread/dprSpread

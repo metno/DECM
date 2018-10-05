@@ -6,8 +6,8 @@ library(DT)
 library(DECM)
 
 ## Load metadata & subset common (pr and tas) GCMs
-#data("metaextract")
-load("../../back-end/data/metaextract.rda")
+data("metaextract")
+#load("metaextract.rda")
 im <- meta$project_id=="CMIP5" & meta$var=="tas"
 im2 <- meta$project_id=="CMIP5" & meta$var=="pr"
 synch <- match(paste(meta$gcm[im2],meta$gcm_rip[im2]),paste(meta$gcm[im],meta$gcm_rip[im]))
@@ -33,7 +33,7 @@ dashboardPage(skin = HTML("blue"),
                 tags$h4("Ensemble selection"),
                 selectInput("gcmselect",
                                    label = "Selection",
-                                   choices = c("Random","Best","My Selection"),
+                                   choices = c("Random","My selection","Best performance"),
                                    selected = "Random"),
                 numericInput("ngcm", label = "Ensemble size", 11, min=1, max=length(gcmst)),
                 checkboxGroupInput("gcms",
@@ -202,12 +202,12 @@ dashboardPage(skin = HTML("blue"),
                                  box(title = 'Scatterplot of the regional mean climate change', 
                                      width = '100%' , status = 'primary',
                                      collapsible = TRUE, collapsed = FALSE,
-                                     plotOutput("dtdpr", width = '100%', height = 550),
+                                     plotOutput("dtdpr", width = '100%', height = 550)
                                      #leafletOutput("dtdpr", width = '100%', height = 550),
-                                     column(width=6,sliderInput("tlim", "temperature range", width='90%',
-                                                                min = -20, max = 20, value = c(-4,6), step=0.5)),
-                                     column(width=6,sliderInput("plim", "precipitation range", width='90%',
-                                                                min = -2, max = 2, value = c(-0.3,0.6), step=0.1))
+                                     #column(width=6,sliderInput("tlim", "temperature range", width='90%',
+                                     #                           min = -20, max = 20, value = c(-4,6), step=0.5)),
+                                     #column(width=6,sliderInput("plim", "precipitation range", width='90%',
+                                     #                           min = -2, max = 2, value = c(-0.3,0.6), step=0.1))
                                  )
                           ),
                           column(12,

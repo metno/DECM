@@ -1,6 +1,13 @@
-## helpers.R
-## Help functions for the shiny app "gcmeval"
+## global.R - Load libraries and define help functions for the shiny app "gcmeval"
 library(plotrix)
+library(shiny)
+library(shinyjs)
+library(shinydashboard)
+if (!require("DT")) install.packages('DT')
+library(DT)
+library(DECM)
+library(fields)
+library(plotly)
 
 Seasons <- list("ann",c('dec','jan','feb'),c('mar','apr','may'),c('jun','jul','aug'),c('sep','oct','nov'))
 Periods <- list("nf","ff")
@@ -104,10 +111,6 @@ regions <- function(type=c("srex","prudence"),region=NULL) {
                     t(matrix(sapply(c(4,5,5,4,4,6,6,7,7,6), 
                              function(j) factor2numeric(x[i,j])),
                              nrow=5,ncol=2))))
-                  #west=as.numeric(x[2:nrow(x),4]),
-                  #east=as.numeric(x[2:nrow(x),5]),
-                  #south=as.numeric(x[2:nrow(x),6]),
-                  #north=as.numeric(x[2:nrow(x),7]))
     if(is.null(y)) {
       y <- prudence 
     } else {
@@ -130,8 +133,11 @@ ranking <- function(measure="bias",varid="tas",season="ann",region="global",im=N
     region <- srex$label[i.srex]
   }
   if (!season %in% names(X$gcm.1$global$mean)) {
-    season <- switch(season, "djf" = c("dec","jan","feb"), "mam"=c("mar","apr","may"),
-                     "jja" = c("jun","jul","aug"), "son"=c("sep","oct","nov"))
+    season <- switch(season, "ann"="ann", "Annual mean"="ann", 
+                     "djf" = c("dec","jan","feb"), "Winter" = c("dec","jan","feb"), 
+                     "mam"=c("mar","apr","may"), "Spring"=c("mar","apr","may"),
+                     "jja" = c("jun","jul","aug"), "Summer" = c("jun","jul","aug"), 
+                     "son"=c("sep","oct","nov"), "Autumn"=c("sep","oct","nov"))
   }
   gcms <- names(X)[grepl("gcm",names(X))]
   ref <- names(X)[!grepl("gcm",names(X))]
@@ -217,8 +223,11 @@ spread <- function(varid="tas",season="ann",region="global",period="ff",im=NULL)
     region <- srex$label[i.srex]
   }
   if (!season %in% names(X[[period]]$gcm.1$global$mean)) {
-    season <- switch(season,"ann"="ann", "djf" = c("dec","jan","feb"), "mam"=c("mar","apr","may"),
-                     "jja" = c("jun","jul","aug"), "son"=c("sep","oct","nov"))
+    season <- switch(season, "ann"="ann", "Annual mean"="ann", 
+                     "djf" = c("dec","jan","feb"), "Winter" = c("dec","jan","feb"), 
+                     "mam"=c("mar","apr","may"), "Spring"=c("mar","apr","may"),
+                     "jja" = c("jun","jul","aug"), "Summer" = c("jun","jul","aug"), 
+                     "son"=c("sep","oct","nov"), "Autumn"=c("sep","oct","nov"))
   }
   gcms <- names(X[[period]])[grepl("gcm",names(X[[period]]))]
   if(is.null(im)) im <- 1:length(gcms)
@@ -273,57 +282,6 @@ spread.weighted <- function(regionwm1="global",regionwm2="Amazon [AMZ:7]",wmreg1
 }
 
 
-
-#Regionlist <- reactive({list(input$regionwm1,input$regionwm2)})
-#Regions <- reactive({Regionlist[which(Regionlist != "---")]})#Only those different from "---"
-
-#total ensemble and model selection spread for seasons, periods and selected focus regions
-#dtasSpread <- array(NA,c(5,2,length(Regions)))
-#dprSpread <- array(NA,c(5,2,length(Regions)))
-#dtasSelSpread <- array(NA,c(5,2,length(Regions)))
-#dprSelSpread <- array(NA,c(5,2,length(Regions)))
-
-#Seasons <- list("ann",c('dec','jan','feb'),c('mar','apr','may'),c('jun','jul','aug'),c('sep','oct','nov'))
-#Periods <- list("nf","ff")
-
-#for (si in 1:5)
-#{
-#  for (peri in 1:2)
-#  {
-#    for (ri in 1:length(Regions))
-#    {
-#      if(tolower(Regions[[ri]])=="global") {
-#        region <- "global"
-#      } else {
-#        i.srex <- which(srex$name==Regions[[ri]])
-#        region <- srex$label[i.srex]
-#      }
-
-#      dtasSpread[si,peri,ri] <- diff(range(sapply(gcmst, function(gcm) mean(sapply(Seasons[[si]], function(s)
-#        stats$tas[[Periods[[peri]]]][[gcm]][[region]][["mean"]][[s]])) - 
-#          mean(sapply(Seasons[[si]], function(s) 
-#            stats$tas$present[[gcm]][[region]][["mean"]][[s]]))),na.rm=T))
-#      dprSpread[si,peri,ri] <- diff(range(sapply(gcmsp, function(gcm) mean(sapply(Seasons[[si]], function(s)
-#        stats$pr[[Periods[[peri]]]][[gcm]][[region]][["mean"]][[s]])) - 
-#          mean(sapply(Seasons[[si]], function(s) 
-#            stats$pr$present[[gcm]][[region]][["mean"]][[s]]))),na.rm=T))*60*60*24
-
-
-#      dtasSelSpread[si,peri,ri] <- diff(range(sapply(gcmst, function(gcm) mean(sapply(Seasons[[si]], function(s)
-#        stats$tas[[Periods[[peri]]]][[gcm]][[region]][["mean"]][[s]])) - 
-#          mean(sapply(Seasons[[si]], function(s) 
-#            stats$tas$present[[gcm]][[region]][["mean"]][[s]])))[im],na.rm=T))
-#      dprSelSpread[si,peri,ri] <- diff(range(sapply(gcmsp, function(gcm) mean(sapply(Seasons[[si]], function(s)
-#        stats$pr[[Periods[[peri]]]][[gcm]][[region]][["mean"]][[s]])) - 
-#          mean(sapply(Seasons[[si]], function(s) 
-#            stats$pr$present[[gcm]][[region]][["mean"]][[s]])))[im],na.rm=T))*60*60*24
-#    }
-#  }
-#}
-
-#seasonal, relative model selection spread
-#dtasRelSpread <- dtasSelSpread/dtasSpread
-#dprRelSpread <- dprSelSpread/dprSpread
 
 
 

@@ -1,9 +1,5 @@
-
 library(shiny)
-library(shinydashboard)
-if (!require("DT")) install.packages('DT')
-library(DT)
-library(DECM)
+library(shinyjs)
 
 ## Load metadata & subset common (pr and tas) GCMs
 data("metaextract")
@@ -33,21 +29,27 @@ dashboardPage(skin = HTML("blue"),
                 tags$h4("Ensemble selection"),
                 selectInput("gcmselect",
                                    label = "Selection",
-                                   choices = c("Random","My selection","Best performance"),
-                                   selected = "Random"),
-                numericInput("ngcm", label = "Ensemble size", 11, min=1, max=length(gcmst)),
+                                   choices = c("My selection","Random","Best performance"),
+                                   selected = "My selection"),
+                numericInput("ngcm", label = h5("Ensemble size"), value=11, min=1, max=length(gcmst)),
                 checkboxGroupInput("gcms",
                                    label = "Climate models (GCMs)",
                                    choices = gcmnames,
-                                   selected = gcmnames[sample(1:length(gcmnames),11,replace=FALSE)])),
+                                   selected = gcmnames[1:11])),
               dashboardBody(
-                #tags$script(HTML("$('body').addClass('fixed');")),#fix sidebar and header (no scrolling)
                 fluidPage(theme = "bootstrap.css",
+                          useShinyjs(),
+                          extendShinyjs(text = "shinyjs.resetClick = function() { Shiny.onInputChange('.clientValue-plotly_click-A', 'null'); }",
+                                        functions = c("resetClick")),
                           fluidRow(column(12, box(collapsible = FALSE, collapsed = FALSE, width = '100%',
                                                   tags$img(src="banner_c3s.png",width="100%"))
                           ),
-                          column(12, box(title = "Disclaimer", status = 'info', collapsible = TRUE, collapsed = FALSE, width = '100%',
-                                         tags$body("This is a prototype and should not be used as a basis for decision making. The GCM names might not correspond to the real GCM data."))
+                          column(12, box(title = "GCMeval - a tool for climate model evaluation", status = 'info', collapsible = FALSE, collapsed = FALSE, width = '100%',
+                                         htmlOutput("IntroText"),
+                                         htmlOutput("DisclaimerText"))
+                          ),
+                          column(12, box(title="A) Model skill evaluation", status = 'info', collapsible = FALSE, collapsed = FALSE, width = '100%',
+                                         htmlOutput("RankingText"))
                           ),
                           column(6,
                                  box(title = "1st focus region",status = 'primary', width='60%',
@@ -108,7 +110,7 @@ dashboardPage(skin = HTML("blue"),
                           column(12, 
                                  box(title = 'Variables', 
                                      width = '100%' , status = 'primary',
-                                     collapsible = TRUE, collapsed = FALSE,
+                                     collapsible = TRUE, collapsed = TRUE,
                                      helpText("How important is the performance of the single variables?"),
                                      flowLayout(
                                        selectInput("wmdt", label = "Temperature",
@@ -119,7 +121,7 @@ dashboardPage(skin = HTML("blue"),
                           column(12, 
                                  box(title = 'Seasons', 
                                      width = '100%' , status = 'primary',
-                                     collapsible = TRUE, collapsed = FALSE,
+                                     collapsible = TRUE, collapsed = TRUE,
                                      helpText("How important is the annual and seasonal performance?"),
                                      flowLayout(
                                        selectInput("wmann", label = "Annual",
@@ -136,7 +138,7 @@ dashboardPage(skin = HTML("blue"),
                           column(12, 
                                  box(title = 'Skill scores', 
                                      width = '100%' , status = 'primary',
-                                     collapsible = TRUE, collapsed = FALSE,
+                                     collapsible = TRUE, collapsed = TRUE,
                                      helpText("Which skill scores (w.r.t. the reference data) are important?"),
                                      flowLayout(
                                        selectInput("wmbias", label = "Bias",
@@ -149,13 +151,24 @@ dashboardPage(skin = HTML("blue"),
                                                    choices = c("Not important (0)" = 0,"Important (1)" = 1, "Very important (2)" =2),selected = 1)),
                                        helpText("¹The combined model performance index summarizes the root mean square differences for multiple variables (following Gleckler et al. 2008: Performance metrics for climate models, J. Geophys. Res., 113, D06104, doi:10.1029/2007JD008972). Here, it is normalised with respect to the median rmse within the full ensemble."))
                           ),
-                          column(12, 
-                                 box(title = 'Weighted performance and projected climate change spread', 
+                          column(8, 
+                                 box(title = 'Weighted performance', 
                                      width = '100%' , status = 'primary',
-                                     collapsible = TRUE, collapsed = FALSE,
+                                     collapsible = FALSE, collapsed = FALSE,
                                      htmlOutput("MetricText"))
                           ),
-                          
+                          column(4,
+                                 box(title = 'Spread of projected climate change', 
+                                         width = '100%' , status = 'primary',
+                                         collapsible = FALSE, collapsed = FALSE,
+                                         htmlOutput("SpreadText"))
+                          ),
+                          column(12,
+                                 box(title = 'B) The spread in future climate changes', 
+                                     width = '100%' , status = 'primary',
+                                     collapsible = FALSE, collapsed = FALSE,
+                                     htmlOutput("ScatterText"))
+                          ),
                           column(6,
                                  box(title = "Focus region",status = 'primary', width='60%',
                                      collapsible = TRUE, collapsed = FALSE,
@@ -202,13 +215,10 @@ dashboardPage(skin = HTML("blue"),
                                  box(title = 'Scatterplot of the regional mean climate change', 
                                      width = '100%' , status = 'primary',
                                      collapsible = TRUE, collapsed = FALSE,
-                                     plotOutput("dtdpr", width = '100%', height = 550)
-                                     #leafletOutput("dtdpr", width = '100%', height = 550),
-                                     #column(width=6,sliderInput("tlim", "temperature range", width='90%',
-                                     #                           min = -20, max = 20, value = c(-4,6), step=0.5)),
-                                     #column(width=6,sliderInput("plim", "precipitation range", width='90%',
-                                     #                           min = -2, max = 2, value = c(-0.3,0.6), step=0.1))
-                                 )
+                                     htmlOutput("spread"), 
+                                     br(),
+                                     plotlyOutput("dtdpr", width = '100%', height = 550)
+                                   )
                           ),
                           column(12,
                                  box(title = 'Info', width='100%', status = 'primary',

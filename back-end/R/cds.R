@@ -17,24 +17,25 @@ getCM <- function(url=NULL,destfile='CM.nc',path=NULL,lon=NULL,lat=NULL,force=FA
     'https://climexp.knmi.nl/CMIP5/monthly/tas/tas_Amon_ACCESS1-0_historical_000.nc'
   if(!is.null(path)) destfile <- file.path(path,destfile)
   if (file.exists(destfile) & !force) {
-    X <- try(retrieve(destfile,lon=lon,lat=lat,verbose=verbose))
+    X <- try(retrieve(destfile,lon=lon,lat=lat,verbose=verbose), silent=!verbose)
     if (inherits(X,"try-error")) force <- TRUE # If downloaded file is incomplete, force new download
   }
   if (!file.exists(destfile) | force) {
-    lok <- try(download.file(url=url, destfile=destfile))
+    lok <- try(download.file(url=url, destfile=destfile), silent=!verbose)
     # KMP 2017-11-27: download.file returns non-zero when failing
     #if (inherits(lok,"try-error")) return()
     if(lok>0) {
-      file.remove(destfile)
+      try(file.remove(destfile), silent=!verbose)
       return()
     }
-    X <- retrieve(destfile,lon=lon,lat=lat,verbose=verbose)
+    X <- try(retrieve(destfile,lon=lon,lat=lat,verbose=verbose), silent=!verbose)
   }
   ## Collect information stored in the netCDF header
   cid <- getatt(destfile)
   ## Extract a time series for the area mean for 
-  cid$area.mean <- aggregate.area(X,FUN='mean')
-  cid$area.sd <- aggregate.area(X,FUN='sd')
+  # Takes a long time. Remove (temporarily?)
+  #cid$area.mean <- aggregate.area(X,FUN='mean')
+  #cid$area.sd <- aggregate.area(X,FUN='sd')
   cid$url <- url
   cid$dates <- paste(range(index(X)),collapse=",")
   ## Collect information stored as model attributes
@@ -51,13 +52,13 @@ getCM <- function(url=NULL,destfile='CM.nc',path=NULL,lon=NULL,lat=NULL,force=FA
 }
 
 ## Specific function to retrieve GCMs
-getGCMs <- function(select=1:9,varid='tas',destfile=NULL,path=NULL,verbose=FALSE) {
+getGCMs <- function(select=1:9,varid='tas',experiment='rcp45',destfile=NULL,path=NULL,verbose=FALSE) {
   if(verbose) print("getGCMs")
   ## Set destfile
-  if(is.null(destfile)) destfile <- paste(rep('GCM',length(select)),select,'.',varid,'.nc',sep='')
+  if(is.null(destfile)) destfile <- paste(rep('GCM',length(select)),select,'.',varid,'.',experiment,'.nc',sep='')
   if(!is.null(path)) destfile <- file.path(path,destfile)
   ## Get the urls
-  url <- cmip5.urls(varid=varid)[select] ## Get the URLs of the 
+  url <- cmip5.urls(varid=varid,experiment=experiment)[select] ## Get the URLs of the 
   ## Set up a list variable to contain all the metadata in sub-lists.
   X <- list()
   for (i in seq_along(select)) {
@@ -91,13 +92,13 @@ testGCM <- function(select=1:9,varid='tas',path=NULL,verbose=FALSE) {
 }
 
 ## Specific model to retrieve RCMs
-getRCMs <- function(select=1:9,varid='tas',destfile=NULL,path=NULL,verbose=FALSE) {
+getRCMs <- function(select=1:9,varid='tas',experiment='rcp45',destfile=NULL,path=NULL,verbose=FALSE) {
   if(verbose) print("getRCMs")
   ## Set destfiles
-  if(is.null(destfile)) destfile <- paste('CM',select,'.',varid,'.nc',sep='')
+  if(is.null(destfile)) destfile <- paste('CM',select,'.',varid,'.',experiment,'.nc',sep='')
   if(!is.null(path)) destfile <- file.path(path,destfile)
   ## Get the urls
-  url <- cordex.urls(varid=varid)[select]
+  url <- cordex.urls(varid=varid,experiment=experiment)[select]
   ## Set up a list variable to contain all the metadata
   X <- list()
   for (i in seq_along(select)) {
@@ -147,7 +148,7 @@ cmip5.urls <- function(experiment='rcp45',varid='tas',
 }
 
 cordex.urls <- function(experiment='rcp45',varid='tas',
-                        url="https://climexp.knmi.nl/CORDEX/EUR-44/mon/",#path=NULL,
+                        url="http://climexp.knmi.nl/CORDEX/EUR-44/mon/",#path=NULL,
 			off=FALSE,force=FALSE,verbose=FALSE) {
   if(verbose) print("cordex.urls")
   urlfiles <- c()
@@ -169,7 +170,7 @@ cordex.urls <- function(experiment='rcp45',varid='tas',
         urlfile  <- paste(urlfile,"EUR-44_cordex",sep="_") # add text
         urlfile  <- paste(urlfile,iexp,"mon",sep="_")         # add exp.name
         urlfile  <- paste(urlfile,run.id,sep="_")      # add exp ID number
-        urlfile  <- paste(urlfile,".nc",sep="")        # add file ext
+        urlfile  <- paste(urlfile,".nc",sep="")        # add file ex
         if(url.exists(urlfile)) {
           if (verbose) print(urlfile)
           urlfiles <- c(urlfiles,urlfile)

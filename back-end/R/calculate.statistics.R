@@ -1,7 +1,7 @@
 ## Functions to calculate basic statistics
 
 ## Calculate the mean annual cycle and spatial correlation for CMIP models
-calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), variable="tas", 
+calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), variable="tas", experiment="rcp45",
                                       nfiles=5, path.gcm=NULL, continue=TRUE, mask="coords.txt", 
                                       verbose=FALSE) {
   if(verbose) print("calculate.statistics.cmip")
@@ -18,7 +18,7 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
   if(!is.null(reference)) {
     store.file <- paste("statistics.cmip", reference, variable, paste(period, collapse="-"), "rda", sep=".")
   } else {
-    store.file <- paste("statistics.cmip", variable, paste(period, collapse="-"), "rda", sep=".")
+    store.file <- paste("statistics.cmip", variable, paste(period, collapse="-"), experiment, "rda", sep=".")
   }
   store <- list()
   if(file.exists(store.file)) load(store.file)
@@ -71,7 +71,7 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
     end <- min(start+nfiles-1,ngcm) 
   }
   for(i in start:end) {
-    X <- getGCMs(select=i, varid=variable, path=path.gcm)
+    X <- getGCMs(select=i, varid=variable, path=path.gcm, experiment=experiment)
     gcm.file <- X[[1]]$filename
     store.name <- paste("gcm",i,sep=".")
     store[[store.name]]$global$spatial.sd <- c(cdo.spatSd(gcm.file,period),
@@ -121,13 +121,18 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
 calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), variable="tas", path.rcm=NULL, verbose=FALSE, mask="PrudenceCoords.txt")
 {
   
-  path.rcm="/home/ubuntu/git/DECM/back-end/data/EUR-44_CORDEX/"
-  prudence <- read.csv("/home/ubuntu/git/DECM/back-end/data/PRUDENCE_regions/RegionSpecifications.csv")
+  # Don't use absolute directory paths! Then you have to go in and change every path if you install the package on another system.
+  # Use find.file instead. It can find both files and directories.
+  #path.rcm <- "/home/ubuntu/git/DECM/back-end/data/EUR-44_CORDEX/"
+  #shfile <- "/home/ubuntu/git/DECM/back-end/data/PRUDENCE_regions/RegionSpecifications.csv"
+  shfile <- find.file("RegionSpecifications.csv")[1]
+  if(!file.exists(shfile)) print("Warning! Couldn't find PRUDENCE shapefile.")
+  prudence <- read.csv(shfile)
+  
   prudence.regions <- as.character(prudence$Code)
 
   country_shape <- get.shapefile("TM_WORLD_BORDERS-0.3.shp")
   country.regions <- as.character(country_shape$ISO3)
-
   
   if(max(period)>2015) reference <- NULL
   
@@ -290,8 +295,7 @@ calculate.mon.weights <- function(lon,lat) {
 calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="tas", nfiles=4,
                                 continue=TRUE, verbose=FALSE, path=NULL, path.gcm=NULL) {
   if(verbose) print("calculate.rmse.cmip")
-  shfile <- find.file("referenceRegions.shp")[1]
-  shape <-  get.shapefile(shfile, with.path = TRUE)
+  shape <-  get.shapefile("referenceRegions.shp", with.path = TRUE)
   
   store <- list()
   store.file <- paste("statistics.cmip", reference, variable, paste(period, collapse="-"),
@@ -327,10 +331,6 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   
   ## Calculate weights only once
   r <- raster(ref)#.mon.file)
-  ## KMP 2017-11-13: these weights don't fit the gcm and ref on line 211
-  ## and xFromCol/yFromRow(r) doesn't match longitude/latitude(ref)
-  #lon <- xFromCol(r)
-  #lat <- yFromRow(r)
   lon <- longitude(ref)
   lat <- latitude(ref)
   weights <- calculate.mon.weights(lon,lat)

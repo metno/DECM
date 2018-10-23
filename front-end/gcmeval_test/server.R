@@ -99,42 +99,6 @@ shinyServer(function(input, output, session) {
   meanRelSpreadIndx_nf <- reactive({floor(weightedspread_nf()*10)+1}) #color index based on weighted mean rel. spread for near future
   meanRelSpreadIndx_ff <- reactive({floor(weightedspread_ff()*10)+1}) #color index based on weighted mean rel. spread for far future
   
-  ## Reactive input
-  observe({
-    if(length(input$gcms)!=input$ngcm) {
-      sel <- "My selection"
-    } else {
-      sel <- input$gcmselect
-    }
-    updateSelectInput(session, inputId = "gcmselect", selected=sel, choices = c("My selection","Random","Best performance")) 
-  })
-  
-  observe({
-    if(length(input$gcms)!=input$ngcm) {
-      updateNumericInput(session, inputId = "ngcm", value=length(input$gcms), min=1, max=length(gcmst))
-    }
-  })
-  
-  observe({
-    if (tolower(input$gcmselect)=="best performance") {
-      i <- best()
-    } else if(tolower(input$gcmselect)=="random") {
-      i <- sample(1:length(gcmnames),input$ngcm,replace=FALSE)
-    } else if(tolower(input$gcmselect)=="my selection") {
-      i <- as.numeric(gsub(":.*","",input$gcms))
-    }
-    updateCheckboxGroupInput(session, inputId = "gcms", choices = gcmnames, selected = gcmnames[i])
-  })
-  
-  observe({
-    d <- event_data(event="plotly_click")
-    if(!is.null(d)) {
-      i <- sort(unique(c(as.numeric(gsub(":.*","",input$gcms)),d$pointNumber+1)))
-      updateCheckboxGroupInput(session, inputId = "gcms", choices = gcmnames, selected = gcmnames[i])
-    }
-    js$resetClick()
-  })
-  
   ## Output: text about spread
   output$IntroText  <- renderText({
     paste("This is a tool for selecting and evaluating a group of climate models from of the CMIP5 ensemble.<br><br>",
@@ -174,7 +138,7 @@ shinyServer(function(input, output, session) {
 
   ## Output: text about spread
   output$ScatterText  <- renderText({
-    paste("Use the scatterplot tool below to study the spread in projected changes for a specific region, season and time-line.",
+    paste("Use the scatterplot below to study the spread in projected changes for a specific region, season and time-line.",
           " How well does your selection of models represent the range of possible climate changes?",
           " Ideally, your subset of models should have a spread similar to the spread of the whole ensemble.",
           " Try to increase the relative spread among your selected climate models by adding more models at the edges of the scatterplot.",sep="")
@@ -256,7 +220,7 @@ shinyServer(function(input, output, session) {
       return(x)})
     
     p <- plot_ly(data.frame(x=dtas(),y=dpr()), x=~x, y=~y, type="scatter", mode="markers",
-            marker=list(color=clr()), text=gcmnames)#, source="scatterplot")
+            marker=list(color=clr()), text=gcmnames, source="scatter")
     layout(p, title=paste("Present day (1981-2010) to",tolower(input$period)),
            xaxis=list(title="Temperature change (deg C)"),
            yaxis=list(title="Precipitation change (mm/day)"), dragmode="lasso")
@@ -278,7 +242,42 @@ shinyServer(function(input, output, session) {
           "Selection spread:<br>",paste("dT: ",round(dtasRel()*100),"% (",round(dtasSel(),1),"°C of total ",round(dtas(),1),"°C).<br>",sep=""),
           paste("dP: ",round(dprRel()*100),"% (",round(dprSel(),2)," mm/day of total ",round(dpr(),2)," mm/day).<br>",sep=""),
           " </td> </tr> </table>",sep="")
-   })
+  })
 
-
+  ## Reactive input
+  observe({
+    if(length(input$gcms)!=input$ngcm) {
+      sel <- "My selection"
+    } else {
+      sel <- input$gcmselect
+    }
+    updateSelectInput(session, inputId = "gcmselect", selected=sel, choices = c("My selection","Random","Best performance")) 
+  })
+  
+  observe({
+    if(length(input$gcms)!=input$ngcm) {
+      updateNumericInput(session, inputId = "ngcm", value=length(input$gcms), min=1, max=length(gcmst))
+    }
+  })
+  
+  observe({
+    if (tolower(input$gcmselect)=="best performance") {
+      i <- best()
+    } else if(tolower(input$gcmselect)=="random") {
+      i <- sample(1:length(gcmnames),input$ngcm,replace=FALSE)
+    } else if(tolower(input$gcmselect)=="my selection") {
+      i <- as.numeric(gsub(":.*","",input$gcms))
+    }
+    updateCheckboxGroupInput(session, inputId = "gcms", choices = gcmnames, selected = gcmnames[i])
+  })
+  
+  observe({
+    d <- event_data(event="plotly_click",source="scatter")
+    if(!is.null(d)) {
+      i <- sort(unique(c(as.numeric(gsub(":.*","",input$gcms)),d$pointNumber+1)))
+      updateCheckboxGroupInput(session, inputId = "gcms", choices = gcmnames, selected = gcmnames[i])
+    }
+    js$resetClick()
+  })
+  
 })

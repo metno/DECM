@@ -16,9 +16,11 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
     }
   }
   if(!is.null(reference)) {
-    store.file <- paste("statistics.cmip", reference, variable, paste(period, collapse="-"), "rda", sep=".")
+    store.file <- paste("statistics.cmip", reference, variable, paste(period, collapse="-"),
+                        experiment, "rda", sep=".")
   } else {
-    store.file <- paste("statistics.cmip", variable, paste(period, collapse="-"), experiment, "rda", sep=".")
+    store.file <- paste("statistics.cmip", variable, paste(period, collapse="-"), 
+                        experiment, "rda", sep=".")
   }
   store <- list()
   if(file.exists(store.file)) load(store.file)
@@ -60,7 +62,7 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
     }
   }
   
-  ngcm <- length(cmip5.urls(varid=variable))
+  ngcm <- length(cmip5.urls(varid=variable,experiment=experiment))
   start <- 1
   if(continue && file.exists(store.file)) {
     start <- as.numeric(tail(sub('.*\\.', '', names(store), perl=TRUE),n=1))+1
@@ -292,14 +294,14 @@ calculate.mon.weights <- function(lon,lat) {
 }
 
 ## Calculate the root mean square error (rms) and relative rms (e)
-calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="tas", nfiles=4,
-                                continue=TRUE, verbose=FALSE, path=NULL, path.gcm=NULL) {
+calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="tas", experiment="rcp45", 
+                                nfiles=4, continue=TRUE, verbose=FALSE, path=NULL, path.gcm=NULL) {
   if(verbose) print("calculate.rmse.cmip")
-  shape <-  get.shapefile("referenceRegions.shp", with.path = TRUE)
+  shape <-  get.shapefile("referenceRegions.shp")
   
   store <- list()
   store.file <- paste("statistics.cmip", reference, variable, paste(period, collapse="-"),
-                      "rda", sep=".")
+                      experiment, "rda", sep=".")
   #if(is.character(find.file(store.file)[1])) store.file <- find.file(store.file)[1]
   if(file.exists(store.file)) load(store.file)
   
@@ -336,7 +338,7 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   weights <- calculate.mon.weights(lon,lat)
   
   ## Check which files are processed
-  ngcm <- length(cmip5.urls(varid=variable))
+  ngcm <- length(cmip5.urls(varid=variable, experiment=experiment))
   start <- 1
   if(continue && file.exists(store.file)) {
     start <- as.numeric(tail(sub('.*\\.', '', names(store), perl=TRUE), n=1)) + 1
@@ -349,7 +351,7 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   
   for(i in start:end) {
     store.name <- paste("gcm",i,sep=".")
-    gcm.file <- file.path(path.gcm,paste("GCM",i,".",variable,".nc",sep=""))
+    gcm.file <- file.path(path.gcm,paste("GCM",i,".",variable,".",experiment,".nc",sep=""))
     if(!file.exists(gcm.file)) getGCMs(i, varid=variable, destfile=file.path(path.gcm,gcm.file))
     gcm.mon.file <- file.path(path,"gcm.monmean.nc")
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),

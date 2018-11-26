@@ -120,35 +120,33 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
   return(store)
 }
 
-calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), variable="tas", path.rcm=NULL, verbose=FALSE, mask="PrudenceCoords.txt")
-{
+calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), 
+        variable="tas", path.rcm=NULL, mask="PrudenceCoords.txt",
+        experiment="rcp45", verbose=FALSE) {
   
-  # Don't use absolute directory paths! Then you have to go in and change every path if you install the package on another system.
-  # Use find.file instead. It can find both files and directories.
-  #path.rcm <- "/home/ubuntu/git/DECM/back-end/data/EUR-44_CORDEX/"
-  #shfile <- "/home/ubuntu/git/DECM/back-end/data/PRUDENCE_regions/RegionSpecifications.csv"
+  if(verbose) print("calculate.statistics.cordex")
   shfile <- find.file("RegionSpecifications.csv")[1]
   if(!file.exists(shfile)) print("Warning! Couldn't find PRUDENCE shapefile.")
   prudence <- read.csv(shfile)
-  
   prudence.regions <- as.character(prudence$Code)
-
   country_shape <- get.shapefile("TM_WORLD_BORDERS-0.3.shp")
   country.regions <- as.character(country_shape$ISO3)
-  
   if(max(period)>2015) reference <- NULL
   
   if(!is.null(reference)) {
-    store.file <- paste("statistics.cordex", reference, variable, paste(period, collapse="-"), "rda", sep=".")
+    store.file <- paste("statistics.cordex", reference, variable, paste(period, collapse="-"), 
+                        experiment, "rda", sep=".")
   } else {
-    store.file <- paste("statistics.cordex", variable, paste(period, collapse="-"), "rda", sep=".")
+    store.file <- paste("statistics.cordex", variable, paste(period, collapse="-"), 
+                        experiment, "rda", sep=".")
   }
   
   store <- list()
 
   if(!is.null(reference)) {
     ref.file <- switch(paste(reference, variable, sep = "."), 
-                       eobs.tas = "tg_0.50deg_reg_small_v16.0_ymon.nc", eobs.pr = "rr_0.50deg_reg_small_v16.0_ymon.nc")
+                       eobs.tas = "tg_0.50deg_reg_small_v16.0_ymon.nc", 
+                       eobs.pr = "rr_0.50deg_reg_small_v16.0_ymon.nc")
     ref.file <- paste(path.rcm,ref.file,sep="")
     
     store.name <- paste(reference,variable,sep=".")
@@ -189,7 +187,9 @@ calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), v
   }
   
   for(m in 0:15){
-    rcm.file <- paste(path.rcm,"masked_ymonmean_",paste(period, collapse="-"),"_",variable,"_EUR-44_cordex_rcp45_mon_0",sprintf("%02d", m),".nc",sep="")
+    rcm.file <- paste(path.rcm,"masked_ymonmean_",paste(period, collapse="-"),
+                      "_",variable,"_EUR-44_cordex_",experiment,"_mon_0",
+                      sprintf("%02d", m),".nc",sep="")
     store.name <- paste("rcm",m,sep=".")
     store[[store.name]]$europe$spatial.sd <- c(cdo.spatSdymon(rcm.file),
                                                cdo.spatSdymon(rcm.file,monthly=TRUE))
@@ -388,13 +388,14 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   invisible(store)
 }
 
-calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variable="tas", nfiles=4,
-                                  continue=TRUE, verbose=FALSE, path=NULL, path.gcm=NULL) {
+calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variable="tas", 
+                                  nfiles=4, continue=TRUE, path=NULL, path.gcm=NULL,
+                                  experiment="rcp45", verbose=FALSE) {
   if(verbose) print("calculate.rmse.cordex")
   
   store <- list()
   store.file <- paste("statistics.cordex", reference, variable, paste(period, collapse="-"),
-                      "rda", sep=".")
+                      experiment, "rda", sep=".")
   #if(is.character(find.file(store.file)[1])) store.file <- find.file(store.file)[1]
   if(file.exists(store.file)) load(store.file)
   
@@ -424,7 +425,7 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
   }
   
   ## Check which files are processed
-  ngcm <- length(cordex.urls(varid=variable))
+  ngcm <- length(cordex.urls(varid=variable,experiment=experiment))
   start <- 1
   if(continue && file.exists(store.file)) {
     start <- as.numeric(tail(sub('.*\\.', '', names(store), perl=TRUE), n=1)) + 1
@@ -438,8 +439,9 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
   ref <- retrieve(ref.mon.file)
   for(i in start:end) {
     store.name <- paste("cm",i,sep=".")
-    gcm.file <- file.path(path.gcm,paste("CM",i,".",variable,".nc",sep=""))
-    if(!file.exists(gcm.file)) getGCMs(i, varid=variable, destfile=file.path(path.gcm,gcm.file))
+    gcm.file <- file.path(path.gcm,paste("CM",i,".",variable,".",experiment,".nc",sep=""))
+    if(!file.exists(gcm.file)) getGCMs(i, varid=variable, experiment=experiment,
+                                       destfile=file.path(path.gcm,gcm.file))
     gcm.mon.file <- file.path(path,"cm.monmean.nc")
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
                 infile=gcm.file,outfile=gcm.mon.file)

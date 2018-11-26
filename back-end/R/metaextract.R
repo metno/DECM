@@ -27,9 +27,13 @@ metaextract.opendap <- function(url=NULL, verbose=FALSE) {
   return(list(globat=globat,varlist=varlist,dimlist=dimlist,url=url,range=range(timeline)))
 }
 
+test <- function(x=NULL,verbose=FALSE,add=TRUE) {
+  if(verbose) print("test")
+  browser()
+}
 ## Function to extract the metadata from local NetCDF files
 ## [Change so that the opendap alternative can be used for data from the KNMI explorer too]
-metaextract <- function(x=NULL, verbose=FALSE) {
+metaextract <- function(x=NULL,add=TRUE,file="metaextract.rda",verbose=FALSE) {
   if(verbose) print("metaextract")
   if (is.null(x)) x <- c(getGCMs(verbose=verbose),getRCMs(verbose=verbose))
   gcms <- names(x)
@@ -63,15 +67,33 @@ metaextract <- function(x=NULL, verbose=FALSE) {
     }
   }
   Y <- as.data.frame(Y)
-  Y -> meta
-  save(meta,file='metaextract.rda')
-  return(Y)
+  if(add & file.exists(file)) {
+    # merge old and new meta data - add and rearrange columns if necessary:
+    load(file)
+    meta.old <- meta
+    if(any(!colnames(Y)%in%colnames(meta.old))) {
+      new.cols <- colnames(Y)[!colnames(Y)%in%colnames(meta.old)] 
+      for(n in new.cols) meta.old[[n]] <- rep(NA,nrow(meta.old))
+    }
+    if(any(!colnames(meta.old)%in%colnames(Y))) {
+      new.cols <- colnames(meta.old)[!colnames(meta.old)%in%colnames(Y)] 
+      for(n in new.cols) Y[[n]] <- rep(NA,nrow(Y))
+    }
+    meta <- rbind(meta.old,Y)
+    meta <- meta[!duplicated(meta),]
+    id <- paste(meta$project_id,meta$experiment_id,meta$var,meta$gcm,meta$gcm_rip,sep=".")
+    meta <- meta[order(id),]
+  } else {
+    Y -> meta
+  }
+  save(meta,file=file)
+  return(meta)
 }
 
-metaextract.cmip5 <- function(x=NULL, verbose=FALSE) {
+metaextract.cmip5 <- function(x=NULL, experiment="rcp45", verbose=FALSE) {
   if(verbose) print("metaextract.cmip")
   ## argument 'x' is input from getGCMs, getRCMs, testGCM, etc
-  if (is.null(x)) x <- getGCMs(verbose=verbose)
+  if (is.null(x)) x <- getGCMs(experiment=experiment,verbose=verbose)
   
   if(!inherits(x,"list")) x <- list(gcm.1=x)
   gcms <- names(x)
@@ -100,11 +122,13 @@ metaextract.cmip5 <- function(x=NULL, verbose=FALSE) {
       if(!is.null(xx$dim$lat$units)) lat.unit <- xx$dim$lat$units
       if(!is.null(xx$dim$lon$units)) lon.unit <- xx$dim$lon$units
     }
-    for(mi in c("url","filename","dates","frequency")) {
-      if(!is.null(xx[[mi]])) eval(parse(text=paste(mi," <- xx$",mi,sep="")))
-    }
-    for(mi in c("project_id","experiment_id","creation_date","tracking_id")) {
-      if(!is.null(xx$model[[mi]])) eval(parse(text=paste(mi," <- xx$model$",mi,sep="")))
+    for(mi in c("url","filename","dates","frequency",
+                "project_id","experiment_id","creation_date","tracking_id")) {
+      if(!is.null(xx[[mi]])) {
+        eval(parse(text=paste(mi," <- xx$",mi,sep="")))
+      } else if (!is.null(xx$model[[mi]])) {
+        eval(parse(text=paste(mi," <- xx$model$",mi,sep="")))
+      }
     }
     if(!is.null(xx$model$model_id)) gcm <- xx$model$model_id
     if(!is.null(xx$model$parent_experiment_rip)) gcm.rip <- xx$model$parent_experiment_rip
@@ -116,13 +140,17 @@ metaextract.cmip5 <- function(x=NULL, verbose=FALSE) {
       h <- strsplit(xx$model$history," ")
       filename <- unlist(h)[grep("rcp.*.nc",unlist(h))[1]]
       gcm <- gsub("_rcp.*","",gsub(".*_Amon_","",filename))
-      gcm.rip <- substr(filename,regexpr("r[0-9]i[0-9]p[0-9]",filename)[1],regexpr("r[0-9]i[0-9]p[0-9]",filename)[1]+5)
-      experiment_id <- paste("historical",substr(filename,regexpr("rcp",filename)[1],regexpr("rcp",filename)[1]+4),sep="+")
+      gcm.rip <- substr(filename,regexpr("r[0-9]i[0-9]p[0-9]",filename)[1],
+                        regexpr("r[0-9]i[0-9]p[0-9]",filename)[1]+5)
+      experiment_id <- paste("historical",substr(filename,regexpr("rcp",filename)[1],
+                                                 regexpr("rcp",filename)[1]+4),sep="+")
     }
+    if(!is.na(filename)) filename <- gsub(".*/","",filename)
     mx <- data.frame(project_id=project_id, url=url, filename=filename,
                      dim=paste(dim,collapse=","), dates=dates, var=paste(var,collapse=","),
                      longname=paste(longname,collapse=","), unit=paste(vunit,collapse=","),
-                     resolution=res, lon=lon.rng, lon_unit=lon.unit, lat=lat.rng, lat_unit=lat.unit,
+                     resolution=res, lon=lon.rng, lon_unit=lon.unit, 
+                     lat=lat.rng, lat_unit=lat.unit,
                      experiment_id=experiment_id, frequency=frequency, 
                      creation_date=creation_date, 
                      gcm=gcm, gcm_rip=gcm.rip)
@@ -186,10 +214,10 @@ metaextract.cordex <- function(x=NULL, verbose=FALSE) {
     if(!is.null(xx$model$model_id)) rcm <- xx$model$model_id
     if(!is.null(xx$model$CORDEX_domain)) rcm.domain <- xx$model$CORDEX_domain
     if(!is.null(xx$model$rcm_version_id)) rcm.v <- xx$model$rcm_version_id
+    if(!is.na(filename)) filename <- gsub(".*/","",filename)
     mx <- data.frame(project_id=project_id, url=url, filename=filename,
                      dim=paste(dim,collapse=","), dates=dates, var=paste(var,collapse=","),
-                     longname=paste(longname,collapse=","), unit=paste(vunit,collapse=","),
-                     #var_id=paste(vid,collapse=","), 
+                     longname=paste(longname,collapse=","), unit=paste(vunit,collapse=","), 
                      resolution=res, lon=lon.rng, lon_unit=lon.unit, lat=lat.rng, lat_unit=lat.unit,
                      experiment_id=experiment_id, frequency=frequency, 
                      creation_date=creation_date, #tracking_id=tracking_id,

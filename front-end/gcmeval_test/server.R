@@ -100,34 +100,46 @@ shinyServer(function(input, output, session) {
   meanRelSpreadIndx_ff <- reactive({floor(weightedspread_ff()*10)+1}) #color index based on weighted mean rel. spread for far future
   
   ## Output: text about spread
+  "<ul><li>...text...</li><li>...more text...</li></ul>"
+  
   output$IntroText  <- renderText({
-    paste("This is a tool for selecting and evaluating a group of climate models from of the CMIP5 ensemble.<br><br>",
-          "The chosen climate models are evaluated based on the following criteria: <br>",
-          "A) The skill of individual climate models to reproduce the climate of the past. <br>",
-          "B) The spread in future climate changes, which should ideally be as large as the spread in the whole ensemble of available climate model simulations.<br><br>")
+    paste("GCMeval is a tool for selecting climate models from the CMIP5 ensemble ",
+          "and evaluating the sub-ensemble based on:<br>",
+          "<ul><li>the spread in projected climate changes, which should ideally be as large as the spread in the whole ensemble, and</li>",
+          "<li> the skill of individual climate models to reproduce the climate of the past.</li></ul><br>")
   })
   
   output$DisclaimerText <- renderText({
-    paste("<i>Disclaimer: This is a prototype and should not be used as a basis for decision making. The GCM names might not correspond to the real GCM data.</i>")
+    paste("<i>Disclaimer: This is a prototype and should not be used as a basis for decision making.</i>")
   })
   
   output$RankingText  <- renderText({
-    paste("Start out by chosing two regions of interest. Then select weights (i.e., the importance) of different regions, seasons, variables, and skill scores.",
-          "Based on your choices, we will calculate a weighted performance score and rank the models.")
+    paste("<i>Start out by picking <b>two focus regions</b>. Then select <b>weights</b> (i.e., the importance) of ",
+          "the regions, seasons, variables, and skill scores.",
+          "A <b>performance score and model ranking</b> is then calculated for the model ensemble ",
+          "based on your choices, weighted for all seasons and skill scores.</i>")
   })
   
   ## Output: text about ranking
   output$MetricText  <- renderText({
-    paste("The mean weighted model performance rank of the selected models is<br><font size = +1, font color=\"",
-          legcolsrank[meanRelMetricsIndx()],"\"><b> Rank ", round(mean_weightedrank()), "  of  ",length(gcmst),"</b></font>.<br><br>",
-          "The following models have been selected:<br>",paste(im(),collapse="/"),
-          ", <br> and their individual performance ranks are: <br>",paste(weightedrank(),collapse="/"),".<br><br>",
-          "The best performing ",input$ngcm," models would be:<br>",paste(best(),collapse="/"),".",sep="")
+    paste("The mean weighted model rank of the selected models is ",
+          "<br><br><font size = +1, font color=\"",
+          legcolsrank[meanRelMetricsIndx()],"\"><b> rank ", round(mean_weightedrank()), "  of  ",
+          length(gcmst),"</b></font><br><br>",sep="")
+  })
+  
+  output$ModelsText  <- renderText({
+    paste("The following models have been selected:<br><font size=+1>",paste(im(),collapse="/"),
+          "</font>, <br> and their individual performance ranks are: ",
+          "<br><font size=+1>",paste(weightedrank(),collapse="/"),"</font>.<br><br>",
+          "The best performing ",input$ngcm," models would be:<br>",
+          "<font size=+1>",paste(best(),collapse="/"),"</font>.",sep="")
   })
   
   ## Output: text about spread
-  output$SpreadText  <- renderText({
-    paste("The weighted mean spread of the selected models is <br><br>","<font size = +1, font color=\"",
+  output$SpreadTextWeighted  <- renderText({
+    paste("The weighted mean spread of the selected models for all regions and seasons ",
+          "is <br><br>","<font size = +1, font color=\"",
           legcols[meanRelSpreadIndx_ff()],"\"><b>", round(weightedspread_nf()*100), "%</b>
                 </font>  for the <b>near future</b> and <br>",
           "<font size = +1, font color=\"", 
@@ -135,13 +147,48 @@ shinyServer(function(input, output, session) {
                 </font> for the <b>far future</b> <br><br> compared to the spread of the whole ensemble.<br><br>",sep="")
     
   })
-
+  
   ## Output: text about spread
+  output$SpreadText  <- renderText({
+    textOut <- reactive({
+      legcols <- two.colors(n=11,start="red",end="green",middle = "orange") #colors for background of legend
+      if(input$weighted) {
+        paste("The weighted mean spread of the selected models for all regions and seasons ",
+              "is <br><br>","<font size = +1, font color=\"",
+              legcols[meanRelSpreadIndx_ff()],"\"><b>", round(weightedspread_nf()*100), "%</b>
+                </font>  for the <b>near future</b> and <br>",
+              "<font size = +1, font color=\"", 
+              legcols[meanRelSpreadIndx_ff()],"\"><b>", round(weightedspread_ff()*100), "%</b>
+                </font> for the <b>far future</b> <br><br> compared to the spread of the whole ensemble.<br><br>",sep="")        
+      } else {
+        dpr <- reactive({60*60*24*spread(varid="pr",season=input$season,region=input$region,period=Period(),im=NULL)})
+        dprSel <- reactive({60*60*24*spread(varid="pr",season=input$season,region=input$region,period=Period(),im=im())})
+        dprRel <- reactive({dprSel()/dpr()})
+        dtas <- reactive({spread(varid="tas",season=input$season,region=input$region,period=Period(),im=NULL)})
+        dtasSel <- reactive({spread(varid="tas",season=input$season,region=input$region,period=Period(),im=im())})
+        dtasRel <- reactive({dtasSel()/dtas()})
+        dtasSpreadIndx <- reactive({floor(mean(dtasRel())*10)+1 })
+        dprSpreadIndx <- reactive({floor(mean(dprRel())*10)+1})
+        paste("The spread of the selected models is <br><br>",
+              "<font size = +1, font color=\"",legcols[dtasSpreadIndx()],"\"><b>",
+              round(dtasRel()*100),
+              "%</b> </font>  for <b>temperature</b> and <br>",
+              "<font size = +1, font color=\"", legcols[dprSpreadIndx()],"\"><b>", 
+              round(dprRel()*100), 
+              "%</b> </font> for <b>precipitation</b> <br><br> ",
+              "compared to the spread of the whole ensemble ",
+              "for the selected region, season, time horizon, and scenario.<br><br>"
+              ,sep="")
+      }
+    })
+    textOut()
+  })
+  
+  ## Output: text about scatterplot
   output$ScatterText  <- renderText({
-    paste("Use the scatterplot below to study the spread in projected changes for a specific region, season and time-line.",
-          " How well does your selection of models represent the range of possible climate changes?",
-          " Ideally, your subset of models should have a spread similar to the spread of the whole ensemble.",
-          " Try to increase the relative spread among your selected climate models by adding more models at the edges of the scatterplot.",sep="")
+    paste("<i>Use the scatterplot below to study the spread in projected changes for a specific region, season and time-line.",
+          " Ideally, the subset of models should have a spread similar to the spread of the whole ensemble.",
+          " Try to increase the relative spread among your selected climate models by adding more models at the edges of the scatterplot.</i>",sep="")
   })
   
     
@@ -220,63 +267,46 @@ shinyServer(function(input, output, session) {
       return(x)})
     
     p <- plot_ly(data.frame(x=dtas(),y=dpr()), x=~x, y=~y, type="scatter", mode="markers",
-            marker=list(color=clr()), text=gcmnames, source="scatter")
+            marker=list(color=clr()), text=gcmnames, source="A")
     layout(p, title=paste("Present day (1981-2010) to",tolower(input$period)),
            xaxis=list(title="Temperature change (deg C)"),
-           yaxis=list(title="Precipitation change (mm/day)"), dragmode="lasso")
+           yaxis=list(title="Precipitation change (mm/day)"))#, dragmode="lasso")
   })
 
-  # Output: textbox with information about spread to go with scatterplot
-  output$spread <- renderText({
-    #add colored legend
-    legcols <- two.colors(n=11,start="red",end="green",middle = "orange") #colors for background of legend
-    
-    dpr <- reactive({60*60*24*spread(varid="pr",season=input$season,region=input$region,period=Period(),im=NULL)})
-    dprSel <- reactive({60*60*24*spread(varid="pr",season=input$season,region=input$region,period=Period(),im=im())})
-    dprRel <- reactive({dprSel()/dpr()})
-    dtas <- reactive({spread(varid="tas",season=input$season,region=input$region,period=Period(),im=NULL)})
-    dtasSel <- reactive({spread(varid="tas",season=input$season,region=input$region,period=Period(),im=im())})
-    dtasRel <- reactive({dtasSel()/dtas()})
-    meanRelSpreadIndx <- reactive({floor((mean(dtasRel())+mean(dprRel()))/2*10)+1 })
-    paste("<table border='1'><tr bgcolor='",legcols[meanRelSpreadIndx()],"'> <td style='padding: 10px;'> ",
-          "Selection spread:<br>",paste("dT: ",round(dtasRel()*100),"% (",round(dtasSel(),1),"°C of total ",round(dtas(),1),"°C).<br>",sep=""),
-          paste("dP: ",round(dprRel()*100),"% (",round(dprSel(),2)," mm/day of total ",round(dpr(),2)," mm/day).<br>",sep=""),
-          " </td> </tr> </table>",sep="")
+  output$clickevent <- renderPrint({
+    event_data("plotly_click", source="A")
   })
 
-  ## Reactive input
+  # When selecting GCMs in plotly scatterplot, update gcms and ngcm
   observe({
-    if(length(input$gcms)!=input$ngcm) {
-      sel <- "My selection"
-    } else {
-      sel <- input$gcmselect
-    }
-    updateSelectInput(session, inputId = "gcmselect", selected=sel, choices = c("My selection","Random","Best performance")) 
-  })
-  
-  observe({
-    if(length(input$gcms)!=input$ngcm) {
-      updateNumericInput(session, inputId = "ngcm", value=length(input$gcms), min=1, max=length(gcmst))
-    }
-  })
-  
-  observe({
-    if (tolower(input$gcmselect)=="best performance") {
-      i <- best()
-    } else if(tolower(input$gcmselect)=="random") {
-      i <- sample(1:length(gcmnames),input$ngcm,replace=FALSE)
-    } else if(tolower(input$gcmselect)=="my selection") {
-      i <- as.numeric(gsub(":.*","",input$gcms))
-    }
-    updateCheckboxGroupInput(session, inputId = "gcms", choices = gcmnames, selected = gcmnames[i])
-  })
-  
-  observe({
-    d <- event_data(event="plotly_click",source="scatter")
+    d <- event_data(event="plotly_click", source="A")
     if(!is.null(d)) {
       i <- sort(unique(c(as.numeric(gsub(":.*","",input$gcms)),d$pointNumber+1)))
       updateCheckboxGroupInput(session, inputId = "gcms", choices = gcmnames, selected = gcmnames[i])
+      updateNumericInput(session, inputId = "ngcm", value=length(input$gcms), min=1, max=length(gcmst))
     }
+  })
+
+  # When selecting GCMs from the checkboxes, update ngcm
+  observeEvent(input$gcms,{
+    updateNumericInput(session, inputId = "ngcm", 
+                       value=length(input$gcms), min=1, max=length(gcmst))
+  })
+  
+  # When clicking 'best' button, select best performing GCMs
+  observeEvent(input$best, {
+    i <- best()
+    updateCheckboxGroupInput(session, inputId = "gcms", choices = gcmnames, selected = gcmnames[i])
+  })
+
+  # When clicking 'random' button, select random GCMs
+  observeEvent(input$randomize, {
+    i <- sample(1:length(gcmnames),input$ngcm,replace=FALSE)
+    updateCheckboxGroupInput(session, inputId = "gcms", choices = gcmnames, selected = gcmnames[i])
+  })
+  
+  # Reset plotly clicks when changing GCM selection (gcms)  
+  observeEvent(input$gcms,{
     js$resetClick()
   })
   

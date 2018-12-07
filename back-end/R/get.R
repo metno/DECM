@@ -12,7 +12,11 @@ get.shapefile <- function(filename,with.path=FALSE){
   if(!with.path){
     fullname <- find.file(filename)[1]
   }
-  readOGR(fullname,verbose=FALSE)
+  if (requireNamespace("rgdal", quietly = TRUE)) {
+    rgdal::readOGR(fullname,verbose=FALSE)
+  } else {
+    stop("Package 'rgdal' needed to use 'get.shapefile'. Please install it.")
+  }
 }
 
 # Provides path to local files with reference data

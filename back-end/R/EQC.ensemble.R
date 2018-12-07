@@ -1,19 +1,10 @@
-## Evaluation of CMIP ensemble based on NCEP/NCAR 1, ERAINT, and MERRA reanalyses
-## Surface temperature. Rank-test for grid-points values
-
-testrank <- function(x,m,N,d1) {
-  ## Find the rank number of m observations
-  ## Need to unwrap the dimensions
-  dim(x) <- c(N,d1)
-  number <- apply(x,1,function(x) order(x)[1:m])
-  return(c(number))
-}
-
-ECQ.ensemble <- function(obs=c('air.mon.mean.nc','ETAINT_t2m.mon.nc','MERRA'),
+## This function evaluates whole ensembles and compares the sample of simulated results to corresponding
+## 'observaitons' (one or several reanalyses). The testing is done through rank-statistics, and we expect
+## thatt the rank number follows a uniform distribution if the simulated results and observations blong to
+## the same statistical population. 
+EQC.ensemble <- function(obs=c('air.mon.mean.nc','ETAINT_t2m.mon.nc','MERRA'),
                          path='CMIP5.monthly',pattern='tas_',it=c(1980,2015),is=NULL,
                          anomaly=FALSE) {
-  require(esd)
-  
   ## Get all the GCM data
   gcms <- list.files(path=path,pattern=pattern,full.names=TRUE)
   n <- length(gcms)

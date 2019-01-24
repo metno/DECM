@@ -12,7 +12,7 @@ commonEOF.gcm <- function(select=1:9,varid='tas',destfile=NULL,destfile.ceof=NUL
       if (tolower(it)=='annual') {
         x <- esd::annual(esd::subset(x,is=is),verbose=verbose) 
       } else {
-        x <- esd::subset(x,it=it,is=is,verbose=verbose)
+        x <- esd::subset.field(x,it=it,is=is,verbose=verbose)
       }
     }
     if (is.null(X)) {
@@ -23,7 +23,7 @@ commonEOF.gcm <- function(select=1:9,varid='tas',destfile=NULL,destfile.ceof=NUL
   }
   if(verbose) print("Calculate common EOF")
   ceof <- esd::EOF(X,verbose=verbose)
-  esd::plot(ceof)
+  esd::plot.eof(ceof)
   
   ## Need to reformat the ceof-object to fit the set-up for the R-shiny app in the front-end.
   if(verbose) print("Reformat the common EOF object")

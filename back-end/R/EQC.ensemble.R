@@ -11,32 +11,32 @@ EQC.ensemble <- function(obs=c('air.mon.mean.nc','ETAINT_t2m.mon.nc','MERRA'),
   N <- n + length(obs)
   m <- length(obs)
   ## Use the grid of the first reanalysis and interploate the other fields onto this grid
-  y1 <- subset(retrieve(obs[1]),it=it,is=is)
-  if (anomaly) y1 <- anomaly(y1)
+  y1 <- esd::subset.field(esd::retrieve(obs[1]),it=it,is=is)
+  if (anomaly) y1 <- esd::anomaly(y1)
   d <- dim(y1)
   
   ## Set up a data matrix containing the data - start with the first reanalysis
   X <- rep(NA,N*d[1]*d[2]); dim(X) <- c(N,d)
   cnames <- rep("",N)
-  X[1,,] <- coredata(y1)
+  X[1,,] <- zoo::coredata(y1)
   cnames[1] <- paste(attr(y1,'model_id'),attr(y1,'run'))
   
   if (m > 1) {
     for (i in 2:m) {
-      y <- subset(retrieve(obs[i]),it=it,is=is)
-      y <- regrid(y,is=y1)
-      if (anomaly) y <- anomaly(y)
-      X[i,,] <- coredata(y)
+      y <- esd::subset.field(esd::retrieve(obs[i]),it=it,is=is)
+      y <- esd::regrid(y,is=y1)
+      if (anomaly) y <- esd::anomaly(y)
+      X[i,,] <- zoo::coredata(y)
       cnames[i] <- paste(attr(y,'model_id'),attr(y,'run'))
     }
   }
   
   ## Do the GCMs:
   for (i in 1:n) {
-    y <- subset(retrieve(gcms[i]),it=it,is=is)
-    y <- regrid(y,is=y1)
-    if (anomaly) y <- anomaly(y)
-    X[i+m,,] <- coredata(y)
+    y <- esd::subset.field(esd::retrieve(gcms[i]),it=it,is=is)
+    y <- esd::regrid(y,is=y1)
+    if (anomaly) y <- esd::anomaly(y)
+    X[i+m,,] <- zoo::coredata(y)
     cnames[i+m] <- paste(attr(y,'model_id'),attr(y,'run'))
   }
   

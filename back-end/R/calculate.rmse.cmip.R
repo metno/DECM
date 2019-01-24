@@ -47,22 +47,23 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   ngcm <- length(cmip5.urls(varid=variable, experiment=experiment))
   start <- 1
   if(continue && file.exists(store.file)) {
-    ok <- sapply(names(store), function(gcm) "rms" %in% names(store[[gcm]]$global))
+    gcmnames <- names(store)[grep("gcm",names(store))]
+    ok <- sapply(gcmnames, function(gcm) "rms" %in% names(store[[gcm]][[length(store[[gcm]])]]))
     if(any(!ok)) {
-      start <- as.numeric(tail(sub('.*\\.', '', names(store)[!ok], perl=TRUE),n=1))+1
+      start <- as.numeric(head(gsub('.*\\.', '', gcmnames[!ok], perl=TRUE),n=1))+1
     } else {
-      start <- min(ngcm, as.numeric(tail(sub('.*\\.', '', names(store), perl=TRUE),n=1))+1)
+      start <- min(ngcm, as.numeric(tail(sub('.*\\.', '', gcmnames, perl=TRUE),n=1))+1)
     }
   }
-  if(continue && file.exists(store.file)) {
-    start <- as.numeric(tail(sub('.*\\.', '', names(store), perl=TRUE), n=1)) + 1
-  }
+  #if(continue && file.exists(store.file)) {
+  #  start <- as.numeric(tail(sub('.*\\.', '', names(store), perl=TRUE), n=1)) + 1
+  #}
   if(nfiles=="all") {
     end <- ngcm
   } else {
     end <- min(start + nfiles - 1, ngcm) 
   }
-  
+  start <- min(start,end)
   for(i in start:end) {
     store.name <- paste("gcm",i,sep=".")
     gcm.file <- file.path(path.gcm,paste("GCM",i,".",variable,".",experiment,".nc",sep=""))

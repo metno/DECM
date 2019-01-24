@@ -5,11 +5,11 @@ testGCM <- function(select=1:9,varid='tas',path=NULL,verbose=FALSE) {
   X <- list()
   for (i in select) {
     if(verbose) print(fnames[i])
-    x <- retrieve(fnames[i],varid=varid)
+    x <- esd::retrieve(fnames[i],varid=varid)
     ncid <- ncdf4::nc_open(fnames[i])
     ncdf4::nc_close(ncid)
-    ncid$area.mean <- aggregate.area(x,FUN='mean')
-    ncid$area.sd <- aggregate.area(x,FUN='sd')
+    ncid$area.mean <- esd::aggregate.area(x,FUN='mean')
+    ncid$area.sd <- esd::aggregate.area(x,FUN='sd')
     ncid$url <- fnames[i]
     X[[as.character(i)]] <- ncid
   }

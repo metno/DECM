@@ -1,12 +1,13 @@
 ## Generic function to retrieve climate model (CM) file from the KNMI ClimateExplorer
-getCM <- function(url=NULL,destfile='CM.nc',path=NULL,lon=NULL,lat=NULL,force=FALSE,verbose=FALSE) {
+getCM <- function(url=NULL,destfile='CM.nc',path=NULL,
+                  lon=NULL,lat=NULL,force=FALSE,verbose=FALSE) {
   if(verbose) print("getCM")
   ## Retrieves the data
   if(is.null(url)) url <-
       'https://climexp.knmi.nl/CMIP5/monthly/tas/tas_Amon_ACCESS1-0_historical_000.nc'
   if(!is.null(path)) destfile <- file.path(path,destfile)
   if (file.exists(destfile) & !force) {
-    X <- try(retrieve(destfile,lon=lon,lat=lat,verbose=verbose), silent=TRUE)
+    X <- try(esd::retrieve(destfile,lon=lon,lat=lat,verbose=verbose), silent=TRUE)
     if (inherits(X,"try-error")) force <- TRUE # If downloaded file is incomplete, force new download
   }
   if (!file.exists(destfile) | force) {
@@ -17,7 +18,7 @@ getCM <- function(url=NULL,destfile='CM.nc',path=NULL,lon=NULL,lat=NULL,force=FA
       try(file.remove(destfile), silent=TRUE)
       return()
     }
-    X <- try(retrieve(destfile,lon=lon,lat=lat,verbose=verbose), silent=TRUE)
+    X <- try(esd::retrieve(destfile,lon=lon,lat=lat,verbose=verbose), silent=TRUE)
   }
   ## Collect information stored in the netCDF header
   cid <- getatt(destfile)
@@ -38,3 +39,4 @@ getCM <- function(url=NULL,destfile='CM.nc',path=NULL,lon=NULL,lat=NULL,force=FA
     if(grepl("CMIP5",model$title)) cid$project_id <- "CMIP5"
   }
   return(cid)
+}

@@ -4,13 +4,27 @@ source("global.R")
 ## Define a server for the Shiny app
 shinyServer(function(input, output, session) {
 
+  stats <- reactive({
+    stats.both[[clean(input$rcp)]]
+  })
+
+  gcmst <- reactive({
+    names(stats()$tas$ff)
+  })
+  
+  gcmsp <- reactive({
+    names(stats()$pr$ff)
+  })
+
   # Region selection for ranking
   Regionlist <- reactive({
     rl <- list(input$regionwm1,input$regionwm2)
     rl[which(rl != "---")]
   })
   
-  im <- reactive({as.numeric(gsub(":.*","",input$gcms))})
+  im <- reactive({
+    as.numeric(gsub(":.*","",input$gcms))
+  })
 
   ## Region selection for scatterplot
   Region <- reactive({
@@ -22,7 +36,7 @@ shinyServer(function(input, output, session) {
     }
     return(region)
   })
-  
+
   ## Season selection for scatterplot
   Season <- reactive({switch(tolower(as.character(input$season)),
                              'annual mean'='ann',
@@ -36,10 +50,17 @@ shinyServer(function(input, output, session) {
                              "near future (2021-2050)"='nf')})
 
   ## Weighted rank calculations
-  tasRanks <- reactive({ranking.all(varid="tas",Regions=Regionlist())})
-  prRanks <- reactive({ranking.all(varid="pr",Regions=Regionlist())})
+  tasRanksRcp45 <- reactive({ranking.all(stats=stats.both$rcp45,varid="tas",Regions=Regionlist())})
+  prRanksRcp45 <- reactive({ranking.all(stats=stats.both$rcp45,varid="pr",Regions=Regionlist())})
+  tasRanksRcp85 <- reactive({ranking.all(stats=stats.both$rcp85,varid="tas",Regions=Regionlist())})
+  prRanksRcp85 <- reactive({ranking.all(stats=stats.both$rcp85,varid="pr",Regions=Regionlist())})
+  tasRanks <- reactive({as.numeric(input$wrcp45)*tasRanksRcp45()+as.numeric(input$wrcp85)*tasRanksRcp85()})
+  prRanks <- reactive({as.numeric(input$wrcp45)*prRanksRcp45()+as.numeric(input$wrcp85)*prRanksRcp85()})
+  #tasRanks <- reactive({ranking.all(stats=stats(),varid="tas",Regions=Regionlist())})
+  #prRanks <- reactive({ranking.all(stats=stats(),varid="pr",Regions=Regionlist())})
 
-  seas_varweightedranks <- reactive({as.numeric(input$wmdt)*tasRanks()+as.numeric(input$wmdp)*prRanks()})
+  seas_varweightedranks <- reactive({
+    as.numeric(input$wmdt)*tasRanks()+as.numeric(input$wmdp)*prRanks()})
   seasweightvec <- reactive({as.numeric(c(input$wmann,input$wmdjf,input$wmmam,input$wmjja,input$wmson))})
   regweightvec <- reactive({
     rw <- as.numeric(c(input$wmreg1,input$wmreg2))
@@ -47,8 +68,8 @@ shinyServer(function(input, output, session) {
   })
   
   weightedranks_all <- reactive({
-    W <- array(NA,c(length(gcmst),4))
-    for (i in 1:length(gcmst)) {
+    W <- array(NA,c(length(gcmnames),4))
+    for (i in 1:length(gcmnames)) {
       for (j in 1:4) {
         W[i,j] <- (seasweightvec() %*% seas_varweightedranks()[i,,j,] %*% regweightvec())
       }
@@ -62,10 +83,10 @@ shinyServer(function(input, output, session) {
   best <- reactive({order(weightedrank_all())[1:input$ngcm]})
 
   ## Weighted spread calculations
-  dtasSpread <- reactive({spread.all(varid="tas",Regions=Regionlist(),im=NULL)})
-  dtasSelSpread <- reactive({spread.all(varid="tas",Regions=Regionlist(),im=im())})
-  dprSpread <- reactive({spread.all(varid="pr",Regions=Regionlist(),im=NULL)})
-  dprSelSpread <- reactive({spread.all(varid="pr",Regions=Regionlist(),im=im())})
+  dtasSpread <- reactive({spread.all(stats(),varid="tas",Regions=Regionlist(),im=NULL)})
+  dtasSelSpread <- reactive({spread.all(stats(),varid="tas",Regions=Regionlist(),im=im())})
+  dprSpread <- reactive({spread.all(stats(),varid="pr",Regions=Regionlist(),im=NULL)})
+  dprSelSpread <- reactive({spread.all(stats(),varid="pr",Regions=Regionlist(),im=im())})
   
   dtasRelSpread <- reactive({dtasSelSpread()/dtasSpread()})
   dprRelSpread <- reactive({dprSelSpread()/dprSpread()})
@@ -79,28 +100,29 @@ shinyServer(function(input, output, session) {
       sum(seasweightvec())/sum(regweightvec()) })
 
   ## Temperature and precip. spread for scatterplot
-  dtas <- reactive({sapply(gcmst, function(gcm) mean(sapply(Season(), function(s)
-    stats$tas[[Period()]][[gcm]][[Region()]][["mean"]][[s]])) - 
+  dtas <- reactive({
+    sapply(gcmst(), function(gcm) mean(sapply(Season(), function(s)
+    stats()$tas[[Period()]][[gcm]][[Region()]][["mean"]][[s]])) - 
       mean(sapply(Season(), function(s) 
-        stats$tas$present[[gcm]][[Region()]][["mean"]][[s]]))) })
-  dpr <- reactive({(60*60*24)*sapply(gcmsp, function(gcm) mean(sapply(Season(), function(s)
-    stats$pr[[Period()]][[gcm]][[Region()]][["mean"]][[s]])) - 
+        stats()$tas$present[[gcm]][[Region()]][["mean"]][[s]]))) })
+  dpr <- reactive({(60*60*24)*sapply(gcmsp(), function(gcm) mean(sapply(Season(), function(s)
+    stats()$pr[[Period()]][[gcm]][[Region()]][["mean"]][[s]])) - 
       mean(sapply(Season(), function(s) 
-        stats$pr$present[[gcm]][[Region()]][["mean"]][[s]])))})
+        stats()$pr$present[[gcm]][[Region()]][["mean"]][[s]])))})
   
   # Statistics used in the app
-  spreadPr <- reactive({60*60*24*spread(varid="pr", season=input$season, 
+  spreadPr <- reactive({60*60*24*spread(stats(), varid="pr", season=input$season, 
                                    region=input$region, period=Period(), im=NULL)})
-  spreadPrSel <- reactive({60*60*24*spread(varid="pr", season=input$season, 
+  spreadPrSel <- reactive({60*60*24*spread(stats(), varid="pr", season=input$season, 
                                       region=input$region, period=Period(), im=im())})
-  spreadTas <- reactive({spread(varid="tas", season=input$season, 
+  spreadTas <- reactive({spread(stats(), varid="tas", season=input$season, 
                            region=input$region, period=Period(), im=NULL)})
-  spreadTasSel <- reactive({spread(varid="tas", season=input$season, region=input$region,
+  spreadTasSel <- reactive({spread(stats(), varid="tas", season=input$season, region=input$region,
                               period=Period(), im=im())})
   spreadPrRel <- reactive({spreadPrSel()/spreadPr()})
-  spreadPrIndx <- reactive({floor(mean(spreadPrRel())*10)+1 })
+  spreadPrIndx <- reactive({as.integer(mean(spreadPrRel())*10)+1 })
   spreadTasRel <- reactive({spreadTasSel()/spreadTas()})
-  spreadTasIndx <- reactive({floor(mean(spreadTasRel())*10)+1 })
+  spreadTasIndx <- reactive({as.integer(mean(spreadTasRel())*10)+1 })
   
   # Generate table with selected GCMs and their ranking
   gcmtable <- reactive({
@@ -125,17 +147,17 @@ shinyServer(function(input, output, session) {
   mean_weightedrank <- reactive({mean(weightedrank(),na.rm=TRUE)})
   
   legcolsrank <- two.colors(n=107,start="green",end="red",middle = "orange") #colors for ranks
-  meanRelMetricsIndx <- reactive({floor(mean_weightedrank())}) #color index based on weighted rank
+  meanRelMetricsIndx <- reactive({as.integer(mean_weightedrank())}) #color index based on weighted rank
   
   legcols <- two.colors(n=11,start="red",end="green",middle = "orange") #colors for percentage number
-  meanRelSpreadIndx_nf <- reactive({floor(weightedspread_nf()*10)+1}) #color index based on weighted mean rel. spread for near future
-  meanRelSpreadIndx_ff <- reactive({floor(weightedspread_ff()*10)+1}) #color index based on weighted mean rel. spread for far future
+  meanRelSpreadIndx_nf <- reactive({as.integer(weightedspread_nf()*10)+1}) #color index based on weighted mean rel. spread for near future
+  meanRelSpreadIndx_ff <- reactive({as.integer(weightedspread_ff()*10)+1}) #color index based on weighted mean rel. spread for far future
   
   output$IntroText  <- renderText({
-    paste("GCMeval is a tool for selecting and evaluating a subset of climate models from ",
-          "the CMIP5 ensemble based on:<br>",
-          "<ul><li>the spread in projected climate changes, and</li>",
-          "<li> the skill of individual climate models to reproduce the climate of the past.</li></ul><br>")
+    paste("This is a tool for selecting and evaluating a subset of climate models from ",
+          "the CMIP5 ensemble based on:<br><br>",
+          "<ul><li>a <b>model skill evaluation</b> of the individual climate models' ability to reproduce the climate of the past, </li>",
+          "<li> and the <b>spread of the regional mean climate change</b> within the sub-ensemble.</li></ul>")
   })
   
   output$DisclaimerText <- renderText({
@@ -154,7 +176,7 @@ shinyServer(function(input, output, session) {
     paste("The mean weighted model rank of the selected models is  ",
           "<font size = +1, font color=\"",
           legcolsrank[meanRelMetricsIndx()],"\"><b> rank ", round(mean_weightedrank()), 
-          "  of  ",length(gcmst),"</b></font>.<br>",sep="")
+          "  of  ",length(gcmnames),"</b></font>.<br>",sep="")
   })
   
   output$ModelsTable <- DT::renderDataTable({
@@ -163,8 +185,8 @@ shinyServer(function(input, output, session) {
               rownames=FALSE) %>% formatStyle(
                 'Rank',
                 target = 'row',
-                backgroundColor = styleEqual(seq(length(gcmnames)), 
-                                  two.colors(n=length(gcmnames), start="green",
+                backgroundColor = styleEqual(seq(1,length(gcmnames),0.5), 
+                                  two.colors(n=length(gcmnames)*2-1, start="green",
                                               end="red", middle = "orange"))
     )
   })
@@ -178,17 +200,17 @@ shinyServer(function(input, output, session) {
   
   textOut <- reactive({
     legcols <- two.colors(n=11, start="red", end="green", middle="orange") 
-    if(input$weighted) {
-      txt <- paste("The weighted mean spread of the selected models for all ",
-                    "regions, seasons and variables is <br><br>",
-                   "<font size = +1, font color=\"",
-                   legcols[meanRelSpreadIndx_ff()],"\"><b>", round(weightedspread_nf()*100),
-                   "%</b></font>  for the <b>near future</b> and <br>",
-                   "<font size = +1, font color=\"",
-                   legcols[meanRelSpreadIndx_ff()],"\"><b>", round(weightedspread_ff()*100), 
-                   "%</b></font> for the <b>far future</b> <br><br> compared to the spread ",
-                   "of the whole ensemble.<br><br>",sep="")        
-    } else {
+    #if(input$weighted) {
+    #  txt <- paste("The weighted mean spread of the selected models for all ",
+    #                "regions, seasons and variables is <br><br>",
+    #               "<font size = +1, font color=\"",
+    #               legcols[meanRelSpreadIndx_ff()],"\"><b>", round(weightedspread_nf()*100),
+    #               "%</b></font>  for the <b>near future</b> and <br>",
+    #               "<font size = +1, font color=\"",
+    #               legcols[meanRelSpreadIndx_ff()],"\"><b>", round(weightedspread_ff()*100), 
+    #               "%</b></font> for the <b>far future</b> <br><br> compared to the spread ",
+    #               "of the whole ensemble.<br><br>",sep="")        
+    #} else {
       txt <- paste("The spread of the selected models compared to the spread ",
                    "of the whole ensemble is <br><br>",
             "<font size = +1, font color=\"",legcols[spreadTasIndx()],"\"><b>",
@@ -198,7 +220,7 @@ shinyServer(function(input, output, session) {
             round(spreadPrRel()*100), 
             "%</b> </font> for <b>precipitation</b> <br><br> ",
             "for the selected region, season, time horizon, and scenario.<br><br>",sep="")
-    }
+    #}
     return(txt)
   })
 
@@ -209,9 +231,10 @@ shinyServer(function(input, output, session) {
   
   ## Output: text about scatterplot
   output$ScatterText  <- renderText({
-    paste("<i>Use the scatterplot below to study the spread in projected changes for a specific region, season and time-line.",
-          " Ideally, the subset of models should have a spread similar to the spread of the whole ensemble.",
-          " Try to increase the relative spread among your selected climate models by adding more models at the edges of the scatterplot.</i>",sep="")
+    paste("<i>Study the mean projected <b>temperature and precipitation changes</b> for the selected",
+          " <b>focus region</b>, <b>season</b>, <b>emission scenario</b> and <b>time horizon</b> in the scatterplot below.",
+          " Ideally, your chosen subset of models should have a spread similar to the spread of the whole ensemble.",
+          " Try to increase the relative spread among the climate models by adding more models at the edges of the scatterplot.</i>",sep="")
   })
   
   ## Output: map 1
@@ -284,21 +307,25 @@ shinyServer(function(input, output, session) {
     c1 <- rgb(116,196,215,150,maxColorValue=255)
     c2 <- rgb(0,144,168,255,maxColorValue=255)
     clr <- reactive({
-      x <- rep(c1,length(gcmst))
+      x <- rep(c1,length(gcmnames))
       x[im()] <- c2
       return(x)})
-    
     p <- plot_ly(data.frame(x=dtas(),y=dpr()), x=~x, y=~y, type="scatter", mode="markers",
             marker=list(color=clr()), text=gcmnames, source="A")
     layout(p, title=paste("Present day (1981-2010) to",tolower(input$period)),
-           xaxis=list(title="Temperature change (deg C)"),
-           yaxis=list(title="Precipitation change (mm/day)"))#, dragmode="lasso")
+           xaxis=list(title="Temperature change (deg C)",range=c(-7,7)),
+           yaxis=list(title="Precipitation change (mm/day)",range=c(-1,1)))#, dragmode="lasso")
   })
 
   output$clickevent <- renderPrint({
     event_data("plotly_click", source="A")
   })
 
+  # Link to skill evaluation from introduction text
+  observeEvent(input$link_to_selection, {
+    js$refocus("ngcm")
+  })
+  
   # When selecting GCMs in plotly scatterplot, update gcms and ngcm
   observe({
     d <- event_data(event="plotly_click", source="A")
@@ -307,18 +334,27 @@ shinyServer(function(input, output, session) {
       updateCheckboxGroupInput(session, inputId = "gcms", 
                                choices = gcmnames, selected = gcmnames[i])
       updateNumericInput(session, inputId = "ngcm", value=length(input$gcms), 
-                         min=1, max=length(gcmst))
+                         min=1, max=length(gcmnames))
     }
   })
 
+  # When changing RCP, change list of GCMs. NO NEED TO DO THIS!
+  # Only simulations available for both RCP4.5 and RCP9.5 are included.
+  #observeEvent(input$rcp, {
+  #  i <- seq(input$ngcm)
+  #  updateCheckboxGroupInput(session, inputId = "gcms", choices = gcmnames, 
+  #                           selected = gcmnames[i])
+  #})
+  
   # When selecting GCMs from the checkboxes, update ngcm
   observeEvent(input$gcms,{
     updateNumericInput(session, inputId = "ngcm", 
-                       value=length(input$gcms), min=1, max=length(gcmst))
+                       value=length(input$gcms), min=1, max=length(gcmnames))
   })
   
   # When clicking 'best' button, select best performing GCMs
   observeEvent(input$best, {
+    #gcmnames <- metaPrep(input$rcp)
     i <- best()
     updateCheckboxGroupInput(session, inputId = "gcms", choices = gcmnames, 
                              selected = gcmnames[i])
@@ -326,7 +362,16 @@ shinyServer(function(input, output, session) {
 
   # When clicking 'random' button, select random GCMs
   observeEvent(input$randomize, {
+    #gcmnames <- metaPrep(input$rcp)
     i <- sample(1:length(gcmnames),input$ngcm,replace=FALSE)
+    updateCheckboxGroupInput(session, inputId = "gcms", choices = gcmnames, 
+                             selected = gcmnames[i])
+  })
+  
+  # When clicking 'random' button, select random GCMs
+  observeEvent(input$first, {
+    #gcmnames <- metaPrep(input$rcp)
+    i <- 1:input$ngcm
     updateCheckboxGroupInput(session, inputId = "gcms", choices = gcmnames, 
                              selected = gcmnames[i])
   })

@@ -50,9 +50,9 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
     gcmnames <- names(store)[grep("gcm",names(store))]
     ok <- sapply(gcmnames, function(gcm) "rms" %in% names(store[[gcm]][[length(store[[gcm]])]]))
     if(any(!ok)) {
-      start <- as.numeric(head(gsub('.*\\.', '', gcmnames[!ok], perl=TRUE),n=1))+1
+      start <- as.numeric(head(gsub('.*\\.', '', gcmnames[!ok], perl=TRUE),n=1))
     } else {
-      start <- min(ngcm, as.numeric(tail(sub('.*\\.', '', gcmnames, perl=TRUE),n=1))+1)
+      start <- min(ngcm, as.numeric(tail(sub('.*\\.', '', gcmnames, perl=TRUE),n=1)))
     }
   }
   #if(continue && file.exists(store.file)) {

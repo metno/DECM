@@ -45,6 +45,7 @@ export(metaextract.opendap)
 export(python.getEra)
 export(scatterplot)
 #export(thredds.urls)
+#export(testrank)
 ## Common EOF functions are not used
 ## and may not even work because of 
 ## changes in the esd package:

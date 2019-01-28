@@ -610,6 +610,9 @@ regions.all <- list('Europe',
 )    
 
 #setwd('/home/ubuntu/git/DECM/back-end/data/TM_WORLD_BORDERS-0.3/')
-afg <- readOGR(dsn = '../../back-end/data/TM_WORLD_BORDERS-0.3/', layer = "TM_WORLD_BORDERS-0.3",verbose = FALSE, stringsAsFactors = FALSE)
+afg <- readOGR(dsn = '../../back-end/inst/extdata/TM_WORLD_BORDERS-0.3/', 
+               layer = "TM_WORLD_BORDERS-0.3",
+               verbose = FALSE, 
+               stringsAsFactors = FALSE)
 
 

@@ -4,7 +4,6 @@ importFrom("grDevices", "dev.new", "dev.off", "pdf", "adjustcolor", "rainbow")
 importFrom("graphics", "grid", "image", "lines", "par", "plot", "text")
 importFrom("stats", "median")
 importFrom("utils", "download.file", "read.csv", "tail")
-importFrom("sp", "coordinates")
 
 # Exports - in alphabetic order
 export(calculate.mon.weights)

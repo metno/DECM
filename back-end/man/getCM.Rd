@@ -69,16 +69,13 @@ Kajsa Parding <kajsamp@met.no>
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-x <- getCM(url='https://climexp.knmi.nl/CMIP5/monthly/tas/tas_Amon_ACCESS1-0_historical_000.nc',
+x <- getCM(url='http://climexp.knmi.nl/CMIP5/monthly/tas/tas_Amon_ACCESS1-0_historical_000.nc',
       destfile='GCM1.nc',lon=c(-60,60),lat=c(45,80),force=TRUE,verbose=TRUE)
     
-x.info <- getatt(x)
-y <- getGCMs(select=1:3,lon=c(-60,60),lat=c(45,80))
-map(y[[1]])
+fname <- x$filename
+x.info <- getatt(fname)
+
+y <- getGCMs(select=1:3)
 }
 
 \keyword{ cds }

@@ -35,12 +35,12 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
                 infile=ref.mulc,outfile=ref.mon.file)
   }
-  ref <- coredata(retrieve(ref.mon.file))
+  ref <- zoo::coredata(retrieve(ref.mon.file))
   
   ## Calculate weights only once
   r <- raster(ref)#.mon.file)
-  lon <- longitude(ref)
-  lat <- latitude(ref)
+  lon <- attr(ref,"longitude")
+  lat <- attr(ref,"latitude")
   weights <- calculate.mon.weights(lon,lat)
   
   ## Check which files are processed
@@ -71,17 +71,17 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
     gcm.mon.file <- file.path(path,"gcm.monmean.nc")
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
                 infile=gcm.file,outfile=gcm.mon.file)
-    gcm <- coredata(retrieve(gcm.mon.file))
-    dim(gcm) <- dim(ref) <- c(12,length(longitude(gcm)),length(latitude(gcm)))
+    gcm <- zoo::coredata(retrieve(gcm.mon.file))
+    dim(gcm) <- dim(ref) <- c(12,length(attr(gcm,"longitude")),length(attr(gcm,"latitude")))
     store[[store.name]]$global$rms <- sqrt(sum(weights*(gcm-ref)^2)/sum(weights))
     for(region in srex.regions) {
       polygon <- shape[which(srex.regions==region),]
       mask <- gen.mask.srex(destfile=gcm.file,mask.polygon=polygon)
-      dim(gcm) <- dim(ref) <- c(12,length(longitude(ref))*length(latitude(ref)))
+      dim(gcm) <- dim(ref) <- c(12,length(attr(ref,"longitude"))*length(attr(ref,"latitude")))
       gcm.masked <- mask.zoo(gcm,mask)
       ref.masked <- mask.zoo(ref,mask)
       dim(gcm.masked) <- dim(ref.masked) <- 
-        c(12,length(longitude(gcm)),length(latitude(gcm)))
+        c(12,length(attr(gcm,"longitude")),length(attr(gcm,"latitude")))
       store[[store.name]][[region]]$rms <- 
         sqrt(sum(weights*(gcm.masked-ref.masked)^2,na.rm=TRUE)/
                sum(weights[!is.na(gcm.masked)]))

@@ -27,7 +27,7 @@ getCM <- function(url=NULL,destfile='CM.nc',path=NULL,
   #cid$area.mean <- aggregate.area(X,FUN='mean')
   #cid$area.sd <- aggregate.area(X,FUN='sd')
   cid$url <- url
-  cid$dates <- paste(range(index(X)),collapse=",")
+  cid$dates <- paste(range(zoo::index(X)),collapse=",")
   ## Collect information stored as model attributes
   ncid <- ncdf4::nc_open(destfile)
   model <- ncdf4::ncatt_get(ncid,0)

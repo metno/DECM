@@ -46,7 +46,7 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
     end <- min(start + nfiles - 1, ngcm) 
   }
   
-  ref <- retrieve(ref.mon.file)
+  ref <- esd::retrieve(ref.mon.file)
   for(i in start:end) {
     store.name <- paste("cm",i,sep=".")
     gcm.file <- file.path(path.gcm,paste("CM",i,".",variable,".",experiment,".nc",sep=""))
@@ -55,11 +55,11 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
     gcm.mon.file <- file.path(path,"cm.monmean.nc")
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
                 infile=gcm.file,outfile=gcm.mon.file)
-    gcm <- coredata(retrieve(gcm.mon.file))
-    ref.i <- subset(ref,is=list(lon=range(lon(gcm)),lat=range(lat(gcm))))
-    weights <- calculate.mon.weights(longitude(ref.i),latitude(ref.i))
-    ref.i <- coredata(ref.i)
-    dim(gcm) <- dim(ref.i) <- c(12,length(longitude(gcm)),length(latitude(gcm)))
+    gcm <- zoo::coredata(retrieve(gcm.mon.file))
+    ref.i <- subset(ref,is=list(lon=range(attr(gcm,"longitude")),lat=range(attr(gcm,"latitude"))))
+    weights <- calculate.mon.weights(attr(ref.i,"longitude"),attr(ref.i,"latitude"))
+    ref.i <- zoo::coredata(ref.i)
+    dim(gcm) <- dim(ref.i) <- c(12,length(attr(gcm,"longitude")),length(attr(gcm,"latitude")))
     store[[store.name]]$rms <- sqrt(sum(weights*(gcm-ref.i)^2,na.rm=TRUE)/sum(weights))
     file.remove(gcm.mon.file)
   }

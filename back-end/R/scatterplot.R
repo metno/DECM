@@ -37,5 +37,5 @@ scatterplot <- function(x,y,ix=NULL,xlim=NULL,ylim=NULL,xlab=NULL,ylab=NULL,im=N
   lines(rep(0,2),ylim*1.5,lwd=0.2)
   grid()
   if(show.legend) legend("bottomleft",ncol=floor(length(x)/3),pch=pch,cex=1,col=col,pt.bg=bg,
-                         bg=adjustcolor("white",alpha=0.6),box.lwd=0.5,legend=legend)
+                         bg=adjustcolor("white",alpha.f=0.6),box.lwd=0.5,legend=legend)
 }

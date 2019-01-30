@@ -647,8 +647,8 @@ afg <- readOGR(dsn = '../../back-end/inst/extdata/TM_WORLD_BORDERS-0.3/',
                verbose = FALSE, 
                stringsAsFactors = FALSE)
 #afg <- readOGR(dsn = '/home/sis/DECM/back-end/inst/extdata/TM_WORLD_BORDERS-0.3/',
-                layer = "TM_WORLD_BORDERS-0.3", verbose = FALSE,
-		stringsAsFactors = FALSE)
+#                layer = "TM_WORLD_BORDERS-0.3", verbose = FALSE,
+#		stringsAsFactors = FALSE)
 
 
 

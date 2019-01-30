@@ -6219,13 +6219,13 @@ function(input, output,session) {
   })
   
   output$figcaption.gcm.scatter = renderInfoBox({
-    txt <- tags$h5('Interactive Scatter Plot showing surface air mean temperature VS mean monthly sums of precipitaiton. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulations. 
+    txt <- tags$h5('Interactive Scatter Plot showing surface air mean temperature VS mean monthly sums of precipitation. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulations. 
                    The black star shows the corresponding values from reanalysis data used as reference (ERAINT).')   
     infoBox(strong('How to read the scatter plot!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.gcm.cc.scatter = renderInfoBox({
-    txt <- tags$h5('Interactive Scatter Plot showing changes in surface air mean temperature VS mean monthly sums of precipitaiton. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulated changes. 
+    txt <- tags$h5('Interactive Scatter Plot showing changes in surface air mean temperature VS mean monthly sums of precipitation. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulated changes. 
                    The black star shows the corresponding values from reanalysis data used as reference (ERAINT).')   
     infoBox(strong('How to read the scatter plot!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
@@ -6275,7 +6275,7 @@ function(input, output,session) {
   })
   
   output$figcaption.rcm.scatter = renderInfoBox({
-    txt <- tags$h5('Interactive Scatter Plot showing surface air mean temperature VS mean monthly sums of precipitaiton. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulations. 
+    txt <- tags$h5('Interactive Scatter Plot showing surface air mean temperature VS mean monthly sums of precipitation. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulations. 
                    The black star shows the corresponding values from reanalysis data used as reference (ERAINT).')   
     infoBox(strong('How to read the scatter plot!'),txt, icon = shiny::icon("line-chart-o"),color = 'olive')
   })

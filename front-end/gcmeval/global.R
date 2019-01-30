@@ -3,6 +3,7 @@ library(plotrix)
 library(shiny)
 library(shinyjs)
 library(shinydashboard)
+library(sp)
 library(DT)
 library(DECM)
 library(esd)
@@ -171,7 +172,7 @@ gcmnames <- paste(seq(gcmnames),gcmnames,sep=": ")
 regions <- function(type=c("srex","prudence"),region=NULL) {
   if(is.null(type) | length(type)>1) region <- NULL
   if(is.null(type) | "srex" %in% tolower(type)) {
-    f <- "referenceRegions.shp"#find.file("referenceRegions.shp")
+    f <- "../../back-end/inst/extdata/SREX_regions/referenceRegions.shp"
     x <- get.shapefile(f,with.path=TRUE)
     ivec <- 1:nrow(x)
     if(!is.null(region)) {
@@ -194,7 +195,7 @@ regions <- function(type=c("srex","prudence"),region=NULL) {
     y <- NULL
   }
   if(is.null(type) | "prudence" %in% tolower(type)) {
-    f <- "RegionSpecifications.csv"#find.file("RegionSpecifications.csv")
+    f <- "../../back-end/inst/extdata/PRUDENCE_regions/RegionSpecifications.csv"
     x <- read.table(f,sep=",")
     ivec <- 2:nrow(x)
     names <- as.character(x[2:nrow(x),1])
@@ -231,7 +232,8 @@ regions <- function(type=c("srex","prudence"),region=NULL) {
 srex <- regions("srex")
 
 #model ranks for seasons, metrics and selected focus regions
-ranking <- function(stats=NULL,measure="bias",varid="tas",season="ann",region="global",rcp=NULL,im=NULL) {
+ranking <- function(stats=NULL,measure="bias",varid="tas",season="ann",
+                    region="global",rcp=NULL,im=NULL) {
   if(is.null(stats)) stats <- dataPrep(rcp=rcp)
   X <- switch(varid, tas=stats$tas$present, pr=stats$pr$present)
   if(tolower(region)=="global") {

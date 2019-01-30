@@ -26,7 +26,7 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
   if(file.exists(store.file)) load(store.file)
   units <- NULL
   if(!is.null(reference)) {
-    reference.raster <- raster(ref.file)
+    #reference.raster <- raster::raster(ref.file)
     store.name <- paste(reference,variable,sep=".")
     store[[store.name]]$global$spatial.sd <- c(cdo.spatSd(ref.file,period), 
                                                cdo.spatSd(ref.file,period,monthly=TRUE))

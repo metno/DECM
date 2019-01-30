@@ -47,7 +47,7 @@ calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010),
       pol.coords <- coordinates(country_shape@polygons[[i]]@Polygons[[1]])
       write(t(pol.coords),file="countrycoord.txt",ncolumns = 2)
       
-      for (p in 1:length(shape@polygons[[i]]@Polygons))
+      for (p in 1:length(country_shape@polygons[[i]]@Polygons))
       {
         pol.coords <- coordinates(country_shape@polygons[[i]]@Polygons[[p]])
         write("&",file="countrycoord.txt",append=T)
@@ -88,7 +88,7 @@ calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010),
       pol.coords <- coordinates(country_shape@polygons[[i]]@Polygons[[1]])
       write(t(pol.coords),file="countrycoord.txt",ncolumns = 2)
       
-      for (p in 1:length(shape@polygons[[i]]@Polygons))
+      for (p in 1:length(country_shape@polygons[[i]]@Polygons))
       {
         pol.coords <- coordinates(country_shape@polygons[[i]]@Polygons[[p]])
         write("&",file="countrycoord.txt",append=T)
@@ -127,7 +127,7 @@ calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010),
         pol.coords <- coordinates(country_shape@polygons[[i]]@Polygons[[1]])
         write(t(pol.coords),file="countrycoord.txt",ncolumns = 2)
         
-        for (p in 1:length(shape@polygons[[i]]@Polygons))
+        for (p in 1:length(country_shape@polygons[[i]]@Polygons))
         {
           pol.coords <- coordinates(country_shape@polygons[[i]]@Polygons[[p]])
           write("&",file="countrycoord.txt",append=T)

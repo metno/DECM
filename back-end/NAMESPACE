@@ -27,7 +27,6 @@ export(getGCMs)
 export(getRCMs)
 export(getReference)
 export(gen.mask.srex)
-export(get.name)
 export(get.shapefile)
 export(get.srex.region)
 export(getCFSR)
@@ -44,8 +43,8 @@ export(metaextract.cordex)
 export(metaextract.opendap)
 export(python.getEra)
 export(scatterplot)
-## Functions that are not used
-## and may not even work:
+## Functions that are not used:
+#export(get.name)
 #export(EQC.ensemble)
 #export(thredds.urls)
 #export(testrank)

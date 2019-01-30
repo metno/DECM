@@ -1,8 +1,11 @@
 # define the back-end
+library(shinyBS)
 
 function(input, output,session) {
   
   ## Messages / Notifications / Tasks
+  
+  addTooltip(session = session,id = 'gcm.period.pu',title = 'this is a test')
   
   notData <- reactive({
     gcm.meta <- gcm.meta.tas.reactive()
@@ -64,7 +67,10 @@ function(input, output,session) {
       x <- filter.sim()
       dat <- x %>% mutate(URL = sprintf(paste0("<a href='", URL,"' target='_blank'>Get data</a>")))
       DT::datatable(dat,escape = FALSE)#,selection = 'single',options = list(), style="bootstrap")
-    })
+      })
+    addPopover(session = session, id = "browser", title = "Climate Model Simulations", 
+               content = 'Climate model simulations are the result of running a global climate model, a regional climate model, or a combination of the two, all constitute suitable tools are suitable tools (computer programs) to simulate climate variables such as temperature, wind, precipitation, humidity, radiation, … based on the laws of physics and physical processes from the past to decades ahead.',
+               placement = 'top',options = list(container = 'body'))
   })
   
   output$glossary <- DT::renderDataTable({
@@ -81,6 +87,8 @@ function(input, output,session) {
       colnames = c('Abbreviation','Description'),options = list(dom = 't'), 
       caption='Glossary and variable names',style="bootstrap")
   })
+  
+  addPopover(session = session, id = "glossary", title = "Data", content = 'this is a test',trigger = 'click')
   
   output$plot <- renderPlot(plot(Oslo, map.show = FALSE, new = FALSE))
   
@@ -759,7 +767,7 @@ function(input, output,session) {
   })
   
   rcm.sc.tas.present.pu <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.region.pu,  period = 'Present (1981-2010)',stat = input$rcm.stat.pu))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat.pu))
   })
   
   rcm.sc.pr.present <- reactive({
@@ -767,7 +775,7 @@ function(input, output,session) {
   })
   
   rcm.sc.pr.present.pu <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.region.pu,  period = 'Present (1981-2010)',stat = input$rcm.stat.pu))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat.pu))
   })
   
   rcm.sc.pr.present.sc.pu <- reactive({
@@ -901,39 +909,39 @@ function(input, output,session) {
     if (region == 'Europe') 
       m <- m %>% addPolygons(lng = c(-24.75,44.75,44.75,-24.75,-24.75), 
                              lat = c(27.75,27.75,72.25,72.25,27.75),
-                             fill = TRUE, color = 'black',weight = 0.8,label = 'Europe') 
+                             fill = TRUE, color = I("#b21c1c"),weight = 3,label = 'Europe',stroke = TRUE, opacity = 0.5,noClip = TRUE) 
     else if (region == 'BI - British Isles')
       m <- m %>% addPolygons(lng = c(-10,2,2,-10,-10),
                              lat = c(50,50,59,59,50),  
-                             fill = TRUE, color = 'black',weight = 0.8,label = 'Europe') 
+                             fill = TRUE, color = I("#b21c1c"),weight = 3,label = 'BI - British Isles',stroke = TRUE, opacity = 0.5,noClip = TRUE) 
     else if (region == 'IP - Iberian Peninsula')
       m <- m %>% addPolygons(lng = c(-10,3,3,-10,-10), 
                              lat = c(36,36,44,44,36), 
-                             fill = TRUE, color = 'black',weight = 0.8,label = 'Europe') 
+                             fill = TRUE, color = I("#b21c1c"),weight = 3,label = 'IP - Iberian Peninsula',stroke = TRUE, opacity = 0.5,noClip = TRUE) 
     else if (region == 'FR - FRANCE')
       m <- m %>% addPolygons(lng = c(-5,5,5,-5,-5), 
                              lat = c(44,44,50,50,44), 
-                             fill = TRUE, color = 'black',weight = 0.8,label = 'Europe') 
+                             fill = TRUE, color = I("#b21c1c"),weight = 3,label = 'FR - FRANCE',stroke = TRUE, opacity = 0.5,noClip = TRUE) 
     else if (region == 'ME - Mid Europe')
       m <- m %>% addPolygons(lng = c(2,16,16,2,2), 
                              lat = c(48,48,55,55,48), 
-                             fill = TRUE, color = 'black',weight = 0.8,label = 'Europe') 
+                             fill = TRUE, color = I("#b21c1c"),weight = 3,label = 'ME - Mid Europe',stroke = TRUE, opacity = 0.5,noClip = TRUE) 
     else if (region == 'SC - Scandinavia')
       m <- m %>% addPolygons(lng = c(5,30,30,5,5), 
                              lat = c(55,55,70,70,55), 
-                             fill = TRUE, color = 'black',weight = 0.8,label = 'Europe') 
+                             fill = TRUE, color = I("#b21c1c"),weight = 3,label = 'SC - Scandinavia',stroke = TRUE, opacity = 0.5,noClip = TRUE) 
     else if (region == 'AL - ALPS')
       m <- m %>% addPolygons(lng = c(5,15,15,5,5), 
                              lat = c(44,44,48,48,44), 
-                             fill = TRUE, color = 'black',weight = 0.8,label = 'Europe') 
+                             fill = TRUE, color = I("#b21c1c"),weight = 3,label = 'AL - ALPS',stroke = TRUE, opacity = 0.5,noClip = TRUE) 
     else if (region == 'MD - Mediterranean')
       m <- m %>% addPolygons(lng = c(3,25,25,3,3), 
                              lat = c(36,36,44,44,36), 
-                             fill = TRUE, color = 'black',weight = 0.8,label = 'Europe') 
+                             fill = TRUE, color = I("#b21c1c"),weight = 3,label = 'MD - Mediterranean',stroke = TRUE, opacity = 0.5,noClip = TRUE) 
     else if (region == 'EA - Eastern Europe')
       m <- m %>% addPolygons(lng = c(16,30,30,16,16), 
                              lat = c(44,44,54,54,44), 
-                             fill = TRUE, color = 'black',weight = 0.8,label = 'Europe')
+                             fill = TRUE, color = I("#b21c1c"),weight = 3,label = 'EA - Eastern Europe',stroke = TRUE, opacity = 0.5,noClip = TRUE)
     else {
       selected_polygon <- subset(afg,afg$ISO3==substr(region,1,3))
       
@@ -951,13 +959,13 @@ function(input, output,session) {
       Srs2 = Polygons(list(Sr1), "s2")
       SpP = SpatialPolygons(list(Srs1,Srs2),1:2)
       projection(SpP) <- projection(selected_polygon)
-      
-      selected_polygon <- intersect(selected_polygon,SpP)
+      if (region != 'NOR - Norway')      
+        selected_polygon <- intersect(selected_polygon,SpP)
       polygon_labelPt <- selected_polygon@polygons[[1]]@labpt
       #center the view on the polygon 
       m <- m %>% setView(lng=polygon_labelPt[1],lat=polygon_labelPt[2],zoom=6)
      
-      m <- m %>% addPolylines(fill = TRUE, stroke = TRUE, color = "red",weight = 1.5, opacity = 0.5,
+      m <- m %>% addPolylines(fill = TRUE, stroke = TRUE, color = I("#b21c1c"),weight = 1.5, opacity = 0.5,
                               data=selected_polygon,noClip = TRUE,
                               group="highlighted_polygon") 
       
@@ -1482,10 +1490,10 @@ function(input, output,session) {
                          options = providerTileOptions(noWrap = FALSE)) 
       if (input$gcm.region == 'Global') {
         m <- m %>% addPolygons(lng = c(-180,180,180,-180,-180), lat = c(-90,-90,90,90,-90), 
-                               fill = TRUE, stroke = TRUE, color = 'red',weight = 3,label = 'Global') 
+                               fill = TRUE, stroke = TRUE, color = I("#b21c1c"),weight = 3,label = 'Global') 
       } else {
         m <- m %>% addPolygons(lng = srex$coords[[id-1]][1,], lat = srex$coords[[id-1]][2,], 
-                               fill = TRUE, stroke = TRUE, color = 'red',weight = 3,label = srex$name[id-1]) 
+                               fill = TRUE, stroke = TRUE, color = I("#b21c1c"),weight = 3,label = srex$name[id-1]) 
       }
       m
     })
@@ -1498,10 +1506,10 @@ function(input, output,session) {
                          options = providerTileOptions(noWrap = FALSE)) 
       if (input$gcm.region.pu == 'Global') {
         m <- m %>% addPolygons(lng = c(-180,180,180,-180,-180), lat = c(-90,-90,90,90,-90), 
-                               fill = TRUE, stroke = TRUE, color = 'red',weight = 3,label = 'Global') 
+                               fill = TRUE, stroke = TRUE, color = I("#b21c1c"),weight = 3,label = 'Global') 
       } else {
         m <- m %>% addPolygons(lng = srex$coords[[id-1]][1,], lat = srex$coords[[id-1]][2,], 
-                               fill = TRUE, stroke = TRUE, color = 'red',weight = 3,label = srex$name[id-1]) 
+                               fill = TRUE, stroke = TRUE, color = I("#b21c1c"),weight = 3,label = srex$name[id-1]) 
       }
       m
     })
@@ -1514,10 +1522,10 @@ function(input, output,session) {
                          options = providerTileOptions(noWrap = FALSE)) 
       if (input$gcm.sc.region.pu == 'Global') {
         m <- m %>% addPolygons(lng = c(-180,180,180,-180,-180), lat = c(-90,-90,90,90,-90), 
-                               fill = TRUE, stroke = TRUE, color = 'red',weight = 3,label = 'Global') 
+                               fill = TRUE, stroke = TRUE, color = I("#b21c1c"),weight = 3,label = 'Global') 
       } else {
         m <- m %>% addPolygons(lng = srex$coords[[id-1]][1,], lat = srex$coords[[id-1]][2,], 
-                               fill = TRUE, stroke = TRUE, color = 'red',weight = 3,label = srex$name[id-1]) 
+                               fill = TRUE, stroke = TRUE, color = I("#b21c1c"),weight = 3,label = srex$name[id-1]) 
       }
       m
     })
@@ -1530,10 +1538,10 @@ function(input, output,session) {
                          options = providerTileOptions(noWrap = FALSE)) 
       if (input$gcm.bias.region.pu == 'Global') {
         m <- m %>% addPolygons(lng = c(-180,180,180,-180,-180), lat = c(-90,-90,90,90,-90), 
-                               fill = TRUE, stroke = TRUE, color = 'red',weight = 3,label = 'Global') 
+                               fill = TRUE, stroke = TRUE, color = I("#b21c1c"),weight = 3,label = 'Global') 
       } else {
         m <- m %>% addPolygons(lng = srex$coords[[id-1]][1,], lat = srex$coords[[id-1]][2,], 
-                               fill = TRUE, stroke = TRUE, color = 'red',weight = 3,label = srex$name[id-1]) 
+                               fill = TRUE, stroke = TRUE, color = I("#b21c1c"),weight = 3,label = srex$name[id-1]) 
       }
       m
     })
@@ -1693,21 +1701,19 @@ function(input, output,session) {
         if (is.null(input$rowsGcm)) {
           for (gcm in gcms) {
             i <- which(is.element(gcms,gcm))
-            leg.name <- paste(paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '),
-                              paste(substr(lev[id[i]],1,5),'...',sep=''),
-                              sep = ' ')
+            leg.name <- paste(lev[id[i]],paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
+            leg.name.abb <- paste(i)
             grp.name <- paste('Group',id[i],sep='')
-            
             
             #if (is.null(input$rowsGcm)) {
             if (is.element(input$gcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                       showlegend = TRUE, legendgroup = grp.name, 
                                       line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter',
-                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                       showlegend = TRUE, legendgroup = grp.name,
                                       line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
             #}
@@ -1716,23 +1722,25 @@ function(input, output,session) {
         } else {
           im <- input$rowsGcm
           for (i in 1:length(im)) {
-            leg.name <- paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
-            grp.name <- paste('Group',id[im[i]],sep='')
+            
+            leg.name <- paste(im[i],paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
+            leg.name.abb <- paste(im[i])
+	    grp.name <- paste('Group',id[im[i]],sep='')
             gcm <- gcms[i] #gcms[im[i]]
             if (is.element(input$gcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                      name = leg.name, mode = 'lines', legendgroup = grp.name, 
+                                      name = leg.name.abb, mode = 'lines', legendgroup = grp.name, 
                                       colors = ",i,", hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                      name = leg.name, mode = 'lines', legendgroup = grp.name,
+                                      name = leg.name.abb, mode = 'lines', legendgroup = grp.name,
                                       colors = colsa[im[",i,"]], hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }
           }
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
           } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
@@ -1741,15 +1749,15 @@ function(input, output,session) {
                             line = list(color = 'transparent'),
                             showlegend = TRUE, name = 'High') %>%
               add_trace(y = ~low, type = 'scatter', mode = 'lines', 
-                        fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
+                        fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),
                         showlegend = TRUE, name = 'Low') %>%
               add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',name = 'Ens. Mean',
-                        line = list(color='rgb(255,127,80)'), showlegend = TRUE,
+                        line = list(color='#b21c1c'), showlegend = TRUE,
                         name = 'Average') 
             
             
             if (!is.null(df$ref))
-              p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', showlegend = TRUE,
+              p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', showlegend = TRUE,
                                          line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
             
             p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
@@ -1921,21 +1929,20 @@ function(input, output,session) {
         
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
-          leg.name <- paste(paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
-          grp.name <- paste('Group',id[i],sep='')
           
+          leg.name <- paste(lev[id[i]],paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
+          leg.name.abb <- paste(i)
+          grp.name <- paste('Group',id[i],sep='')
           
           #if (is.null(input$rowsGcm)) {
           if (is.element(input$gcm.colorBy, c('None','---')))
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                    name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                     showlegend = TRUE, legendgroup = grp.name, 
                                     line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
           else
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter',
-                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                    name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                     showlegend = TRUE, legendgroup = grp.name,
                                     line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
           #}
@@ -1944,7 +1951,7 @@ function(input, output,session) {
         
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('ensemble', tolower(input$gcm.chart.type.pu))) { # Make an enveloppe instead of lines
@@ -1953,15 +1960,15 @@ function(input, output,session) {
                         line = list(color = 'transparent'),
                         showlegend = TRUE, name = 'High') %>%
           add_trace(y = ~low, type = 'scatter', mode = 'lines', 
-                    fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
+                    fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),
                     showlegend = TRUE, name = 'Low') %>%
           add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',name = 'Ens. Mean',
-                    line = list(color='rgb(255,127,80)'), showlegend = TRUE,
+                    line = list(color='#b21c1c'), showlegend = TRUE,
                     name = 'Average') 
         
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', showlegend = TRUE,
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', showlegend = TRUE,
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
@@ -2118,22 +2125,21 @@ function(input, output,session) {
         # Add all models
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
-          leg.name <- paste(paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
+          leg.name.abb <- paste(lev[id[i]])
+          leg.name <- paste(lev[id[i]],paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
           grp.name <- paste('Group',id[i],sep='')
           
           
           #if (is.null(input$rowsGcm)) {
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter',
-                                  name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                  name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                   showlegend = TRUE, legendgroup = grp.name,
                                   line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
           #}
           ## Highlight selected models in tab:models
         }
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('ensemble', tolower(input$gcm.sc.chart.type.pu))) { # Make an enveloppe instead of lines
@@ -2142,15 +2148,15 @@ function(input, output,session) {
                         line = list(color = 'transparent'),
                         showlegend = TRUE, name = 'High') %>%
           add_trace(y = ~low, type = 'scatter', mode = 'lines', 
-                    fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
+                    fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),
                     showlegend = TRUE, name = 'Low') %>%
           add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',name = 'Ens. Mean',
-                    line = list(color='rgb(255,127,80)'), showlegend = TRUE,
+                    line = list(color='#b21c1c'), showlegend = TRUE,
                     name = 'Average') 
         
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', showlegend = TRUE,
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', showlegend = TRUE,
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
@@ -2307,22 +2313,20 @@ function(input, output,session) {
         # Add all models
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
-          leg.name <- paste(paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
+          leg.name.abb <- paste(lev[id[i]])
+          leg.name <- paste(lev[id[i]], paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
           grp.name <- paste('Group',id[i],sep='')
-          
-          
+                    
           #if (is.null(input$rowsGcm)) {
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter',
-                                  name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                  name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                   showlegend = TRUE, legendgroup = grp.name,
                                   line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
           #}
           ## Highlight selected models in tab:models
         }
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('ensemble', tolower(input$gcm.cc.chart.type))) { # Make an enveloppe instead of lines
@@ -2331,15 +2335,15 @@ function(input, output,session) {
                         line = list(color = 'transparent'),
                         showlegend = TRUE, name = 'High') %>%
           add_trace(y = ~low, type = 'scatter', mode = 'lines', 
-                    fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
+                    fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),
                     showlegend = TRUE, name = 'Low') %>%
           add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',name = 'Ens. Mean',
-                    line = list(color='rgb(255,127,80)'), showlegend = TRUE,
+                    line = list(color='#b21c1c'), showlegend = TRUE,
                     name = 'Average') 
         
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', showlegend = TRUE,
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', showlegend = TRUE,
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
@@ -2477,19 +2481,18 @@ function(input, output,session) {
           for (gcm in gcms) {
             i <- which(is.element(gcms,gcm))
             #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
-            leg.name <- paste(paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '),
-                              paste(substr(lev[id[i]],1,5),'...',sep=''),
-                              sep = ' ')
+            leg.name.abb <- paste(lev[id[i]])
+            leg.name <- paste(lev[id[i]],paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
             grp.name <- paste('Group',id[i],sep='')
             
             if (is.element(input$gcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                       showlegend = TRUE, legendgroup = grp.name,
                                       line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                       showlegend = TRUE, legendgroup = grp.name,
                                       line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
             
@@ -2498,17 +2501,18 @@ function(input, output,session) {
         } else {
           im <- input$rowsGcm
           for (i in 1:length(im)) {
-            leg.name <- paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' ')
+            leg.name.abb <- paste(im[i])
+            leg.name <- paste(im[i],paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
             grp.name <- paste('Group',id[i],sep='')
             gcm <- gcms[i]
             if (is.element(input$gcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                      name = leg.name, mode = 'lines', legendgroup = grp.name,
+                                      name = leg.name.abb, mode = 'lines', legendgroup = grp.name,
                                       colors = ",i,",hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                      name = leg.name, mode = 'lines', legendgroup = grp.name,
+                                      name = leg.name.abb, mode = 'lines', legendgroup = grp.name,
                                       colors = colsa[im[",i,"]],hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }            
@@ -2516,19 +2520,19 @@ function(input, output,session) {
           }
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
         } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
           p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
                           line = list(color = 'transparent'),name = 'High',showlegend = TRUE) %>%
             add_trace(y = ~low, type = 'scatter', mode = 'lines',showlegend = TRUE,
-                      fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),name = 'Low') %>%
-            add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',line = list(color='rgb(135,206,250)'),
+                      fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),name = 'Low') %>%
+            add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',line = list(color='#b21c1c'),
                       name = 'Ens. Mean',showlegend = TRUE) 
           
           if (!is.null(df$ref))
-            p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+            p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                        line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
           
           p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
@@ -2647,19 +2651,19 @@ function(input, output,session) {
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
           #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
-          leg.name <- paste(paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
+          leg.name <- paste(lev[id[i]],paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
+	  leg.name.abb <- paste(lev[id[i]])
+          
           grp.name <- paste('Group',id[i],sep='')
           
           if (is.element(input$gcm.colorBy, c('None','---')))
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                    name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                     showlegend = TRUE, legendgroup = grp.name,
                                     line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
           else
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                    name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                    name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                     showlegend = TRUE, legendgroup = grp.name,
                                     line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
           
@@ -2667,7 +2671,7 @@ function(input, output,session) {
         ## Highlight selected Simulations in tab:models
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
@@ -2675,11 +2679,11 @@ function(input, output,session) {
                         line = list(color = 'transparent'),name = 'High',showlegend = TRUE) %>%
           add_trace(y = ~low, type = 'scatter', mode = 'lines',showlegend = TRUE,
                     fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),name = 'Low') %>%
-          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',line = list(color='rgb(135,206,250)'),
+          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',line = list(color='rgb(35, 132, 170)'),
                     name = 'Ens. Mean',showlegend = TRUE) 
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
@@ -2793,13 +2797,12 @@ function(input, output,session) {
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
           #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
-          leg.name <- paste(paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
-          grp.name <- paste('Group',id[i],sep='')
+          leg.name <- paste(lev[id[i]],paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
+          leg.name.abb <- paste(lev[id[i]])
+ 	  grp.name <- paste('Group',id[i],sep='')
           
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                  name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                  name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                   showlegend = TRUE, legendgroup = grp.name,
                                   line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
           
@@ -2807,7 +2810,7 @@ function(input, output,session) {
         ## Highlight selected Simulations in tab:models
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('ensemble', tolower(input$gcm.sc.chart.type.pu))) { # Make an enveloppe instead of lines
@@ -2815,11 +2818,11 @@ function(input, output,session) {
                         line = list(color = 'transparent'),name = 'High',showlegend = TRUE) %>%
           add_trace(y = ~low, type = 'scatter', mode = 'lines',showlegend = TRUE,
                     fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),name = 'Low') %>%
-          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',line = list(color='rgb(135,206,250)'),
+          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',line = list(color='rgb(35, 132, 170)'),
                     name = 'Ens. Mean',showlegend = TRUE) 
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
@@ -2932,13 +2935,12 @@ function(input, output,session) {
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
           #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
-          leg.name <- paste(paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
+          leg.name <- paste(lev[id[i]],paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
+          leg.name.abb <- paste(lev[id[i]])
           grp.name <- paste('Group',id[i],sep='')
           
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
-                                  name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                  name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                   showlegend = TRUE, legendgroup = grp.name,
                                   line = list(color = colsa[",i,"], width = 2, shape ='spline'))",sep='')))
           
@@ -2946,7 +2948,7 @@ function(input, output,session) {
         ## Highlight selected Simulations in tab:models
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('ensemble', tolower(input$gcm.cc.chart.type))) { # Make an enveloppe instead of lines
@@ -2954,11 +2956,11 @@ function(input, output,session) {
                         line = list(color = 'transparent'),name = 'High',showlegend = TRUE) %>%
           add_trace(y = ~low, type = 'scatter', mode = 'lines',showlegend = TRUE,
                     fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),name = 'Low') %>%
-          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',line = list(color='rgb(135,206,250)'),
+          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',line = list(color='rgb(35, 132, 170)'),
                     name = 'Ens. Mean',showlegend = TRUE) 
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
@@ -3249,6 +3251,27 @@ function(input, output,session) {
       
       ## Create the plot
       p.sc <- plot_ly(df)
+      
+      if (length(df$dpr) > 1 | length(df$dtas) > 1) {
+        
+        dfe.70 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.6827,draw = FALSE)
+        dfe.95 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9545,draw = FALSE)
+        dfe.99 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9973,draw = FALSE)
+        p.sc <- p.sc %>% 
+          add_polygons(x = dfe.99[,1],y = dfe.99[,2] , name = '99% CL',
+                       fillcolor = 'rgba(255,127,80,0.5)',
+                       line = list(color = 'rgba(255,127,80,0.6)'),
+                       opacity = 0.5) %>%
+          add_polygons(x = dfe.95[,1],y = dfe.95[,2] , name = '95% CL',
+                       fillcolor = 'rgba(255,127,80,0.6)',
+                       line = list(color = 'rgba(255,127,80,0.7)'),
+                       opacity = 0.7) %>% 
+          add_polygons(x = dfe.70[,1],y = dfe.70[,2] , name = '70% CL',
+                       fillcolor = 'rgba(255,127,80,0.7)',
+                       line = list(color = 'rgba(255,127,80,0.8)'),
+                       opacity = 0.8) 
+      }
+      
       if ((input$gcm.chart.type == 'Individual Simulations')) {
         ## Add all Simulations
         if (is.null(input$rowsGcm)) {
@@ -3264,12 +3287,12 @@ function(input, output,session) {
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
                                       name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                       showlegend = TRUE, legendgroup = grp.name,
-                                      marker = list(color = ",i,", symbol = 3,size = 12,opacity = 0.7,line = list(width = 2,color = '#FFFFFF')))",sep='')))
+                                      marker = list(color = ",i,", symbol = 3 ,size = 12,opacity = 0.7,line = list(width = 1,color = '#FFFFFF')))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
                                       name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                       showlegend = TRUE, legendgroup = grp.name,
-                                      marker = list(color = cols[",i,"], symbol = 3,size = 12,opacity=0.7,line = list(width = 2,color = '#FFFFFF')))",sep='')))
+                                      marker = list(color = cols[",i,"], symbol = 3,size = 12,opacity=0.7,line = list(width = 1,color = '#FFFFFF')))",sep='')))
             
           }
           ## Highlight selected Simulations in tab:models
@@ -3293,53 +3316,6 @@ function(input, output,session) {
           }
           } 
       
-      if (length(df$dpr) > 1 | length(df$dtas) > 1) {
-        # p.sc <-  p.sc  %>%  layout(shapes = list(list(name = 'Env. 90% of all sim',type = 'circle',
-        #                                              xref = 'x', x0 = quantile(df$dtas[-length(df$dtas)],probs = 0.05,na.rm = TRUE), x1 = quantile(df$dtas[-length(df$dtas)],0.95,na.rm=TRUE),
-        #                                              yref = 'y', y0 = quantile(df$dpr[-length(df$dpr)],0.05,na.rm=TRUE), y1 = quantile(df$dpr[-length(df$dpr)],0.95,na.rm=TRUE),
-        #                                              fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-        #                                              opacity = 0.4),
-        #                                         list(name = 'Env. of all sim.',type = 'circle',
-        #                                              xref = 'x', x0 = min(df$dtas[-length(df$dtas)],na.rm=TRUE), x1 = max(df$dtas[-length(df$dtas)],na.rm=TRUE),
-        #                                              yref = 'y', y0 = min(df$dpr[-length(df$dpr)],na.rm=TRUE), y1 = max(df$dpr[-length(df$dpr)],na.rm=TRUE),
-        #                                              fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-        #                                              opacity = 0.3)))
-        #
-        dfe.70 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.6827,draw = FALSE)
-        dfe.95 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9545,draw = FALSE)
-        dfe.99 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9973,draw = FALSE)
-        p.sc <- p.sc %>% 
-          add_polygons(x = dfe.99[,1],y = dfe.99[,2] , name = '99% Confidence Level',
-                       fillcolor = 'rgba(255,127,80,0.5)',
-                       line = list(color = 'rgba(255,127,80,0.6)'),
-                       opacity = 0.5) %>%
-          add_polygons(x = dfe.95[,1],y = dfe.95[,2] , name = '95% Confidence Level',
-                       fillcolor = 'rgba(255,127,80,0.6)',
-                       line = list(color = 'rgba(255,127,80,0.7)'),
-                       opacity = 0.7) %>% 
-          add_polygons(x = dfe.70[,1],y = dfe.70[,2] , name = '70% Confidence Level',
-                       fillcolor = 'rgba(255,127,80,0.7)',
-                       line = list(color = 'rgba(255,127,80,0.8)'),
-                       opacity = 0.8) 
-      }
-      # p.sc <- p.sc  %>% layout(shapes = list(list(name = 'Env. of all sim.',type = 'circle',
-      #                                             xref = 'x', 
-      #                                             x0 = mean(df$dtas[-length(df$dtas)],na.rm=TRUE) - sd(df$dtas[-length(df$dtas)],na.rm=TRUE), 
-      #                                             x1 = mean(df$dtas[-length(df$dtas)],na.rm=TRUE) + sd(df$dtas[-length(df$dtas)],na.rm=TRUE),
-      #                                             yref = 'y', 
-      #                                             y0 = mean(df$dpr[-length(df$dpr)],na.rm=TRUE) - sd(df$dpr[-length(df$dpr)],na.rm=TRUE), 
-      #                                             y1 = mean(df$dpr[-length(df$dpr)],na.rm=TRUE) + sd(df$dpr[-length(df$dpr)],na.rm=TRUE),
-      #                                             fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-      #                                             opacity = 0.4),
-      #                                        list(name = 'Env. of all sim.',type = 'circle',
-      #                                             xref = 'x', 
-      #                                             x0 = mean(df$dtas[-length(df$dtas)],na.rm=TRUE) - 2 * sd(df$dtas[-length(df$dtas)],na.rm=TRUE), 
-      #                                             x1 = mean(df$dtas[-length(df$dtas)],na.rm=TRUE) + 2 * sd(df$dtas[-length(df$dtas)],na.rm=TRUE),
-      #                                             yref = 'y', 
-      #                                             y0 = mean(df$dpr[-length(df$dpr)],na.rm=TRUE) - 2 * sd(df$dpr[-length(df$dpr)],na.rm=TRUE), 
-      #                                             y1 = mean(df$dpr[-length(df$dpr)],na.rm=TRUE) + 2 * sd(df$dpr[-length(df$dpr)],na.rm=TRUE),
-      #                                             fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-      #                                             opacity = 0.3)))
       if ((input$gcm.chart.type == 'Ensemble of All Simulations') | (input$gcm.chart.type == "Both - Ensemble & Individual Simulations"))
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
       #}
@@ -3350,7 +3326,7 @@ function(input, output,session) {
                                    marker = list(color = 'rgb(255,127,80)', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
         
         p.sc <- p.sc %>% add_trace(x = df$dtas[length(df$dtas)],y = df$dpr[length(df$dpr)],type = 'scatter',mode = 'markers',
-                                   name = 'ERAINT', hoverinfo = 'text+x+y',text='ERAINT',showlegend = TRUE,
+                                   name = 'REF', hoverinfo = 'text+x+y',text='ERAINT',showlegend = TRUE,
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       } else {
         p.sc <- p.sc %>% add_trace(x = ~mean(df$dtas[-length(df$dpr)]),y = ~ mean(df$dpr[-length(df$dpr)]),type = 'scatter',mode = 'markers',
@@ -3358,7 +3334,7 @@ function(input, output,session) {
                                    marker = list(color = 'rgb(255,127,80)', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
         
         p.sc <- p.sc %>% add_trace(x = df$dtas[length(df$dtas)],y = df$dpr[length(df$dpr)],type = 'scatter',mode = 'markers',
-                                   name = 'ERAINT', hoverinfo = 'text+x+y',text='ERAINT',showlegend = FALSE,
+                                   name = 'REF', hoverinfo = 'text+x+y',text='ERAINT',showlegend = FALSE,
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       }
       if (input$gcm.outputValues == 'Bias') {
@@ -3462,53 +3438,46 @@ function(input, output,session) {
       
       ## Create the plot
       p.sc <- plot_ly(df)
+      
+      ### Add ellipsoid
+      if (length(df$dpr) > 1 | length(df$dtas) > 1) {
+        
+        dfe.70 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.6827,draw = FALSE)
+        dfe.95 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9545,draw = FALSE)
+        dfe.99 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9973,draw = FALSE)
+        p.sc <- p.sc %>% 
+          add_polygons(x = dfe.99[,1],y = dfe.99[,2] , name = '99% CL',
+                       fillcolor = 'rgba(255,127,80,0.5)',
+                       line = list(color = 'rgba(255,127,80,0.6)'),
+                       opacity = 0.5) %>%
+          add_polygons(x = dfe.95[,1],y = dfe.95[,2] , name = '95% CL',
+                       fillcolor = 'rgba(255,127,80,0.6)',
+                       line = list(color = 'rgba(255,127,80,0.7)'),
+                       opacity = 0.7) %>% 
+          add_polygons(x = dfe.70[,1],y = dfe.70[,2] , name = '70% CL',
+                       fillcolor = 'rgba(255,127,80,0.7)',
+                       line = list(color = 'rgba(255,127,80,0.8)'),
+                       opacity = 0.8) 
+      }
+      
       if ((input$gcm.cc.chart.type == 'Individual Simulations')) {
         ## Add all Simulations
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
           #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
-          leg.name <- paste(paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
-          grp.name <- paste('Group',id[i],sep='')
+          leg.name <- paste(lev[id[i]],paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
+          leg.name.abb <- lev[id[i]]
+	  grp.name <- paste('Group',id[i],sep='')
           
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
-                                  name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                  name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                   showlegend = TRUE, legendgroup = grp.name,
-                                  marker = list(color = ",i,", symbol = 3,size = 12,opacity = 0.7,line = list(width = 2,color = '#FFFFFF')))",sep='')))
+                                  marker = list(color = ",i,",symbol = 3, size = 12,opacity = 0.7,line = list(width = 1,color = '#FFFFFF')))",sep='')))
         }
         ## Highlight selected Simulations in tab:models
         } 
       
-      if (length(df$dpr) > 1 | length(df$dtas) > 1) {
-        # p.sc <-  p.sc  %>%  layout(shapes = list(list(name = 'Env. 90% of all sim',type = 'circle',
-        #                                              xref = 'x', x0 = quantile(df$dtas[-length(df$dtas)],probs = 0.05,na.rm = TRUE), x1 = quantile(df$dtas[-length(df$dtas)],0.95,na.rm=TRUE),
-        #                                              yref = 'y', y0 = quantile(df$dpr[-length(df$dpr)],0.05,na.rm=TRUE), y1 = quantile(df$dpr[-length(df$dpr)],0.95,na.rm=TRUE),
-        #                                              fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-        #                                              opacity = 0.4),
-        #                                         list(name = 'Env. of all sim.',type = 'circle',
-        #                                              xref = 'x', x0 = min(df$dtas[-length(df$dtas)],na.rm=TRUE), x1 = max(df$dtas[-length(df$dtas)],na.rm=TRUE),
-        #                                              yref = 'y', y0 = min(df$dpr[-length(df$dpr)],na.rm=TRUE), y1 = max(df$dpr[-length(df$dpr)],na.rm=TRUE),
-        #                                              fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-        #                                              opacity = 0.3)))
-        #
-        dfe.70 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.6827,draw = FALSE)
-        dfe.95 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9545,draw = FALSE)
-        dfe.99 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9973,draw = FALSE)
-        p.sc <- p.sc %>% 
-          add_polygons(x = dfe.99[,1],y = dfe.99[,2] , name = '99% Confidence Level',
-                       fillcolor = 'rgba(255,127,80,0.5)',
-                       line = list(color = 'rgba(255,127,80,0.6)'),
-                       opacity = 0.5) %>%
-          add_polygons(x = dfe.95[,1],y = dfe.95[,2] , name = '95% Confidence Level',
-                       fillcolor = 'rgba(255,127,80,0.6)',
-                       line = list(color = 'rgba(255,127,80,0.7)'),
-                       opacity = 0.7) %>% 
-          add_polygons(x = dfe.70[,1],y = dfe.70[,2] , name = '70% Confidence Level',
-                       fillcolor = 'rgba(255,127,80,0.7)',
-                       line = list(color = 'rgba(255,127,80,0.8)'),
-                       opacity = 0.8) 
-      }
+      
       if ((input$gcm.cc.chart.type == 'Ensemble of All Simulations') | (input$gcm.cc.chart.type == "Both - Ensemble & Individual Simulations"))
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
       #}
@@ -3519,7 +3488,7 @@ function(input, output,session) {
                                    marker = list(color = 'rgb(255,127,80)', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
         
         p.sc <- p.sc %>% add_trace(x = df$dtas[length(df$dtas)],y = df$dpr[length(df$dpr)],type = 'scatter',mode = 'markers',
-                                   name = 'ERAINT', hoverinfo = 'text+x+y',text='ERAINT',showlegend = TRUE,
+                                   name = 'REF', hoverinfo = 'text+x+y',text='ERAINT',showlegend = TRUE,
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       } else {
         p.sc <- p.sc %>% add_trace(x = ~mean(df$dtas[-length(df$dpr)]),y = ~ mean(df$dpr[-length(df$dpr)]),type = 'scatter',mode = 'markers',
@@ -3527,7 +3496,7 @@ function(input, output,session) {
                                    marker = list(color = 'rgb(255,127,80)', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
         
         p.sc <- p.sc %>% add_trace(x = df$dtas[length(df$dtas)],y = df$dpr[length(df$dpr)],type = 'scatter',mode = 'markers',
-                                   name = 'ERAINT', hoverinfo = 'text+x+y',text='ERAINT',showlegend = FALSE,
+                                   name = 'REF', hoverinfo = 'text+x+y',text='ERAINT',showlegend = FALSE,
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       }
       ylab <- 'Change (absolute) in annual means of regional temperature values [deg. C]'
@@ -3800,21 +3769,20 @@ function(input, output,session) {
         if (is.null(input$rowsRcm)) {
           for (rcm in rcms) {
             i <- which(is.element(rcms,rcm))
-            leg.name <- paste(paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = ' '),
-                              paste(substr(lev[id[i]],1,5),'...',sep=''),
-                              sep = ' ')
-            grp.name <- paste('Group',id[i],sep='')
             
+            leg.name <- paste(lev[id[i]],paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = ' '))
+	    leg.name.abb <- paste(i)
+            grp.name <- paste('Group',id[i],sep='')
             
             #if (is.null(input$rowsRcm)) {
             if (is.element(input$rcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                      name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      name =  leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                       showlegend = TRUE, legendgroup = grp.name, 
                                       line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter',
-                                      name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      name =  leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                       showlegend = TRUE, legendgroup = grp.name,
                                       line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
             #}
@@ -3823,23 +3791,24 @@ function(input, output,session) {
         } else {
           im <- input$rowsRcm
           for (i in 1:length(im)) {
-            leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = '  ')
+            leg.name <- paste(i,paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = '  '))
+	    leg.name.abb <- paste(i)
             grp.name <- paste('Group',id[im[i]],sep='')
             rcm <- rcms[i] #rcms[im[i]]
             if (is.element(input$rcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                      name = paste(im[",i,"],substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name, 
+                                      name = leg.name.abb, mode = 'lines', legendgroup = grp.name, 
                                       colors = ",i,", hoverinfo = 'text+x+y',text=leg.name,
-                                      line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
+                                      line = list(color = ",i,", width = 1.5, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                      name = paste(im[",i,"],substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                      name = leg.name.abb, mode = 'lines', legendgroup = grp.name,
                                       colors = colsa[im[",i,"]], hoverinfo = 'text+x+y',text=leg.name,
-                                      line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
+                                      line = list(color = colsa[im[",i,"]], width = 1.5, shape ='spline'))",sep='')))
           }
           }
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'EOBS', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
           } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
@@ -3848,18 +3817,18 @@ function(input, output,session) {
                             line = list(color = 'transparent'),
                             showlegend = FALSE, name = 'High') %>%
               add_trace(y = ~low, type = 'scatter', mode = 'lines',
-                        fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
-                        showlegend = FALSE, name = 'Low') %>%
+                        fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),
+                        showlegend = TRUE, name = 'Low') %>%
               add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                        line = list(color='rgb(255,127,80)'),
+                        line = list(color='#b21c1c'),
                         name = 'Average') 
             
             
             if (!is.null(df$ref))
-              p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
+              p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                          line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
             
-            
+            p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
             
           } else if (grepl('box',tolower(input$rcm.chart.type))) {
             p.sc <- plot_ly(df, type = 'box')
@@ -3928,7 +3897,7 @@ function(input, output,session) {
     output$hydro.sc.tas <- rcm.sc.tas
     
     output$rcm.sc.bias.tas.pu <- renderPlotly({
-      
+      #browser()
       rcm.meta.tas <- rcm.meta.tas.reactive.pu()
       df <- rcm.sc.tas.reactive.pu()
       
@@ -4021,42 +3990,40 @@ function(input, output,session) {
         # Add all models
         for (rcm in rcms) {
           i <- which(is.element(rcms,rcm))
-          leg.name <- paste(paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
+	  leg.name <- paste(paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = ' '))          
+  	  leg.name.abb <- paste(i)
           grp.name <- paste('Group',id[i],sep='')
-          
           
           #if (is.null(input$rowsRcm)) {
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter',
-                                  name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                  name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                   showlegend = TRUE, legendgroup = grp.name,
                                   line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
           #}
           ## Highlight selected models in tab:models
         } 
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'EOBS', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'REF', text = 'EOBS', text ='REF',mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('ensemble', tolower(input$rcm.chart.type.pu))) { # Make an enveloppe instead of lines
         
         p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
                         line = list(color = 'transparent'),
-                        showlegend = FALSE, name = 'High') %>%
+                        showlegend = TRUE, name = 'High') %>%
           add_trace(y = ~low, type = 'scatter', mode = 'lines',
-                    fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
-                    showlegend = FALSE, name = 'Low') %>%
+                    fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),
+                    showlegend = TRUE, name = 'Low') %>%
           add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                    line = list(color='rgb(255,127,80)'),
+                    line = list(color='#b21c1c'),
                     name = 'Average') 
         
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS',mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
         
       } else if (grepl('box',tolower(input$rcm.chart.type.pu))) {
         p.sc <- plot_ly(df, type = 'box')
@@ -4107,10 +4074,8 @@ function(input, output,session) {
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
                                            zeroline = FALSE))
-      if (input$rcm.legend.sc == 'Hide')
-        p.sc <- p.sc %>% layout(showlegend = FALSE)
-      else
-        p.sc <- p.sc %>% layout(showlegend = TRUE)
+      if (input$rcm.chart.type.pu != 'Individual Simulations')
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
       p.sc$elementId <- NULL
       p.sc
     })
@@ -4207,42 +4172,40 @@ function(input, output,session) {
         # Add all models
         for (rcm in rcms) {
           i <- which(is.element(rcms,rcm))
-          leg.name <- paste(paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
+          leg.name <- paste(as.character(i),paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = ' '))
+          leg.name.abb <- paste(as.character(i))
           grp.name <- paste('Group',id[i],sep='')
-          
           
           #if (is.null(input$rowsRcm)) {
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter',
-                                  name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                  name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                   showlegend = TRUE, legendgroup = grp.name,
                                   line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
           #}
           ## Highlight selected models in tab:models
         } 
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'EOBS', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'REF', text = 'EOBS',mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('ensemble', tolower(input$rcm.sc.chart.type.pu))) { # Make an enveloppe instead of lines
         
         p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
                         line = list(color = 'transparent'),
-                        showlegend = FALSE, name = 'High') %>%
+                        showlegend = TRUE, name = 'High') %>%
           add_trace(y = ~low, type = 'scatter', mode = 'lines',
-                    fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
-                    showlegend = FALSE, name = 'Low') %>%
+                    fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),
+                    showlegend = TRUE, name = 'Low') %>%
           add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                    line = list(color='rgb(255,127,80)'),
+                    line = list(color='#b21c1c'),
                     name = 'Average') 
         
-        
+ 
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
         
       } else if (grepl('box',tolower(input$rcm.sc.chart.type.pu))) {
         p.sc <- plot_ly(df, type = 'box')
@@ -4293,10 +4256,7 @@ function(input, output,session) {
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
                                            zeroline = FALSE))
-      if (input$rcm.legend.sc == 'Hide')
-        p.sc <- p.sc %>% layout(showlegend = FALSE)
-      else
-        p.sc <- p.sc %>% layout(showlegend = TRUE)
+
       p.sc$elementId <- NULL
       p.sc
     })
@@ -4392,22 +4352,21 @@ function(input, output,session) {
         # Add all models
         for (rcm in rcms) {
           i <- which(is.element(rcms,rcm))
-          leg.name <- paste(paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
+          leg.name <- paste(i, paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = ' '))
+          leg.name.abb <- paste(i)
           grp.name <- paste('Group',id[i],sep='')
           
           
           #if (is.null(input$rowsRcm)) {
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter',
-                                  name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                  name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                   showlegend = TRUE, legendgroup = grp.name,
                                   line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
           #}
           ## Highlight selected models in tab:models
         } 
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'EOBS', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('ensemble', tolower(input$rcm.cc.chart.type))) { # Make an enveloppe instead of lines
@@ -4416,15 +4375,15 @@ function(input, output,session) {
                         line = list(color = 'transparent'),
                         showlegend = FALSE, name = 'High') %>%
           add_trace(y = ~low, type = 'scatter', mode = 'lines',
-                    fill = 'tonexty', fillcolor='rgba(255,127,80,0.2)', line = list(color = 'transparent'),
+                    fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),
                     showlegend = FALSE, name = 'Low') %>%
           add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                    line = list(color='rgb(255,127,80)'),
+                    line = list(color='#b21c1c'),
                     name = 'Average') 
         
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS',mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
         
@@ -4478,10 +4437,8 @@ function(input, output,session) {
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
                                            zeroline = FALSE))
-      if (input$rcm.legend.sc == 'Hide')
-        p.sc <- p.sc %>% layout(showlegend = FALSE)
-      else
-        p.sc <- p.sc %>% layout(showlegend = TRUE)
+      if (input$rcm.sc.chart.type.pu != 'Individual Simulations')
+        
       p.sc$elementId <- NULL
       p.sc
     })
@@ -4558,19 +4515,18 @@ function(input, output,session) {
           for (rcm in rcms) {
             i <- which(is.element(rcms,rcm))
             #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
-            leg.name <- paste(paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','rcm')])),collapse = ' '),
-                              paste(substr(lev[id[i]],1,5),'...',sep=''),
-                              sep = ' ')
+            leg.name <- paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','rcm')])),collapse = ' ')
+            leg.name.abb <- paste(i)
             grp.name <- paste('Group',id[i],sep='') #leg.name
             
             if (is.element(input$rcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                      name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                      name = leg.name.abb , mode = 'lines', legendgroup = grp.name,
                                       colors = ",i,",hoverinfo = 'text+x+y',text=leg.name, legendgroup = grp.name,
                                       line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                      name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                      name = leg.name.abb, mode = 'lines', legendgroup = grp.name,
                                       colors = colsa[",i,"],hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
             
@@ -4579,17 +4535,18 @@ function(input, output,session) {
         } else {
           im <- input$rowsRcm
           for (i in 1:length(im)) {
-            leg.name <- paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','rcm')])),collapse = ' ')
-            grp.name <- paste('Group',id[i],sep='')
+            leg.name <- paste(im[i],paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','rcm')])),collapse = ' '),sep =' ')
+            leg.name.abb <- paste(im[i]) 
+	    grp.name <- paste('Group',id[i],sep='')
             rcm <- rcms[i]
             if (is.element(input$rcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                      name = paste(",im,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                      name = leg.name.abb , mode = 'lines', legendgroup = grp.name,
                                       colors = ",i,",hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                      name = paste(",im,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                      name = leg.name.abb , mode = 'lines', legendgroup = grp.name,
                                       colors = colsa[im[",i,"]],hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }            
@@ -4597,24 +4554,24 @@ function(input, output,session) {
           }
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
         } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
           p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
                           line = list(color = 'transparent'),
-                          showlegend = FALSE, name = 'High') %>%
+                          showlegend = TRUE, name = 'High') %>%
             add_trace(y = ~low, type = 'scatter', mode = 'lines',
                       fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),
-                      showlegend = FALSE, name = 'Low') %>%
+                      showlegend = TRUE, name = 'Low') %>%
             add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                      line = list(color='rgb(135,206,250)'),
+                      line = list(color='rgb(35, 132, 170)'),
                       name = 'Average') 
           
           if (!is.null(df$ref))
-            p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+            p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                        line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-          
+          p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))          
         } else if (grepl('box',tolower(input$rcm.chart.type))) {
           p.sc <- plot_ly(df, type = 'box')
           
@@ -4650,7 +4607,7 @@ function(input, output,session) {
       else 
         ylab <- "Simulated regional precipitation [mm]"
       # Format layout 
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$rcm.region),
+      p.sc <- p.sc %>% layout(title = paste("Region: ", input$rcm.region.pu),
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -4674,7 +4631,7 @@ function(input, output,session) {
       
       p.sc$elementId <- NULL
       p.sc
-        })
+    })
     
     output$rcm.sc.bias.pr.pu <- renderPlotly({
       rcm.meta.pr <- rcm.meta.pr.reactive.pu()
@@ -4725,19 +4682,18 @@ function(input, output,session) {
         for (rcm in rcms) {
           i <- which(is.element(rcms,rcm))
           #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
-          leg.name <- paste(paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','rcm')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
+          leg.name <- paste(i,paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','rcm')])),collapse = ' '))
+          leg.name.abb <- paste(i) 
           grp.name <- paste('Group',id[i],sep='') #leg.name
           
           if (is.element(input$rcm.colorBy, c('None','---')))
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                    name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                    name = leg.name.abb, mode = 'lines', legendgroup = grp.name,
                                     colors = ",i,",hoverinfo = 'text+x+y',text=leg.name, legendgroup = grp.name,
                                     line = list(color = ",i,", width = 2, shape ='spline'))",sep='')))
           else
             eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                    name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                    name = leg.name.abb, mode = 'lines', legendgroup = grp.name,
                                     colors = colsa[",i,"],hoverinfo = 'text+x+y',text=leg.name,
                                     line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
           
@@ -4745,22 +4701,22 @@ function(input, output,session) {
         ## Highlight selected Simulations in tab:models
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('ensemble', tolower(input$rcm.chart.type.pu))) { # Make an enveloppe instead of lines
         p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
                         line = list(color = 'transparent'),
-                        showlegend = FALSE, name = 'High') %>%
+                        showlegend = TRUE, name = 'High') %>%
           add_trace(y = ~low, type = 'scatter', mode = 'lines',
                     fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),
-                    showlegend = FALSE, name = 'Low') %>%
+                    showlegend = TRUE, name = 'Low') %>%
           add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                    line = list(color='rgb(135,206,250)'),
+                    line = list(color='rgb(35, 132, 170)'),
                     name = 'Average') 
-        
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('box',tolower(input$rcm.chart.type.pu))) {
@@ -4811,8 +4767,8 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE))
       
-      if (input$rcm.legend.sc == 'Hide')
-        p.sc <- p.sc %>% layout(showlegend = FALSE)
+      if (grepl('ensemble',tolower(input$rcm.chart.type.pu)))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
       
       p.sc$elementId <- NULL
       p.sc
@@ -4870,13 +4826,12 @@ function(input, output,session) {
         for (rcm in rcms) {
           i <- which(is.element(rcms,rcm))
           #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
-          leg.name <- paste(paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','rcm')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
+          leg.name <- paste(i,paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','rcm')])),collapse = ' '))
+          leg.name.abb <- paste(i) 
           grp.name <- paste('Group',id[i],sep='') #leg.name
           
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                  name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                  name = leg.name.abb, mode = 'lines', legendgroup = grp.name,
                                   colors = colsa[",i,"],hoverinfo = 'text+x+y',text=leg.name,
                                   line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
           
@@ -4884,23 +4839,25 @@ function(input, output,session) {
         ## Highlight selected Simulations in tab:models
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('ensemble', tolower(input$rcm.sc.chart.type.pu))) { # Make an enveloppe instead of lines
         p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
                         line = list(color = 'transparent'),
-                        showlegend = FALSE, name = 'High') %>%
+                        showlegend = TRUE, name = 'High') %>%
           add_trace(y = ~low, type = 'scatter', mode = 'lines',
                     fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),
-                    showlegend = FALSE, name = 'Low') %>%
+                    showlegend = TRUE, name = 'Low') %>%
           add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                    line = list(color='rgb(135,206,250)'),
+                    line = list(color='rgb(35, 132, 170)'),
                     name = 'Average') 
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
+        
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
         
       } else if (grepl('box',tolower(input$rcm.sc.chart.type.pu))) {
         p.sc <- plot_ly(df, type = 'box')
@@ -4949,8 +4906,8 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE))
       
-      if (input$rcm.legend.sc == 'Hide')
-        p.sc <- p.sc %>% layout(showlegend = FALSE)
+      if (input$rcm.sc.chart.type.pu != 'Individual Simulations')
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
       
       p.sc$elementId <- NULL
       p.sc
@@ -5004,13 +4961,12 @@ function(input, output,session) {
         for (rcm in rcms) {
           i <- which(is.element(rcms,rcm))
           #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
-          leg.name <- paste(paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','rcm')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
+          leg.name <- paste(i,paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','rcm')])),collapse = ' '),sep =' ')
+          leg.name.abb <- paste(i)
           grp.name <- paste('Group',id[i],sep='') #leg.name
           
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
-                                  name = paste(",i,",substr(leg.name,1,5),'...',sep=' '), mode = 'lines', legendgroup = grp.name,
+                                  name = leg.name.abb , mode = 'lines', legendgroup = grp.name,
                                   colors = colsa[",i,"],hoverinfo = 'text+x+y',text=leg.name,
                                   line = list(color = cols[",i,"], width = 2, shape ='spline'))",sep='')))
           
@@ -5018,7 +4974,7 @@ function(input, output,session) {
         ## Highlight selected Simulations in tab:models
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'EOBS', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('ensemble', tolower(input$rcm.cc.chart.type))) { # Make an enveloppe instead of lines
@@ -5029,11 +4985,11 @@ function(input, output,session) {
                     fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),
                     showlegend = FALSE, name = 'Low') %>%
           add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                    line = list(color='rgb(135,206,250)'),
+                    line = list(color='rgb(35, 132, 170)'),
                     name = 'Average') 
         
         if (!is.null(df$ref))
-          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', mode = 'lines', 
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'ERAINT', text = 'REF', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
       } else if (grepl('box',tolower(input$rcm.cc.chart.type))) {
@@ -5336,27 +5292,47 @@ function(input, output,session) {
       
       ## Create the plot
       p.sc <- plot_ly(df)
+      
+      if (length(df$dpr) > 1 | length(df$dtas) > 1) {
+        
+        dfe.70 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.6827,draw = FALSE)
+        dfe.95 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9545,draw = FALSE)
+        dfe.99 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9973,draw = FALSE)
+        p.sc <- p.sc %>% 
+          add_polygons(x = dfe.99[,1],y = dfe.99[,2] , name = '99% CL',
+                       fillcolor = 'rgba(255,127,80,0.5)',
+                       line = list(color = 'rgba(255,127,80,0.6)'),
+                       opacity = 0.5) %>%
+          add_polygons(x = dfe.95[,1],y = dfe.95[,2] , name = '95% CL',
+                       fillcolor = 'rgba(255,127,80,0.6)',
+                       line = list(color = 'rgba(255,127,80,0.7)'),
+                       opacity = 0.7) %>% 
+          add_polygons(x = dfe.70[,1],y = dfe.70[,2] , name = '70% CL',
+                       fillcolor = 'rgba(255,127,80,0.7)',
+                       line = list(color = 'rgba(255,127,80,0.8)'),
+                       opacity = 0.8)  
+      }
+      
       if ((input$rcm.chart.type == 'Individual Simulations')) {
         ## Add all Simulations
         if (is.null(input$rowsRcm)) {
           for (rcm in rcms) {
             i <- which(is.element(rcms,rcm))
             #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
-            leg.name <- paste(paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','gcm_rip','rcm')])),collapse = ' '),
-                              paste(substr(lev[id[i]],1,5),'...',sep=''),
-                              sep = ' ')
+            leg.name <- paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','gcm_rip','rcm')])),collapse = ' ')
+            leg.name.abb <- paste(i)
             grp.name <- paste('Group',id[i],sep='')
             
             if (is.element(input$rcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
-                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                       showlegend = TRUE, legendgroup = grp.name,
-                                      marker = list(color = ",i,", symbol = 3,size = 12,opacity = 0.7,line = list(width = 2,color = '#FFFFFF')))",sep='')))
+                                      marker = list(color = ",i,", symbol = 3,size = 12,opacity = 0.7,line = list(width = 1,color = '#FFFFFF')))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
-                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                       showlegend = TRUE, legendgroup = grp.name,
-                                      marker = list(color = cols[",i,"], symbol = 3,size = 12,opacity=0.7,line = list(width = 2,color = '#FFFFFF')))",sep='')))
+                                      marker = list(color = cols[",i,"], symbol = 3,size = 12,opacity=0.7,line = list(width = 1,color = '#FFFFFF')))",sep='')))
             
           }
           ## Highlight selected Simulations in tab:models
@@ -5364,51 +5340,24 @@ function(input, output,session) {
           im <- input$rowsRcm
           for (i in 1:length(im)) {
             leg.name <- paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','gcm_rip','rcm')])),collapse = ' ')
+            leg.name.abb <- paste(im[i])
             grp.name <- paste('Group',id[i],sep='')
             rcm <- rcms[i]
             if (is.element(input$rcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
-                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                       showlegend = TRUE, legendgroup = grp.name,
                                       marker = list(color = ",i,", symbol = 3,size = 12,opacity = 0.7,line = list(width = 1)))",sep='')))
             else
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
-                                      name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                      name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                       showlegend = TRUE, legendgroup = grp.name,
                                       marker = list(color = cols[im[",i,"]], symbol = 3,size = 12,opacity=0.7,line = list(width = 1))",sep='')))
           }
-          }
-          } 
+        }
+      } 
       
-      if (length(df$dpr) > 1 | length(df$dtas) > 1) {
-        # p.sc <-  p.sc  %>%  layout(shapes = list(list(name = 'Env. 90% of all sim',type = 'circle',
-        #                                               xref = 'x', x0 = quantile(df$dtas[-length(df$dtas)],probs = 0.05,na.rm = TRUE), x1 = quantile(df$dtas[-length(df$dtas)],0.95,na.rm=TRUE),
-        #                                               yref = 'y', y0 = quantile(df$dpr[-length(df$dpr)],0.05,na.rm=TRUE), y1 = quantile(df$dpr[-length(df$dpr)],0.95,na.rm=TRUE),
-        #                                               fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-        #                                               opacity = 0.4),
-        #                                          list(name = 'Env. of all sim.',type = 'circle',
-        #                                               xref = 'x', x0 = min(df$dtas[-length(df$dtas)],na.rm=TRUE), x1 = max(df$dtas[-length(df$dtas)],na.rm=TRUE),
-        #                                               yref = 'y', y0 = min(df$dpr[-length(df$dpr)],na.rm=TRUE), y1 = max(df$dpr[-length(df$dpr)],na.rm=TRUE),
-        #                                               fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-        #                                               opacity = 0.3)))
-        
-        dfe.70 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.6827,draw = FALSE)
-        dfe.95 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9545,draw = FALSE)
-        dfe.99 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9973,draw = FALSE)
-        p.sc <- p.sc %>% 
-          add_polygons(x = dfe.99[,1],y = dfe.99[,2] , name = '99% Confidence Level',
-                       fillcolor = 'rgba(255,127,80,0.5)',
-                       line = list(color = 'rgba(255,127,80,0.6)'),
-                       opacity = 0.5) %>%
-          add_polygons(x = dfe.95[,1],y = dfe.95[,2] , name = '95% Confidence Level',
-                       fillcolor = 'rgba(255,127,80,0.6)',
-                       line = list(color = 'rgba(255,127,80,0.7)'),
-                       opacity = 0.7) %>% 
-          add_polygons(x = dfe.70[,1],y = dfe.70[,2] , name = '70% Confidence Level',
-                       fillcolor = 'rgba(255,127,80,0.7)',
-                       line = list(color = 'rgba(255,127,80,0.8)'),
-                       opacity = 0.8)  
-      }
+      
       
       if ((input$rcm.chart.type == 'Ensemble of All Simulations') | (input$rcm.chart.type == "Both - Ensemble & Individual Simulations"))
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
@@ -5417,18 +5366,18 @@ function(input, output,session) {
       if (input$rcm.legend.sc == 'Display') {
         p.sc <- p.sc %>% add_trace(x = ~mean(df$dtas[-length(df$dpr)]),y = ~ mean(df$dpr[-length(df$dpr)]),type = 'scatter',mode = 'markers',
                                    name = 'Ens. Mean', hoverinfo = 'text+x+y',text='Ens. Mean',showlegend = TRUE,
-                                   marker = list(color = 'rgb(255,127,80)', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
+                                   marker = list(color = '#871010', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
         
         p.sc <- p.sc %>% add_trace(x = df$dtas[length(df$dtas)],y = df$dpr[length(df$dpr)],type = 'scatter',mode = 'markers',
-                                   name = 'ERAINT', hoverinfo = 'text+x+y',text='ERAINT',showlegend = TRUE,
+                                   name = 'REF', hoverinfo = 'text+x+y',text='ERAINT',showlegend = TRUE,
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       } else {
         p.sc <- p.sc %>% add_trace(x = ~mean(df$dtas[-length(df$dpr)]),y = ~ mean(df$dpr[-length(df$dpr)]),type = 'scatter',mode = 'markers',
                                    name = 'Ens. Mean', hoverinfo = 'text+x+y',text='Ens. Mean',showlegend = FALSE,
-                                   marker = list(color = 'rgb(255,127,80)', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
+                                   marker = list(color = '#871010', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
         
         p.sc <- p.sc %>% add_trace(x = df$dtas[length(df$dtas)],y = df$dpr[length(df$dpr)],type = 'scatter',mode = 'markers',
-                                   name = 'ERAINT', hoverinfo = 'text+x+y',text='ERAINT',showlegend = FALSE,
+                                   name = 'REF', hoverinfo = 'text+x+y',text='ERAINT',showlegend = FALSE,
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       }
       if (input$rcm.outputValues == 'Bias') {
@@ -5531,53 +5480,45 @@ function(input, output,session) {
       
       ## Create the plot
       p.sc <- plot_ly(df)
+      
+      if (length(df$dpr) > 1 | length(df$dtas) > 1) {
+        
+        dfe.70 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.6827,draw = FALSE)
+        dfe.95 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9545,draw = FALSE)
+        dfe.99 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9973,draw = FALSE)
+        p.sc <- p.sc %>% 
+          add_polygons(x = dfe.99[,1],y = dfe.99[,2] , name = '99% CL',
+                       fillcolor = 'rgba(255,127,80,0.5)',
+                       line = list(color = 'rgba(255,127,80,0.6)'),
+                       opacity = 0.5) %>%
+          add_polygons(x = dfe.95[,1],y = dfe.95[,2] , name = '95% CL',
+                       fillcolor = 'rgba(255,127,80,0.6)',
+                       line = list(color = 'rgba(255,127,80,0.7)'),
+                       opacity = 0.7) %>% 
+          add_polygons(x = dfe.70[,1],y = dfe.70[,2] , name = '70% CL',
+                       fillcolor = 'rgba(255,127,80,0.7)',
+                       line = list(color = 'rgba(255,127,80,0.8)'),
+                       opacity = 0.8)  
+      }
+      
       if ((input$rcm.cc.chart.type == 'Individual Simulations')) {
         ## Add all Simulations
         for (rcm in rcms) {
           i <- which(is.element(rcms,rcm))
           #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
-          leg.name <- paste(paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','gcm_rip','rcm')])),collapse = ' '),
-                            paste(substr(lev[id[i]],1,5),'...',sep=''),
-                            sep = ' ')
+          leg.name <- paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','gcm_rip','rcm')])),collapse = ' ')
+          leg.name.abb <- paste(i)
           grp.name <- paste('Group',id[i],sep='')
           
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
-                                  name = leg.name, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
+                                  name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
                                   showlegend = TRUE, legendgroup = grp.name,
                                   marker = list(color = ",i,", symbol = 3,size = 12,opacity=0.7,line = list(width = 2,color = '#FFFFFF')))",sep='')))
           
         }
       } 
       
-      if (length(df$dpr) > 1 | length(df$dtas) > 1) {
-        # p.sc <-  p.sc  %>%  layout(shapes = list(list(name = 'Env. 90% of all sim',type = 'circle',
-        #                                               xref = 'x', x0 = quantile(df$dtas[-length(df$dtas)],probs = 0.05,na.rm = TRUE), x1 = quantile(df$dtas[-length(df$dtas)],0.95,na.rm=TRUE),
-        #                                               yref = 'y', y0 = quantile(df$dpr[-length(df$dpr)],0.05,na.rm=TRUE), y1 = quantile(df$dpr[-length(df$dpr)],0.95,na.rm=TRUE),
-        #                                               fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-        #                                               opacity = 0.4),
-        #                                          list(name = 'Env. of all sim.',type = 'circle',
-        #                                               xref = 'x', x0 = min(df$dtas[-length(df$dtas)],na.rm=TRUE), x1 = max(df$dtas[-length(df$dtas)],na.rm=TRUE),
-        #                                               yref = 'y', y0 = min(df$dpr[-length(df$dpr)],na.rm=TRUE), y1 = max(df$dpr[-length(df$dpr)],na.rm=TRUE),
-        #                                               fillcolor = 'rgba(255,127,80,0.4)', line = list(color = 'rgba(255,127,80,0.8)'),
-        #                                               opacity = 0.3)))
-        
-        dfe.70 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.6827,draw = FALSE)
-        dfe.95 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9545,draw = FALSE)
-        dfe.99 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.9973,draw = FALSE)
-        p.sc <- p.sc %>% 
-          add_polygons(x = dfe.99[,1],y = dfe.99[,2] , name = '99% Confidence Level',
-                       fillcolor = 'rgba(255,127,80,0.5)',
-                       line = list(color = 'rgba(255,127,80,0.6)'),
-                       opacity = 0.5) %>%
-          add_polygons(x = dfe.95[,1],y = dfe.95[,2] , name = '95% Confidence Level',
-                       fillcolor = 'rgba(255,127,80,0.6)',
-                       line = list(color = 'rgba(255,127,80,0.7)'),
-                       opacity = 0.7) %>% 
-          add_polygons(x = dfe.70[,1],y = dfe.70[,2] , name = '70% Confidence Level',
-                       fillcolor = 'rgba(255,127,80,0.7)',
-                       line = list(color = 'rgba(255,127,80,0.8)'),
-                       opacity = 0.8)  
-      }
+      
       
       if ((input$rcm.cc.chart.type == 'Ensemble of All Simulations') | (input$rcm.cc.chart.type == "Both - Ensemble & Individual Simulations"))
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
@@ -5589,7 +5530,7 @@ function(input, output,session) {
                                    marker = list(color = 'rgb(255,127,80)', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
         
         p.sc <- p.sc %>% add_trace(x = df$dtas[length(df$dtas)],y = df$dpr[length(df$dpr)],type = 'scatter',mode = 'markers',
-                                   name = 'ERAINT', hoverinfo = 'text+x+y',text='ERAINT',showlegend = TRUE,
+                                   name = 'REF', hoverinfo = 'text+x+y',text='ERAINT',showlegend = TRUE,
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       } else {
         p.sc <- p.sc %>% add_trace(x = ~mean(df$dtas[-length(df$dpr)]),y = ~ mean(df$dpr[-length(df$dpr)]),type = 'scatter',mode = 'markers',
@@ -5597,7 +5538,7 @@ function(input, output,session) {
                                    marker = list(color = 'rgb(255,127,80)', symbol = 17,line =list(width = 2,color = '#FFFFFF'), size = 20))
         
         p.sc <- p.sc %>% add_trace(x = df$dtas[length(df$dtas)],y = df$dpr[length(df$dpr)],type = 'scatter',mode = 'markers',
-                                   name = 'ERAINT', hoverinfo = 'text+x+y',text='ERAINT',showlegend = FALSE,
+                                   name = 'REF', hoverinfo = 'text+x+y',text='ERAINT',showlegend = FALSE,
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       }
       ylab <- 'Change (absolute) in annual means of regional temperature values [deg. C]'
@@ -5968,7 +5909,6 @@ function(input, output,session) {
       selP <- switch(input$period.cc,'Near Future (2021-2050)' = 'nf','Far future (2071-2100)' = 'ff')
       # 
       selData <- dcc %>% filter(season == selS, rcp == selR , period == selP)
-      # browser()
       # plot
       for (i in 1:length(selData[,6])) {
         
@@ -5977,24 +5917,10 @@ function(input, output,session) {
         eval(parse(text = paste("p <- p %>% add_trace(data=selData, x = ~ t2m[",i,"],y = ~ mu[",i,"]*100,type = 'scatter', 
                                 name = leg.name, mode = 'markers', hoverinfo = 'text+x+y',text=leg.name,
                                 showlegend = TRUE, 
-                                marker = list(color = ",i,", symbol = 3,size = 12,opacity=0.7,line = list(width = 2,color = '#FFFFFF')))",sep='')))
+                                marker = list(color = ",i,", symbol = 3,size = 12,opacity=0.7,line = list(width = 1,color = '#FFFFFF')))",sep='')))
       }
       
-      # p <- p %>% add_trace(data = selData, name = 'All',x = ~t2m, y = ~mu, type = "scatter",
-      #                      mode = "markers", colors = I('blue'), 
-      #                      marker = list(size = 14, symbol = '+', color = 'blue', line = list(width = 1,color = I('blue')),opacity = 0.2), 
-      #                      text = ~paste("<br> Model: ", selData[,6], "</br> Score:", 2)) 
-      
-      # if (length(input$rows)>0) {
-      #   
-      #   p <- p %>% add_trace(data = selData %>% filter(model == input$rows), name = 'Changes',x = ~t2m, y = ~mu, type = "scatter",
-      #                        mode = "markers", colors = I('blue'), 
-      #                        marker = list(size = 14, symbol = 'circles', color = 'blue', line = list(width = 1,color = I('blue')),opacity = 0.2), 
-      #                        text = ~paste("<br> Model: ", selData[,6], "</br> Score:", 2))
-      # }
-      # 
       de <- dataEllipse(x = as.matrix(selData[,1:2]),levels = 0.90,draw = FALSE) # 0.05,0.1,0.25,0.5,0.75,0.9,
-      #dev.off()
       
       if (input$ci == 'Display') {
         p <- p %>% add_text(x = c(-2,2,-2,2) , y = c(0.5,0.5,-0.5,-0.5), 
@@ -6022,7 +5948,7 @@ function(input, output,session) {
         selData2 <- subset(selData,subset = is.element(models.45,input$rows))
         p <- p %>% add_trace(data = selData2, name = 'Selected',x = ~t2m, y = ~mu, type = "scatter",
                              mode = "markers", colors = I('black'),
-                             marker = list(size = 12, symbol = '+', line = list(width = 2,color = I('red')),opacity = 0.6), 
+                             marker = list(size = 12, symbol = '+', line = list(width = 1,color = I('red')),opacity = 0.6), 
                              text = ~paste("<br> Model: ", selData2[,6], "</br> Score:", 2)) %>% 
           add_text(data = selData2, x = ~t2m, y = ~mu, text = ~model,name = 'Model name', 
                    textfont = list(family = "sans serif", size = 14,color = toRGB("black")), textposition = "top")
@@ -6164,18 +6090,32 @@ function(input, output,session) {
   #		 action = NULL, duration = 20, closeButton = TRUE,id = NULL, type = c("warning"),session = getDefaultReactiveDomain())
   #) 
   
-  observe(
-    showModal(modalDialog(
-      footer = modalButton("Accept"),
-      title = "Disclaimer",
-      tags$div(tags$p(tags$h4("This web application is a prototype and provides a straighforward and simple evaluation of the quality of climate models in simulating 
-                              basic climatic features such as the seasoanl cycle of mean air temperature and precipitation over various 
-                              regions in the world. This prototype is developed through the C3S DECM project and is the copyright of the Norwegian Meteorological Institute (2018).
-                              By clicking on 'Accept' you accept the terms of use in the"), tags$h4(tags$a(href= 'http://climate.copernicus.eu/disclaimer-privacy','Framework Agreement for Copernicus services')),
-                      tags$h4('Any feedbacks are welcome!'),
-                      tags$h5('email to abdelkader@met.no or send your feedback from the following website'), tags$a(href= 'https://climatedatasite.net','https://climatedatasite.net')
-      ))))
-    )
+  
+  # observe(
+  #   showNotification(
+  #      tags$div(tags$p(tags$h4("DISCLAIMER"),
+  #                      tags$h4("This web application is a prototype and provides a straighforward and simple evaluation of the quality of climate models in simulating 
+  #                             basic climatic features such as the seasoanl cycle of mean air temperature and precipitation over various 
+  #                             regions in the world. This prototype is developed through the C3S DECM project and is the copyright of the Norwegian Meteorological Institute (2018).
+  #                             Please have a look into the terms of use in the"), tags$h3(tags$a(href= 'https://climate.copernicus.eu/disclaimer-and-privacy','Framework Agreement for Copernicus services')),
+  #                      tags$h4('Any feedbacks are welcome!'),
+  #                      tags$h6('(The disclaimer window will close automatically in few seconds or use the close bottom on the top left)'),
+  #                      tags$h6('email to abdelkader@met.no or send your feedback from the following website'), tags$a(href= 'https://climatedatasite.net','https://climatedatasite.net'))),
+  # 		 action = NULL, duration = 10, closeButton = TRUE,id = NULL, type = c("warning"),session = getDefaultReactiveDomain())
+  # )
+  
+  #observe(
+  #  showModal(modalDialog(
+  #    footer = modalButton("Accept"),
+  #    title = "Disclaimer",
+  #    tags$div(tags$p(tags$h4("This web application is a prototype and provides a straighforward and simple evaluation of the quality of climate models in simulating
+  #                            basic climatic features such as the seasoanl cycle of mean air temperature and precipitation over various
+  #                            regions in the world. This prototype is developed through the C3S DECM project and is the copyright of the Norwegian Meteorological Institute (2018).
+  #                            By clicking on 'Accept' you accept the terms of use in the"), tags$h4(tags$a(href= 'https://climate.copernicus.eu/disclaimer-and-privacy','Framework Agreement for Copernicus services')),
+  #                    tags$h4('Any feedbacks are welcome!'),
+  #                    tags$h5('email to abdelkader@met.no or send your feedback from the following website'), tags$a(href= 'https://climatedatasite.net','https://climatedatasite.net')
+  #    ))))
+  #  )
   
   
   # observe(
@@ -6235,101 +6175,109 @@ function(input, output,session) {
     infoBox('What Climate Simulations evaluated here !',txt, icon = shiny::icon("table"),color = 'olive')
   })
   
-  txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
+  txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
   
   # GCM info text output
   output$figcaption.gcm.sc.tas = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.gcm.tas.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the bias in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the bias in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.gcm.tas.cc = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the changes in simulated historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the changes in simulated historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.gcm.sc.tas.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.gcm.sc.pr = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.gcm.pr.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the bias in historical and projected monthly precipitation totals. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the bias in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.gcm.sc.pr.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.gcm.pr.cc = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the changes in seasonal cycle in historical and projected monthly precipitation totals. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the changes in seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.gcm.scatter = renderInfoBox({
     txt <- tags$h5('Interactive Scatter Plot showing surface air mean temperature VS mean monthly sums of precipitaiton. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulations. 
                    The black star shows the corresponding values from reanalysis data used as reference (ERAINT).')   
-    infoBox('How to read the scatter plot!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    infoBox(strong('How to read the scatter plot!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.gcm.cc.scatter = renderInfoBox({
     txt <- tags$h5('Interactive Scatter Plot showing changes in surface air mean temperature VS mean monthly sums of precipitaiton. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulated changes. 
                    The black star shows the corresponding values from reanalysis data used as reference (ERAINT).')   
-    infoBox('How to read the scatter plot!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    infoBox(strong('How to read the scatter plot!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   # RCM info text output
   output$figcaption.rcm.sc.tas = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.rcm.tas.cc = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the future changes seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the future changes seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
-  
+  output$figcaption.rcm.tas.pu = renderInfoBox({
+    txt <- tags$h5('Interactive charts  evaluating the bias in seasonal cycle of historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+  })
   output$figcaption.rcm.sc.tas.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.rcm.sc.pr = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.rcm.pr.cc = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the future changes in seasonal cycle in historical and projected monthly precipitation totals. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the future changes in seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+  })
+  
+  output$figcaption.rcm.pr.pu = renderInfoBox({
+    txt <- tags$h5('Interactive charts evaluating the bias in seasonal cycle of historical and projected monthly precipitation totals assuming the intermediate (RCP4.5) emission scenario. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.rcm.sc.pr.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.rcm.cc.scatter = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the future changes in seasonal cycle in historical and projected monthly precipitation totals. The orange line and envelope show the mean and the spread from the multi-model ensemble of simulations. The black line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox('How to read the chart!',txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    txt <- tags$h5('Interactive charts evaluating the future changes in seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
   })
   
   output$figcaption.rcm.scatter = renderInfoBox({
     txt <- tags$h5('Interactive Scatter Plot showing surface air mean temperature VS mean monthly sums of precipitaiton. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulations. 
                    The black star shows the corresponding values from reanalysis data used as reference (ERAINT).')   
-    infoBox('How to read the scatter plot!',txt, icon = shiny::icon("line-chart-o"),color = 'olive')
+    infoBox(strong('How to read the scatter plot!'),txt, icon = shiny::icon("line-chart-o"),color = 'olive')
   })
   
   # Text info
@@ -6338,15 +6286,15 @@ function(input, output,session) {
   txtRemember <- tags$h5('These simulations are based on models and data to represent the climate system. Those models are in turn based on coarse resolution, different parameterization schemes and simplifications of physical processes which systematically lead to deviations (biases) from the reference data.')
   
   figTips = renderInfoBox({
-    infoBox('Tips on how to modify the chart to meet your needs!',txtTips, icon = shiny::icon("info-sign", lib = "glyphicon"),color = 'orange')
+    infoBox(strong('Tips on how to modify the chart to meet your needs!'),txtTips, icon = shiny::icon("info-sign", lib = "glyphicon"),color = 'orange')
   })
   
   figMoreTips = renderInfoBox({
-    infoBox('More Tips on how to use the chart!',txtMoreTips, icon = shiny::icon("plus-sign", lib = "glyphicon"),color = 'light-blue')
+    infoBox(strong('More Tips on how to use the chart!'),txtMoreTips, icon = shiny::icon("plus-sign", lib = "glyphicon"),color = 'light-blue')
   })
   
   figRemember = renderInfoBox({
-    infoBox('Recommendations on how to use the chart!',txtRemember, icon = shiny::icon("asterisk", lib = "glyphicon"),color = 'red')
+    infoBox(strong('Recommendations on how to use the chart!'),txtRemember, icon = shiny::icon("asterisk", lib = "glyphicon"),color = 'red')
   })
   
   output$figTips.gcm.tas <- figTips
@@ -6534,7 +6482,6 @@ function(input, output,session) {
   })
   
     }
-
 
 
 

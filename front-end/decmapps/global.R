@@ -14,7 +14,9 @@ library(plotly)
 library(shinydashboard)
 library(car)
 library(DECM)
+library(shinyBS)
 #library(fields)
+
 
 #if ('RgoogleMaps' %in% installed.packages()) install.packages('RgoogleMaps')
 #library(RgoogleMaps)
@@ -273,17 +275,17 @@ varscore <- function(x) {
 
 # Scatter plot data ...
 stats <- NULL
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.era.tas.1981-2010.rda")
+load("/home/sis/DECM/back-end/data/statistics.cmip.era.tas.1981-2010.rda")
 stats$tas$present <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.tas.2021-2050.rda")
+load("/home/sis/DECM/back-end/data/statistics.cmip.tas.2021-2050.rda")
 stats$tas$nf <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.tas.2071-2100.rda")
+load("/home/sis/DECM/back-end/data/statistics.cmip.tas.2071-2100.rda")
 stats$tas$ff <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.era.pr.1981-2010.rda")
+load("/home/sis/DECM/back-end/data/statistics.cmip.era.pr.1981-2010.rda")
 stats$pr$present <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.pr.2021-2050.rda")
+load("/home/sis/DECM/back-end/data/statistics.cmip.pr.2021-2050.rda")
 stats$pr$nf <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cmip.pr.2071-2100.rda")
+load("/home/sis/DECM/back-end/data/statistics.cmip.pr.2071-2100.rda")
 stats$pr$ff <- store
 
 # regions <- function(type=c("srex","prudence"),region=NULL) {
@@ -555,20 +557,20 @@ rcm.meta.all <- rcm.meta.pr[,-c(5:8,15)]
   
 # RCM statistics ...
 rcms <- NULL
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.eobs.tas.1981-2010.rda")
+load("/home/sis/DECM/back-end/data/statistics.cordex.eobs.tas.1981-2010.rda")
 store$eobs.tas$corr <- store$eobs.tas$mean
 store$eobs.tas$corr <- rep(1,13)
 rcms$tas$present <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.tas.2021-2050.rda")
+load("/home/sis/DECM/back-end/data/statistics.cordex.tas.2021-2050.rda")
 rcms$tas$nf <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.tas.2071-2100.rda")
+load("/home/sis/DECM/back-end/data/statistics.cordex.tas.2071-2100.rda")
 rcms$tas$ff <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.eobs.pr.1981-2010.rda")
+load("/home/sis/DECM/back-end/data/statistics.cordex.eobs.pr.1981-2010.rda")
 store$eobs.pr$corr <- rep(1,13)
 rcms$pr$present <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.pr.2021-2050.rda")
+load("/home/sis/DECM/back-end/data/statistics.cordex.pr.2021-2050.rda")
 rcms$pr$nf <- store
-load("/home/ubuntu/git/DECM/back-end/data/statistics.cordex.pr.2071-2100.rda")
+load("/home/sis/DECM/back-end/data/statistics.cordex.pr.2071-2100.rda")
 rcms$pr$ff <- store
 
 regions.all <- list('Europe',
@@ -610,6 +612,6 @@ regions.all <- list('Europe',
 )    
 
 #setwd('/home/ubuntu/git/DECM/back-end/data/TM_WORLD_BORDERS-0.3/')
-afg <- readOGR(dsn = '/home/ubuntu/git/DECM/back-end/data/TM_WORLD_BORDERS-0.3/', layer = "TM_WORLD_BORDERS-0.3",verbose = FALSE, stringsAsFactors = FALSE)
+afg <- readOGR(dsn = '/home/sis/DECM/back-end/data/TM_WORLD_BORDERS-0.3/', layer = "TM_WORLD_BORDERS-0.3",verbose = FALSE, stringsAsFactors = FALSE)
 
 

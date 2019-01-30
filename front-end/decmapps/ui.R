@@ -2,35 +2,37 @@
 # Show a tabset that includes a plot, summary, and
 # table view of the generated distribution
 
+
 library(shinydashboard)
+library(shinyBS)
+
 data("metaextract")
 M <- data.frame(list(Project=meta$project_id,Experiment=meta$experiment_id,GCM=meta$gcm,
                      RIP=meta$gcm_rip, RCM=meta$rcm, VAR=meta$var, Unit=meta$unit, Resolution=paste(meta$resolution,"deg"),
                      Domain=paste(gsub(","," - ",meta$lon),"E"," / ",paste(gsub(","," - ",meta$lat)),"N",sep=""), 
                      Years=gsub(",","-",gsub("-[0-9]{2}","",meta$dates)), URL=meta$url))
 
-dashboardPage(skin = 'red',
-              dashboardHeader(title = 'Data Evaluation for Climate Models (DECM prototype)', titleWidth = '600px', 
+dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
+              dashboardHeader(title = tags$h1('DATA EVALUATION FOR CLIMATE MODELS'), #titleWidth = '500px', 
                               #set height for header
                               tags$li(class = "dropdown",
                                       tags$style(".main-header {height: 60px}"),
-                                      tags$style(".main-header .logo {height: 60px}")
-                              ),
-                              # tags$li(a(href = 'http://www.copernicus.eu/',
-                              #           img(src = 'https://climatedatasite.net/wp-content/uploads/2018/02/copernicus-logo.png',
-                              #               title = "Copernicus", height = "30px"),
-                              #           title = "Copernicus website"),
-                              #         class = "dropdown"),
-                              # tags$li(a(href = 'https://climate.copernicus.eu/',
-                              #           img(src = 'https://climatedatasite.net/wp-content/uploads/2018/02/c3s-logo.png',
-                              #               title = "Climate Change Service", height = "30px"),
-                              #           title = "Climate Change Service"),
-                              #         class = "dropdown"),
-                              tags$li(a(href = 'https://climate.copernicus.eu/data-evaluation-climate-models',
-                                        img(src = 'https://climatedatasite.net/wp-content/uploads/2018/02/banner_c3s.png',
-                                            title = "DECM website", height = "40px"),
-                                        style = "padding-top:10px; padding-bottom:10px;"),
-                                      class = "dropdown")
+                                      tags$style(".main-header .logo {height: 60px}"),
+                                      tags$style(".main-header .logo {text-align :left !important;}"),
+                                      tags$style(".main-header {text-align :left !important;}"),
+                                      tags$style(".main-header .sidebar-toggle {color:#EEE;margin: left !important;}")
+                              )#,
+                              #tags$li(h5("Menu",
+			      #	       style = "text-align: left !important;color: white;padding:10px;"),
+                              #         class = "dropdown")
+                              #tags$li(h3("Data Evaluation for Climate Models (DECM prototype)",
+                              #          style = "text-align: left !important;color: white;padding:0;"),
+                              #        class = "dropdown"),
+                              #tags$li(a(href = 'https://climate.copernicus.eu/data-evaluation-climate-models',
+                              #          img(src = 'https://climatedatasite.net/wp-content/uploads/2018/02/banner_c3s.png',
+                              #              title = "DECM website", height = "40px"),
+                              #          style = "padding-top:10px; padding-bottom:10px;"),
+                              #        class = "dropdown")
                               # dropdownMenu(
                               #   type = "messages", 
                               #   badgeStatus =  "success",
@@ -46,9 +48,9 @@ dashboardPage(skin = 'red',
               # ,
               # dropdownMenu(type = "messages", .list = msgs),
               # dropdownMenu(type = "tasks",.list = tasks)),
-              dashboardSidebar(collapsed = TRUE,width = '300px',
-                               sidebarMenu(
-                                 menuItem("Product Users", tabName = 'pu',startExpanded = TRUE,
+              dashboardSidebar(collapsed = TRUE,width = '250px',
+              sidebarMenu(
+              menuItem("Product Users", tabName = 'pu',startExpanded = TRUE,
                                           menuSubItem("Explore the Simulations", tabName = "browse"),
                                           menuSubItem("Seasonal Cycle", tabName = "seasonalCycle",selected = TRUE),
                                           menuSubItem("Models' Biases", tabName = "bias"),
@@ -85,6 +87,9 @@ dashboardPage(skin = 'red',
                                           sliderInput("dates7", "Years",min=1900, max=2099,
                                                       step = 5, value= c(1900,2099),
                                                       sep="",width = "100%"),
+                                          bsPopover(id = 'dates7',title = 'Select the years to include in the simulations',
+                                                    content = 'The time span for the simulaitons. You can expand or reduce the time span at your convenience with a frequecny of 5 years. This input is useful when computing the changes (past or future) with regards to the base period.',
+                                                    placement = 'bottom',options = list(container = "body")),
                                           sliderInput("datesref", "Base period",min=1900, max=2099,
                                                       step = 5, value= c(1980,2010),
                                                       sep="",width = "100%"),
@@ -99,6 +104,85 @@ dashboardPage(skin = 'red',
               ),
               dashboardBody(
                 #include google analytics
+		tags$link(href='https://fonts.googleapis.com/css?family=Karla',rel='stylesheet'),
+                tags$head(tags$style(HTML('
+					  .main-header .sidebar-toggle:before {
+					          content: "MENU (Click to display or hide)";font-family:Karla;font-size:16px;}
+					  /* logo */
+                                          .skin-red .main-header .logo {
+                                          background-color: #871010;
+                                          }
+                                          
+                                          /* logo when hovered */
+                                          .skin-red .main-header .logo:hover {
+                                          background-color: #871010;
+                                          }
+                                          
+                                          /* navbar (rest of the header) */
+                                          .skin-red .main-header .navbar{
+                                          background-color: #871010;
+                                          }        
+                                          
+                                          /* other links in the sidebarmenu when hovered */
+                                          .skin-red .main-sidebar .sidebar .sidebar-menu a:hover{
+                                          background-color: #871010;
+                                          }
+                                          /* toggle button when hovered  */                    
+                                          .skin-red .main-header .navbar .sidebar-toggle:hover{
+                                          background-color: #871010;
+					  margin-left:0px;
+					  overflow: auto;
+					  }
+
+                '))),
+               tags$body(tags$style(HTML('
+                .content {
+		max-width:900px;
+		margin: auto !important;
+		font-family: Karla !important;
+                font-size: 16px;
+                text-align: left;
+		line-height:22px;
+		}
+                '))),
+	       tags$head(tags$style(HTML('
+               h1 {
+                  font-family:Karla;
+		  font-size:18px;
+		  font-weight:bold;
+               	  text-align:center;
+		  padding: 0px;
+		  margin-top:7px;
+	       }
+	       .main-header {
+               font-family: Karla !important;
+               font-size: 16px;
+               text-align: center;}
+               '))),
+               tags$head(tags$style(HTML('
+                .box {
+                      font-family: Karla !important;
+		      margin: 5px;	      
+                }
+                .box.box-solid.box-danger>.box-header {
+                    background:#b21c1c;
+                }
+                .box.box-solid.box-danger{
+                    border-bottom-color:#b21c1c;
+                    border-left-color:#b21c1c;
+                    border-right-color:#b21c1c;
+                    border-top-color:#b21c1c;
+                '))),
+                tags$head(tags$style(HTML('
+                .popover-title{
+                              color: #FFE4E1;
+                              font-size: 16px;
+                              background-color:#b21c1c;
+                              }
+                .popover-content {
+                  font-size: 12px;
+                }
+                '))),
                 tags$head(HTML("<script async src='https://www.googletagmanager.com/gtag/js?id=UA-108282573-4'></script>
                                <script>
                                window.dataLayer = window.dataLayer || [];
@@ -111,9 +195,10 @@ dashboardPage(skin = 'red',
                   tags$style(
                     HTML(".shiny-notification {
                          position:fixed;
-                         top: calc(60%);;
-                         left: calc(20%);;
-                         }"
+                         top: calc(10%);
+                         left: calc(20%);
+                         right: calc(20%);
+                         opacity : 1;}"
             			)
                     )
                     ),
@@ -131,20 +216,29 @@ dashboardPage(skin = 'red',
                 
                 tabItems(
                   tabItem(tabName = "browse", 
-                          tags$h4("Product Users | Explore the simulations"),
-                          box(status = 'danger',solidHeader = TRUE,width = '100%',
-                              tags$h5('TIPS | Climate projections describe a range of possible climate outcomes and 
-                                      are based on different climate models with different set-ups. 
-                                      How should I use this information? It is important to evaluate the climate models’ 
-                                      ability to simulate changes, and one way to do so is to examine how they reproduce 
-                                      the mean seasonal cycle in temperature and precipitation. We examine model output 
-                                      collected from the Climate Model Intercomparison Project - Phase5 (CMIP5), 
-                                      the Coordinated Regional Climate Downscaling Experiment over Europe (EURO-CORDEX), 
-                                      and the Empirical-Statistical Downscaling project (ESD) at the Norwegian Meteorological 
-                                      Institute to provide the best estimates of global/regional/local climate signal that in turn can be used in impact studies. Click on the dashboard to navigate between other items.')
-                              ),
                           fluidPage(
-                            # fluidRow(
+                            fluidRow(
+                              box(status = 'danger',solidHeader = TRUE, width = '100%',
+                                  'In this web page, you can',
+                                  tags$ul(
+                                    tags$li("check the GLOSSARY which contains a list of abbreviations and climate variable names including a short description"), 
+                                    tags$li("FILTER or refine your selection from a list of various settings, e.g. selecting a specific GCM, RCM, ..."), 
+                                    tags$li("explore available CLIMATE MODEL SIMULATIONS based on your selection and get a quick link to the data (redirected from http://climexpl.knmi.nl)")),                                    title = "Product Users | Explore the simulations",collapsible = TRUE,collapsed = TRUE
+                              )
+                            ),
+                            fluidRow(
+                              box(status = 'danger',solidHeader = FALSE, width = '100%',collapsible=FALSE,
+			           tags$div(HTML('<p style="color:#871010;">TIPS | Climate projections describe a range of possible climate outcomes.</p>
+				   <details style="color:#871010;"><summary>Read More</summary> 
+                                   Climate projections are based on different climate models with different set-ups. 
+                                   How should I use this information? It is important to evaluate the climate models’ 
+                                   ability to simulate changes, and one way to do so is to examine how they reproduce 
+                                   the mean seasonal cycle in temperature and precipitation. We examine model output 
+                                   collected from the Climate Model Intercomparison Project - Phase5 (CMIP5), 
+                                   the Coordinated Regional Climate Downscaling Experiment over Europe (EURO-CORDEX), 
+                                   and the Empirical-Statistical Downscaling project (ESD) at the Norwegian Meteorological 
+                                   Institute to provide the best estimates of global/regional/local climate signal that in turn can be used in impact studies. Click on the dashboard to navigate between other items.</details>')))),
+		            #fluidRow(
                             #   box(width = '100%',
                             #       column(12, infoBoxOutput('simulation',width = '100%')),
                             #       title = 'Read Me First',status = 'danger', solidHeader = TRUE, collapsible = TRUE, 
@@ -159,7 +253,7 @@ dashboardPage(skin = 'red',
                             fluidRow(
                               box(width = '100%',
                                   column(12,
-                                         selectInput("project",label = "Global Climate Model",
+                                         selectInput("project",label = "Project",
                                                      choices = c('none',as.character(M$Project)),selected = 'none',width = '100%'),
                                          selectInput("exp",label = "Experiment",
                                                      choices = c('none',as.character(M$Experiment)), selected = 'none',width = '100%'),
@@ -187,12 +281,20 @@ dashboardPage(skin = 'red',
                           )
                               ),
                   tabItem(tabName = "bias", 
-                          tags$h4("Product Users | Models' biases"),
-                          box(status = 'danger',solidHeader = TRUE,width = '100%',
-                              tags$h5("TIPS | One way to assess the skill of climate models is to examine the models' biases in reproducing the seasonal cycle. 
-                                      Here, you can navigate between (CMIP5, A) global and (EURO-CORDEX, B) regional climate models, modify the settings so that they fit your needs, and explore how the models reproduce the monthly mean air temperature and precipitation totals over a number of pre-defined regions. 
-                                      You can additionally click on the dashboard menu to navigate between other evaluations of climate model simulations.")
+                          fluidPage(box(status = 'danger',solidHeader = TRUE, width = '100%',
+                              'In this web page, you can',
+                              tags$ul(
+                                tags$li("select a region to navigate through various predefined regions (EURO-CORDEX, PRUDENCE, European countries)"), 
+                                tags$li("modify the default settings and select the output type (e.g. chart, boxplot) and values (e.g. bias, change)"), 
+                                tags$li("evalutate future changes in monthly mean air Temperature statistics"),
+                                tags$li("evaluate future changes in monthly precipitaiton totals statistics")
                               ),
+                              title = "Product Users | Models' biases",collapsible = TRUE, collapsed = TRUE
+                          ),
+                          box(status = 'danger',solidHeader = TRUE,width = '100%',
+                              tags$div(HTML('<p style="color:#871010;">TIPS | One way to assess the skill of climate models is to examine the model biases in reproducing the seasonal cycle. 
+                                      Here, you can navigate between (CMIP5, A) global and (EURO-CORDEX, B) regional climate models, modify the settings so that they fit your needs, and explore how the models reproduce the monthly mean air temperature and precipitation totals over a number of pre-defined regions. You can additionally click on the dashboard menu to navigate between other evaluations of climate model simulations.</p>'))
+                              )),
                           tabsetPanel(type = "tabs",
                                       tabPanel("A | Global Climate Model Evaluation", p(), 
                                                fluidPage(
@@ -220,7 +322,8 @@ dashboardPage(skin = 'red',
                                                               column(4,selectInput("gcm.period.pu", label = "Period", 
                                                                                    choices = c("Present (1981-2010)","Near Future (2021-2050)",
                                                                                                "Far Future (2071-2100)"),
-                                                                                   selected = "Present",width = '100%')),
+                                                                                   selected = "Present",width = '100%'),
+                                                                     bsPopover(id = 'gcm.period.pu',title = 'test2',content = 'this is a test',placement = 'top')),
                                                               column(8,br(),helpText('You can navigate between one control and two (near and far) future time horizons.'))
                                                        )
                                                      ),
@@ -248,34 +351,41 @@ dashboardPage(skin = 'red',
                                                               column(4,selectInput("gcm.var.pu", label = "Variables", 
                                                                                    choices = c('Individual','Synchronised'),
                                                                                    selected = 'Synchronised',width = '100%')),
-                                                              column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as preciptiation and temperaure.',width = '100%'))
+                                                              column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%'))
                                                        )
                                                      ),
                                                      title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'), collapsible = TRUE, collapsed = TRUE)
                                                ),
                                                fluidRow(
                                                  box(
-                                                   fluidRow(
                                                      column(12,
                                                             plotlyOutput("gcm.sc.bias.tas.pu",width = '100%',height = '600'))
+                                                  ,
+                                                   fluidRow(
+                                                     column(12,
+                                                            box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                                infoBoxOutput("figcaption.gcm.tas.pu",width= '100%')
+                                                            ))
                                                    ),
                                                    fluidRow(
                                                      column(12,
-                                                            infoBoxOutput("figcaption.gcm.tas.pu",width= '100%'))
-                                                   ),
-                                                   fluidRow(
-                                                     column(12,
-                                                            infoBoxOutput("figTips.gcm.tas.pu",width= '100%')
+                                                            box(status = 'danger',solidHeader = TRUE,width = '100%',
+                                                                infoBoxOutput("figTips.gcm.tas.pu",width= '100%')
+                                                            )
                                                      )
                                                    ),
                                                    fluidRow(
                                                      column(12,
-                                                            infoBoxOutput("figMoreTips.gcm.tas.pu",width= '100%')
+                                                            box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                                infoBoxOutput("figMoreTips.gcm.tas.pu",width= '100%')
+                                                            )
                                                      )
                                                    ),
                                                    fluidRow(
                                                      column(12,
-                                                            infoBoxOutput("figRemember.gcm.tas.pu",width= '100%')
+                                                            box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                                infoBoxOutput("figRemember.gcm.tas.pu",width= '100%')
+                                                            )
                                                      )
                                                    ),
                                                    title = '3. Bias in monthly mean air Temperature',
@@ -284,32 +394,35 @@ dashboardPage(skin = 'red',
                                                ),
                                                fluidRow(
                                                  box(
+                                                     column(12,plotlyOutput("gcm.sc.bias.pr.pu",height = '600'))
+                                                   ,
                                                    fluidRow(
                                                      column(12,
-                                                            plotlyOutput("gcm.sc.bias.pr.pu",width = '100%',height = '600'))
-                                                   ),
-                                                   fluidRow(
-                                                     column(12,
+                                                            box(status = 'danger',width = '100%',solidHeader = TRUE,
                                                             infoBoxOutput("figcaption.gcm.pr.pu",width= '100%'))
-                                                   ),
-                                                   fluidRow(
-                                                     column(12,
-                                                            infoBoxOutput("figTips.gcm.pr.pu",width= '100%')
                                                      )
                                                    ),
                                                    fluidRow(
                                                      column(12,
-                                                            infoBoxOutput("figMoreTips.gcm.pr.pu",width= '100%')
+                                                            box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                            infoBoxOutput("figTips.gcm.pr.pu",width= '100%'))
                                                      )
                                                    ),
                                                    fluidRow(
                                                      column(12,
-                                                            infoBoxOutput("figRemember.gcm.pr.pu",width= '100%')
+                                                            box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                            infoBoxOutput("figMoreTips.gcm.pr.pu",width= '100%'))
+                                                     )
+                                                   ),
+                                                   fluidRow(
+                                                     column(12,
+                                                            box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                                infoBoxOutput("figRemember.gcm.pr.pu",width= '100%'))
                                                      )
                                                    ),
                                                    title = '4. Bias in monthly precipitation totals',
                                                    status = 'danger',solidHeader = TRUE,width = '100%',
-                                                   collapsible = TRUE,collapsed = FALSE)
+                                                   collapsible = TRUE,collapsed = TRUE)
                                                )
                                                  )
                                                ),
@@ -320,7 +433,7 @@ dashboardPage(skin = 'red',
                                                        #tags$figcaption('The EURO-CORDEX domain.',
                                                        #                tags$a(href = 'http://www.cordex.org/domains/cordex-region-euro-cordex/',"Read more")),
                                                        column(12,
-                                                              column(4,selectInput("rcm.bias.region.pu", label = NULL, 
+                                                              column(4,selectInput("rcm.region.pu", label = NULL, 
                                                                                    choices = regions.all,
                                                                                    selected = "Europe",width = '100%')),
                                                               column(8,helpText('You can navigate between the various predefined regions such as Europe (EURO-CORDEX domain, PRUDENCE regions, and national regions'))
@@ -367,34 +480,39 @@ dashboardPage(skin = 'red',
                                                                 column(4,selectInput("rcm.var.pu", label = "Variables", 
                                                                                      choices = c('Individual','Synchronised'),
                                                                                      selected = 'Synchronised',width = '100%')),
-                                                                column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as preciptiation and temperaure.',width = '100%'))
+                                                                column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%'))
                                                          )
                                                        ),
                                                        title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'), collapsible = TRUE, collapsed = TRUE)
                                                  ),
                                                  fluidRow(
                                                    box(
+                                                     
+                                                       column(12,
+                                                              plotlyOutput("rcm.sc.bias.tas.pu",height = '600'))
+                                                     ,
                                                      fluidRow(
                                                        column(12,
-                                                              plotlyOutput("rcm.sc.bias.tas.pu",width = '100%',height = '600'))
-                                                     ),
-                                                     fluidRow(
-                                                       column(12,
-                                                              infoBoxOutput("figcaption.rcm.tas.pu",width= '100%'))
-                                                     ),
-                                                     fluidRow(
-                                                       column(12,
-                                                              infoBoxOutput("figTips.rcm.tas.pu",width= '100%')
+                                                              box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                                  infoBoxOutput("figcaption.rcm.tas.pu",width= '100%'))
                                                        )
                                                      ),
                                                      fluidRow(
                                                        column(12,
-                                                              infoBoxOutput("figMoreTips.rcm.tas.pu",width= '100%')
+                                                              box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                                  infoBoxOutput("figTips.rcm.tas.pu",width= '100%'))
                                                        )
                                                      ),
                                                      fluidRow(
                                                        column(12,
-                                                              infoBoxOutput("figRemember.rcm.tas.pu",width= '100%')
+                                                              box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                                  infoBoxOutput("figMoreTips.rcm.tas.pu",width= '100%'))
+                                                       )
+                                                     ),
+                                                     fluidRow(
+                                                       column(12,
+                                                              box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                                  infoBoxOutput("figRemember.rcm.tas.pu",width= '100%'))
                                                        )
                                                      ),
                                                      title = '3. Bias in monthly mean air Temperature',
@@ -403,43 +521,58 @@ dashboardPage(skin = 'red',
                                                  ),
                                                  fluidRow(
                                                    box(
+                                                     
+                                                       column(12,
+                                                              plotlyOutput("rcm.sc.bias.pr.pu",height = '600'))
+                                                     ,
                                                      fluidRow(
                                                        column(12,
-                                                              plotlyOutput("rcm.sc.bias.pr.pu",width = '100%',height = '600'))
-                                                     ),
-                                                     fluidRow(
-                                                       column(12,
-                                                              infoBoxOutput("figcaption.rcm.pr.pu",width= '100%'))
-                                                     ),
-                                                     fluidRow(
-                                                       column(12,
-                                                              infoBoxOutput("figTips.rcm.pr.pu",width= '100%')
+                                                              box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                                  infoBoxOutput("figcaption.rcm.pr.pu",width= '100%'))
                                                        )
                                                      ),
                                                      fluidRow(
                                                        column(12,
-                                                              infoBoxOutput("figMoreTips.rcm.pr.pu",width= '100%')
+                                                              box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                              infoBoxOutput("figTips.rcm.pr.pu",width= '100%'))
                                                        )
                                                      ),
                                                      fluidRow(
                                                        column(12,
-                                                              infoBoxOutput("figRemember.rcm.pr.pu",width= '100%')
+                                                              box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                                  infoBoxOutput("figMoreTips.rcm.pr.pu",width= '100%'))
+                                                       )
+                                                     ),
+                                                     fluidRow(
+                                                       column(12,
+                                                              box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                                  infoBoxOutput("figRemember.rcm.pr.pu",width= '100%'))
                                                        )
                                                      ),
                                                      title = '4. Bias in monthly precipitation totals',
                                                      status = 'danger',solidHeader = TRUE,width = '100%',
-                                                     collapsible = TRUE,collapsed = FALSE)
+                                                     collapsible = TRUE,collapsed = TRUE)
                                                  )
                                                )
                                       )
                               )
                 ),
                 tabItem(tabName = "seasonalCycle",
-                        tags$h4("Product Users | Seasonal Cycle"),
-                        box(status = 'danger',solidHeader = TRUE,width = '100%',
-                            tags$h5('TIPS | One way to assess the skill of climate models is to examine how they reproduce the seasonal cycle. 
-                                    Here, you can navigate between (CMIP5, A) global and (Euro-CORDEX, B) regional climate models, modify the settings so that they fit your needs, and explore how the models reproduce the monthly mean air temperature and precipitation totals over a number of pre-defined regions. Click on the dashboard to navigate between other evaluation items.')
+                        fluidRow(),
+			box(status = 'danger',solidHeader = TRUE, width = '100%', 
+                            'In this web page, you can',
+                            tags$ul(
+                              tags$li("select a region to navigate through various predefined regions (EURO-CORDEX, PRUDENCE, European countries)"), 
+                              tags$li("modify the default settings and select the output type (e.g. chart, boxplot) and values (e.g. bias, change)"), 
+                              tags$li("evalutate the seasonal cycle of monthly mean air Temperature statistics"),
+                              tags$li("evaluate the seasonal cycle of monthly precipitaiton totals statistics")
                             ),
+                            title = "Product Users | Seasonal Cycle",collapsible = TRUE,collapsed = TRUE
+                        ),
+                        box(status = 'danger',solidHeader = TRUE,width = '100%',
+                            tags$div(HTML('<p style="color:#871010;">TIPS | One way to assess the skill of climate models is to examine how they reproduce the seasonal cycle. 
+                                    Here, you can navigate between (CMIP5, A) global and (Euro-CORDEX, B) regional climate models, modify the settings so that they fit your needs, and explore how the models reproduce the monthly mean air temperature and precipitation totals over a number of pre-defined regions. Click on the dashboard to navigate between other evaluation items.<p/>'))
+                        ),
                         tabsetPanel(type = "tabs",
                                     tabPanel("A | Global Climate Model Evaluation", p(),
                                              fluidPage(
@@ -495,34 +628,38 @@ dashboardPage(skin = 'red',
                                                             column(4,selectInput("gcm.sc.var.pu", label = "Variables",
                                                                                  choices = c('Individual','Synchronised'),
                                                                                  selected = 'Synchronised',width = '100%')),
-                                                            column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as preciptiation and temperaure.',width = '100%'))
+                                                            column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%'))
                                                      )
                                                    ),
                                                    title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'), collapsible = TRUE, collapsed = TRUE)
                                              ),
                                              fluidRow(
                                                box(
+                                                 column(12,
+                                                          plotlyOutput("gcm.sc.tas.pu",height = '600'))
+                                                 ,
                                                  fluidRow(
                                                    column(12,
-                                                          plotlyOutput("gcm.sc.tas.pu",width = '100%',height = '600'))
-                                                 ),
-                                                 fluidRow(
-                                                   column(12,
+                                                          box(status = 'danger',width = '100%',solidHeader = TRUE,
                                                           infoBoxOutput("figcaption.gcm.sc.tas.pu",width= '100%'))
-                                                 ),
-                                                 fluidRow(
-                                                   column(12,
-                                                          infoBoxOutput("figTips.gcm.sc.tas.pu",width= '100%')
                                                    )
                                                  ),
                                                  fluidRow(
                                                    column(12,
-                                                          infoBoxOutput("figMoreTips.gcm.sc.tas.pu",width= '100%')
+                                                          box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                              infoBoxOutput("figTips.gcm.sc.tas.pu",width= '100%'))
                                                    )
                                                  ),
                                                  fluidRow(
                                                    column(12,
-                                                          infoBoxOutput("figRemember.gcm.sc.tas.pu",width= '100%')
+                                                          box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                              infoBoxOutput("figMoreTips.gcm.sc.tas.pu",width= '100%'))
+                                                   )
+                                                 ),
+                                                 fluidRow(
+                                                   column(12,
+                                                          box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                              infoBoxOutput("figRemember.gcm.sc.tas.pu",width= '100%'))
                                                    )
                                                  ),
                                                  title = '3. Seasonal Cycle of monthly mean air Temperature',
@@ -531,32 +668,36 @@ dashboardPage(skin = 'red',
                                              ),
                                              fluidRow(
                                                box(
+                                                   column(12,
+                                                          plotlyOutput("gcm.sc.pr.pu",height = '600'))
+                                                 ,
                                                  fluidRow(
                                                    column(12,
-                                                          plotlyOutput("gcm.sc.pr.pu",width = '100%',height = '600'))
-                                                 ),
-                                                 fluidRow(
-                                                   column(12,
-                                                          infoBoxOutput("figcaption.gcm.sc.pr.pu",width= '100%'))
-                                                 ),
-                                                 fluidRow(
-                                                   column(12,
-                                                          infoBoxOutput("figTips.gcm.sc.pr.pu",width= '100%')
+                                                          box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                              infoBoxOutput("figcaption.gcm.sc.pr.pu",width= '100%'))
                                                    )
                                                  ),
                                                  fluidRow(
                                                    column(12,
-                                                          infoBoxOutput("figMoreTips.gcm.sc.pr.pu",width= '100%')
+                                                          box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                              infoBoxOutput("figTips.gcm.sc.pr.pu",width= '100%'))
                                                    )
                                                  ),
                                                  fluidRow(
                                                    column(12,
-                                                          infoBoxOutput("figRemember.gcm.sc.pr.pu",width= '100%')
+                                                          box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                              infoBoxOutput("figMoreTips.gcm.sc.pr.pu",width= '100%'))
+                                                   )
+                                                 ),
+                                                 fluidRow(
+                                                   column(12,
+                                                          box(status = 'danger',width = '100%',solidHeader = TRUE,
+                                                              infoBoxOutput("figRemember.gcm.sc.pr.pu",width= '100%'))
                                                    )
                                                  ),
                                                  title = '4. Seasonal Cycle of monthly precipitation totals',
                                                  status = 'danger',solidHeader = TRUE,width = '100%',
-                                                 collapsible = TRUE,collapsed = FALSE)
+                                                 collapsible = TRUE,collapsed = TRUE)
                                              )
                                                )
                                              ),
@@ -611,17 +752,15 @@ dashboardPage(skin = 'red',
                                                               column(4,selectInput("rcm.sc.var.pu", label = "Variables",
                                                                                    choices = c('Individual','Synchronised'),
                                                                                    selected = 'Synchronised',width = '100%')),
-                                                              column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as preciptiation and temperaure.',width = '100%'))
+                                                              column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%'))
                                                        )
                                                      ),
                                                      title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'), collapsible = TRUE, collapsed = TRUE)
                                                ),
                                                fluidRow(
                                                  box(
-                                                   fluidRow(
-                                                     column(12,
-                                                            plotlyOutput("rcm.sc.tas.pu",width = '100%',height = '600'))
-                                                   ),
+                                                   column(12,plotlyOutput("rcm.sc.tas.pu",height = '600'))
+						   ,
                                                    fluidRow(
                                                      column(12,
                                                             infoBoxOutput("figcaption.rcm.sc.tas.pu",width= '100%'))
@@ -646,11 +785,10 @@ dashboardPage(skin = 'red',
                                                    collapsible = TRUE,collapsed = FALSE)
                                                ),
                                                fluidRow(
-                                                 box(
-                                                   fluidRow(
+                                                 box(                                                   
                                                      column(12,
                                                             plotlyOutput("rcm.sc.pr.pu",width = '100%',height = '600'))
-                                                   ),
+                                                   ,
                                                    fluidRow(
                                                      column(12,
                                                             infoBoxOutput("figcaption.rcm.sc.pr.pu",width= '100%'))
@@ -670,9 +808,9 @@ dashboardPage(skin = 'red',
                                                             infoBoxOutput("figRemember.rcm.sc.pr.pu",width= '100%')
                                                      )
                                                    ),
-                                                   title = '4. Bias in monthly precipitation totals',
+                                                   title = '4. Seasonal Cycle of monthly precipitaiton totals',
                                                    status = 'danger',solidHeader = TRUE,width = '100%',
-                                                   collapsible = TRUE,collapsed = FALSE)
+                                                   collapsible = TRUE,collapsed = TRUE)
                                                )
                                              )
                                     )
@@ -699,10 +837,11 @@ tabItem(tabName = "score3",
                     tabPanel("Scatter Plots", p() , fluidPage(plotOutput("scatter")))
         )),
 tabItem(tabName = "gcms",
-        tags$h4("Data Users | Global Climate Models"),
+        box(status = 'danger',solidHeader = TRUE, width = '100%',
+            tags$h4("Data Users | Global Climate Models")
+        ),
         box(status = 'danger',solidHeader = TRUE,width = '100%',
-            tags$h5('TIPS | the global climate models constitute powerful tools for climate projection to provide the best representation of the projected climate signal over a region of interest. 
-                    The climate simulations evaluated here are based on the Coordinated Regional Climate Downscaling Experiment over Europe (EURO-CORDEX) to produce the best estimates of regional/local climate signal that in turn can be used in impact studies. You can click on the dashboard to navigate between other items.')
+            tags$div(HTML('<p style="color:#871010;">TIPS | The global climate models constitute powerful tools for climate projection to provide the best representation of the projected climate signal over a region of interest. The climate simulations evaluated here are based on the Coordinated Regional Climate Downscaling Experiment over Europe (EURO-CORDEX) to produce the best estimates of regional/local climate signal that in turn can be used in impact studies. You can click on the dashboard to navigate between other items.</p>'))
             ),
         # tabsetPanel(id = 'gcms.tabs',type = "tabs",selected = "Seasonal Cycle",
         #             tabPanel("Metadata", p(),
@@ -761,14 +900,14 @@ tabItem(tabName = "gcms",
                      fluidRow(column(4,  selectInput("gcm.colorBy", label = "Color By", 
                                                      choices = c('None','---','Group'),
                                                      selected = 'None',width = '100%')),
-                              column(8,br(),helpText('You can apply the same color within groupped simulations by values in the meta data table such as the global climate model ID. In this case, all simulations within each group will have same colored lines'))),
+                              column(8,br(),helpText('You can apply the same color within grouped simulations by values in the meta data table such as the global climate model ID. In this case, all simulations within each group will have same colored lines'))),
                      fluidRow(column(4,  selectInput("gcm.outputValues", label = "Displayed values", 
                                                      choices = c('Absolute','Anomaly','Bias','RMSE','Change'),
                                                      selected = 'Absolute',width = '100%')),
                               column(8,
                                      tags$style("#description {border: 2px solid #dd4b39;font-size: 18px;}"),
                                      #textInput(inputId="description",label = '',
-                                     br(),helpText('You can transform the values into anomalies by substracting the mean, compute the bias or the root mean square errors as devitations with regards to the reference data, or compute the climate change with regards to the base period 1981-2010'))),                                         
+                                     br(),helpText('You can transform the values into anomalies by subtracting the mean, compute the bias or the root mean square errors as deviations with regards to the reference data, or compute the climate change with regards to the base period 1981-2010'))),                                         
                      fluidRow(column(4,  selectInput("gcm.stat", label = "Statistics", 
                                                      choices = c('Mean','Standard Deviation','Spatial Correlation'))),
                               column(8,br(),
@@ -776,7 +915,7 @@ tabItem(tabName = "gcms",
                      fluidRow(column(4,  selectInput("gcm.var", label = "Variables", 
                                                      choices = c('Individual','Synchronised'),
                                                      selected = 'Synchronised',width = '100%')),
-                              column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as preciptiation and temperaure.',width = '100%'))),
+                              column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%'))),
                      title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'), collapsible = TRUE, collapsed = TRUE))
         ),
         fluidRow(
@@ -785,7 +924,7 @@ tabItem(tabName = "gcms",
                      tabsetPanel(
                        tabPanel("Chart",p(),
                                 #box(tags$h4('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled air mean temperature by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5). You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation instead of the mean. Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),width='100%',title = tags$figcaption('Info'),collapsible = TRUE, collapsed = TRUE,status = 'danger'),
-                                plotlyOutput("gcm.sc.tas",width = '100%',height = '600'),p(),
+                                plotlyOutput("gcm.sc.tas",height = '600'),p(),
                                 column(12,infoBoxOutput("figcaption.gcm.sc.tas",width= '100%')),p(),
                                 column(12,infoBoxOutput("figTips.gcm.tas",width= '100%')),p(),
                                 column(12,infoBoxOutput("figMoreTips.gcm.tas",width= '100%')),p(),
@@ -804,7 +943,7 @@ tabItem(tabName = "gcms",
                                 #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
                                 #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation instead of the mean.
                                 #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),
-                                plotlyOutput("gcm.sc.pr",width = '100%',height = '600'),p(),
+                                plotlyOutput("gcm.sc.pr",height = '600'),p(),
                                 column(12,infoBoxOutput("figcaption.gcm.sc.pr",width= '100%')),p(),
                                 column(12,infoBoxOutput("figTips.gcm.pr",width= '100%')),p(),
                                 column(12,infoBoxOutput("figMoreTips.gcm.pr",width= '100%')),p(),
@@ -812,7 +951,7 @@ tabItem(tabName = "gcms",
                        tabPanel("Data", DT::dataTableOutput("gcm.sc.pr.data")),
                        tabPanel('Metadata',DT::dataTableOutput("gcm.meta.pr"))),
                      title = tags$p('4. Evaluate the seasonal cycle in Simulated Monthly Precipitation totals'), 
-                     collapsible = TRUE, collapsed = FALSE))),
+                     collapsible = TRUE, collapsed = TRUE))),
         fluidRow(
           column(12,
                  box(width = '100%', solidHeader = TRUE, status = 'danger',
@@ -822,7 +961,7 @@ tabItem(tabName = "gcms",
                                 #                 You can modify the type of the displayed output from the "Settings & Outputs" parameters to select different future time period. The shaded rectangles show the range and 90% confidence interval from the ensemble model simulations, respectively.
                                 #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation instead of the mean. Please note that the spatial correlation only works for present (1981-2010) climate. 
                                 #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, select/deselect individual simulations, and download the plot as png.'),
-                                plotlyOutput("gcm.scatter",width = '100%',height = '600'),p(),
+                                plotlyOutput("gcm.scatter",height = '600'),p(),
                                 column(12,infoBoxOutput("figcaption.gcm.scatter",width= '100%')),p(),
                                 column(12,infoBoxOutput("figTips.gcm.scatter",width= '100%')),p(),
                                 column(12,infoBoxOutput("figMoreTips.gcm.scatter",width= '100%')),p(),
@@ -860,10 +999,12 @@ tabItem(tabName = "gcms",
         # )
         ),
 tabItem(tabName = "rcms",
-        tags$h4('Data Users | Regional Climate Models'),
+        box(status = 'danger',solidHeader = TRUE, width = '100%',
+            tags$h4('Data Users | Regional Climate Models')
+        ),
         box(status = 'danger',solidHeader = TRUE,width = '100%',
-            tags$h5('TIPS | The regional climate model simulations constitute a better representation of regional climate outcomes than global climate outputs as they are run on higher spatial resolution, and include more local processes to provide the best representation of the climate signal over a region of interest. 
-                    The climate simulations evaluated here are based on the Coordinated Regional Climate Downscaling Experiment over Europe (EURO-CORDEX) to produce the best estimates of regional/local climate signal that in turn can be used in impact studies. You can click on the dashboard to navigate between other items.')
+            tags$div(HTML('<p style="color:#871010;">TIPS | The regional climate model simulations constitute a better representation of regional climate outcomes than global climate outputs as they are run on higher spatial resolution, and include more local processes to provide the best representation of the climate signal over a region of interest. 
+                    The climate simulations evaluated here are based on the Coordinated Regional Climate Downscaling Experiment over Europe (EURO-CORDEX) to produce the best estimates of regional/local climate signal that in turn can be used in impact studies. You can click on the dashboard to navigate between other items.</p>'))
             ),
         # tabsetPanel(id = 'rcms.tabs',type = "tabs",selected = "Seasonal Cycle",
         #             tabPanel("Metadata", p(),
@@ -945,7 +1086,7 @@ tabItem(tabName = "rcms",
                          column(4,selectInput("rcm.var", label = "Variables", 
                                               choices = c('Individual','Synchronised'),
                                               selected = 'Synchronised',width = '100%')),
-                         column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as preciptiation and temperaure.',width = '100%'))),
+                         column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%'))),
                        title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'), 
                        collapsible = TRUE, collapsed = TRUE))
           ),
@@ -958,7 +1099,7 @@ tabItem(tabName = "rcms",
                                   #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
                                   #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation (only works on present (1981-2010) climate)  instead of the mean.
                                   #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),
-                                  plotlyOutput("rcm.sc.tas",width = '100%',height = '600'),p(),
+                                  plotlyOutput("rcm.sc.tas",height = '600'),p(),
                                   column(12,infoBoxOutput("figcaption.rcm.sc.tas",width= '100%')),p(),
                                   column(12,infoBoxOutput("figTips.rcm.tas",width= '100%')),p(),
                                   column(12,infoBoxOutput("figMoreTips.rcm.tas",width= '100%')),p(),
@@ -977,7 +1118,7 @@ tabItem(tabName = "rcms",
                                   #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
                                   #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation (only works on present (1981-2010) climate)  instead of the mean.
                                   #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),
-                                  plotlyOutput("rcm.sc.pr",width = '100%',height = '600'),p(),
+                                  plotlyOutput("rcm.sc.pr",height = '600'),p(),
                                   column(12,infoBoxOutput("figcaption.rcm.sc.pr",width= '100%')),p(),
                                   column(12,infoBoxOutput("figTips.rcm.pr",width= '100%')),p(),
                                   column(12,infoBoxOutput("figMoreTips.rcm.pr",width= '100%')),p(),
@@ -985,7 +1126,7 @@ tabItem(tabName = "rcms",
                          tabPanel("Data", DT::dataTableOutput("rcm.sc.pr.data")),
                          tabPanel('Metadata',DT::dataTableOutput("rcm.meta.pr"))),
                        title = tags$p('4. Evaluate the seasonal cycle in Simulated Monthly Precipitation totals'), 
-                       collapsible = TRUE, collapsed = FALSE))),
+                       collapsible = TRUE, collapsed = TRUE))),
           fluidRow(
             column(12,
                    box(width = '100%', solidHeader = TRUE, status = 'danger',
@@ -995,7 +1136,7 @@ tabItem(tabName = "rcms",
                                   #               You can modify the type of the displayed output from the "Settings & Outputs" parameters to select different future time period. The shaded rectangles show the range and 90% confidence interval from the ensemble model simulations, respectively.
                                   #               You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlations (only works on present (1981-2010) climate) instead of the mean.
                                   #               Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, select/deselect individual simulations, and download the plot as png.'),
-                                  plotlyOutput("rcm.scatter",width = '100%',height = '600'),p(),
+                                  plotlyOutput("rcm.scatter",height = '600'),p(),
                                   column(12,infoBoxOutput("figcaption.rcm.scatter",width= '100%')),p(),
                                   column(12,infoBoxOutput("figTips.rcm.scatter",width= '100%')),p(),
                                   column(12,infoBoxOutput("figMoreTips.rcm.scatter",width= '100%')),p(),
@@ -1022,16 +1163,24 @@ tabItem(tabName = "stations",
                     #                                column(2,selectInput(inputId = 'im',label = "Model",
                     #                                                     choices = c('Ens. Mean','------',gcmnames.26),
                     #                                                     selected = 'Ens. Mean',width = '100%')))),
-                    tabPanel("Chart", p(), plotlyOutput("station.ts",width = '100%',height = '900')),
+                    tabPanel("Chart", p(), plotlyOutput("station.ts",height = '900')),
                     tabPanel("Data", p(), DT::dataTableOutput('station.data'))
         )
 ),
 tabItem(tabName = "score5", 
-        tags$h4('Product Users | Changes in Climate'),
+        box(status = 'danger',solidHeader = TRUE, width = '100%',
+            'In this web page, you can',
+            tags$ul(
+              tags$li("select a region to navigate through various predefined regions (EURO-CORDEX, PRUDENCE, European countries)"), 
+              tags$li("modify the default settings and select the output type (e.g. chart, boxplot) and values (e.g. bias, change)"), 
+              tags$li("evalutate future changes in monthly mean air Temperature statistics"),
+              tags$li("evaluate future changes in monthly precipitaiton totals statistics")),
+              title = 'Product Users | Changes in Climate',collapsible = TRUE,collapsed = TRUE
+        ),
         box(status = 'danger',solidHeader = TRUE,width = '100%',
-            tags$h5('TIPS | Changes in Climate can be obtained using various climate models such as global climate models, regional climate models, and empirical statistical climate models which constitute powerful tools to provide the best representation of the projected climate signal over a region of interest. 
-                    The climate simulations evaluated here are based on the CMIP5 global climate models, these are in turn used to force regional climate models (Coordinated Regional Climate Downscaling Experiment) and Empirical-Statistical Models (ESD) to produce the best estimates of regional/local climate signal that in turn can be used in impact studies. You can click on the dashboard to navigate between other items.')
-            ),
+            tags$div(HTML('<p style="color:#871010;">TIPS | Changes in Climate can be obtained using various climate models such as global climate models, regional climate models, and empirical statistical climate models which constitute powerful tools to provide the best representation of the projected climate signal over a region of interest. 
+                    The climate simulations evaluated here are based on the CMIP5 global climate models, these are in turn used to force regional climate models (Coordinated Regional Climate Downscaling Experiment) and Empirical-Statistical Models (ESD) to produce the best estimates of regional/local climate signal that in turn can be used in impact studies. You can click on the dashboard to navigate between other items.</p>'))
+        ),
         fluidPage(
           fluidRow(
             box(collapsible = TRUE,collapsed = FALSE,
@@ -1068,31 +1217,31 @@ tabItem(tabName = "score5",
                                               column(4,selectInput("gcm.cc.var", label = "Variables", 
                                                                    choices = c('Individual','Synchronised'),
                                                                    selected = 'Synchronised',width = '100%')),
-                                              column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as preciptiation and temperaure.',width = '100%')))   
+                                              column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%')))   
                                    ),
                                    tabPanel("Temperature", p(),
-                                            plotlyOutput("gcm.cc.tas.pu",width = '100%',height = '600'),
+                                            plotlyOutput("gcm.cc.tas.pu",height = '600'),
                                             column(12,infoBoxOutput("figcaption.gcm.tas.cc",width= '100%')),p(),
                                             column(12,infoBoxOutput("figTips.gcm.tas.cc",width= '100%')),p(),
                                             column(12,infoBoxOutput("figMoreTips.gcm.tas.cc",width= '100%')),p(),
                                             column(12,infoBoxOutput("figRemember.gcm.tas.cc",width= '100%'))
                                    ),
                                    tabPanel("Precipitation", p(),
-                                            plotlyOutput("gcm.cc.pr.pu",width = '100%',height = '600'),
+                                            plotlyOutput("gcm.cc.pr.pu",height = '600'),
                                             column(12,infoBoxOutput("figcaption.gcm.pr.cc",width= '100%')),p(),
                                             column(12,infoBoxOutput("figTips.gcm.pr.cc",width= '100%')),p(),
                                             column(12,infoBoxOutput("figMoreTips.gcm.pr.cc",width= '100%')),p(),
                                             column(12,infoBoxOutput("figRemember.gcm.pr.cc",width= '100%'))
                                    ),
                                    tabPanel("Precipitation vs Temperature", p(),
-                                            plotlyOutput("gcm.cc.scatter.pu",width = '100%',height = '600'),
+                                            plotlyOutput("gcm.cc.scatter.pu",height = '600'),
                                             column(12,infoBoxOutput("figcaption.gcm.cc.scatter",width= '100%')),p(),
                                             column(12,infoBoxOutput("figTips.gcm.cc.scatter",width= '100%')),p(),
                                             column(12,infoBoxOutput("figMoreTips.gcm.cc.scatter",width= '100%')),p(),
                                             column(12,infoBoxOutput("figRemember.gcm.cc",width= '100%'))
                                    )
                                    #tabPanel("Scatter", p(),
-                                   #         plotlyOutput("gcm.cc.scatter.pu",width = '100%',height = '600')
+                                   #         plotlyOutput("gcm.cc.scatter.pu",height = '600')
                                    #)
                        )
                 ),
@@ -1133,24 +1282,24 @@ tabItem(tabName = "score5",
                                               column(4,selectInput("rcm.cc.var", label = "Variables", 
                                                                    choices = c('Individual','Synchronised'),
                                                                    selected = 'Synchronised',width = '100%')),
-                                              column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as preciptiation and temperaure.',width = '100%')))   
+                                              column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%')))   
                                    ),
                                    tabPanel("Temperature", p(), 
-                                            plotlyOutput("rcm.cc.tas.pu",width = '100%',height = '600'),
+                                            plotlyOutput("rcm.cc.tas.pu",height = '600'),
                                             column(12,infoBoxOutput("figcaption.rcm.tas.cc",width= '100%')),p(),
                                             column(12,infoBoxOutput("figTips.rcm.tas.cc",width= '100%')),p(),
                                             column(12,infoBoxOutput("figMoreTips.rcm.tas.cc",width= '100%')),p(),
                                             column(12,infoBoxOutput("figRemember.rcm.tas.cc",width= '100%'))
                                    ),
                                    tabPanel("Precipitation", p(),
-                                            plotlyOutput("rcm.cc.pr.pu",width = '100%',height = '600'),
+                                            plotlyOutput("rcm.cc.pr.pu",height = '600'),
                                             column(12,infoBoxOutput("figcaption.rcm.pr.cc",width= '100%')),p(),
                                             column(12,infoBoxOutput("figTips.rcm.pr.cc",width= '100%')),p(),
                                             column(12,infoBoxOutput("figMoreTips.rcm.pr.cc",width= '100%')),p(),
                                             column(12,infoBoxOutput("figRemember.rcm.pr.cc",width= '100%'))
                                    ),
                                    tabPanel("Precipitation vs Temperature", p(),
-                                            plotlyOutput("rcm.cc.scatter.pu",width = '100%',height = '600'),
+                                            plotlyOutput("rcm.cc.scatter.pu",height = '600'),
                                             column(12,infoBoxOutput("figcaption.rcm.cc.scatter",width= '100%')),p(),
                                             column(12,infoBoxOutput("figTips.rcm.cc.scatter",width= '100%')),p(),
                                             column(12,infoBoxOutput("figMoreTips.rcm.cc.scatter",width= '100%')),p(),
@@ -1158,7 +1307,7 @@ tabItem(tabName = "score5",
                                    )
                        )
                 ),
-                title = 'EURO-CORDEX Regional Climate model Simulations (Implemented over the whole Europe!)',status = 'danger',solidHeader = TRUE,width = '100%')
+                title = 'EURO-CORDEX Regional Climate model Simulations',status = 'danger',solidHeader = TRUE,width = '100%')
           ),
           fluidRow(
             box(collapsible = TRUE,collapsed = TRUE,
@@ -1223,7 +1372,7 @@ tabItem(tabName = "score5",
                                                                    min = 55, max = 72, value = c(55, 72)))
                                             )
                                    ),
-                                   tabPanel("Plot climate changes at individual locations", p(), fluidPage(plotlyOutput("plot.cc",width = '100%',height = '600')),
+                                   tabPanel("Plot climate changes at individual locations", p(), fluidPage(plotlyOutput("plot.cc",height = '600')),
                                             # fluidRow(
                                             #   column(2, tags$b('Smoother') ,checkboxInput("loess", "Fit a loess function", TRUE))),
                                             fluidRow(
@@ -1233,8 +1382,7 @@ tabItem(tabName = "score5",
                                    # tabPanel("Distribution", p(), box(fluidPage(plotOutput("prob.cc",width = '100%',height = '600')))),
                                    # tabPanel("Taylor Diagram", p(), fluidPage(plotOutput("taylor.cc"))),
                                    tabPanel("Scatter Plot (work in progress!)", p() , 
-                                            fluidPage(
-                                              column(12,plotlyOutput("scatter.cc",width = '100%',height = '600'))),
+                                              column(12,plotlyOutput("scatter.cc",height = '600')),
                                             #column(3,DT::dataTableOutput("tgcm"))),
                                             #column(3,checkboxGroupInput(inputId = 'im.cc',label = "Model",
                                             #                             choices =  c('Ens. Mean','------',levels(factor(model.45)),
@@ -1312,7 +1460,7 @@ tabItem(tabName = "hydro",
                                   #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
                                   #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
                                   #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),
-                                  plotlyOutput("hydro.sc.pr",width = '100%',height = '900'))
+                                  plotlyOutput("hydro.sc.pr",height = '900'))
                        ),
                        title = tags$p('3. Water Resources'),
                        collapsible = TRUE, collapsed = TRUE))
@@ -1326,7 +1474,7 @@ tabItem(tabName = "hydro",
                                   #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
                                   #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
                                   #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),
-                                  plotlyOutput("hydro.sc.tas",width = '100%',height = '900'))
+                                  plotlyOutput("hydro.sc.tas",height = '900'))
                        ),
                        title = tags$p('4. Drought'), 
                        collapsible = TRUE, collapsed = TRUE)
@@ -1889,4 +2037,3 @@ tabItem(tabName = "health",
                 )
               )
 )    
-

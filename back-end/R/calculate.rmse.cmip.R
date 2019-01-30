@@ -33,12 +33,12 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   
   if(!file.exists(ref.mon.file)) {
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
-                infile=ref.mulc,outfile=ref.mon.file)
+                ref.mulc, ref.mon.file)
   }
-  ref <- zoo::coredata(retrieve(ref.mon.file))
+  ref <- zoo::coredata(esd::retrieve(ref.mon.file))
   
   ## Calculate weights only once
-  r <- raster(ref)#.mon.file)
+  #r <- raster::raster(ref)#.mon.file)
   lon <- attr(ref,"longitude")
   lat <- attr(ref,"latitude")
   weights <- calculate.mon.weights(lon,lat)
@@ -70,8 +70,8 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
     if(!file.exists(gcm.file)) getGCMs(i, varid=variable, destfile=file.path(path.gcm,gcm.file))
     gcm.mon.file <- file.path(path,"gcm.monmean.nc")
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
-                infile=gcm.file,outfile=gcm.mon.file)
-    gcm <- zoo::coredata(retrieve(gcm.mon.file))
+                gcm.file, gcm.mon.file)
+    gcm <- zoo::coredata(esd::retrieve(gcm.mon.file))
     dim(gcm) <- dim(ref) <- c(12,length(attr(gcm,"longitude")),length(attr(gcm,"latitude")))
     store[[store.name]]$global$rms <- sqrt(sum(weights*(gcm-ref)^2)/sum(weights))
     for(region in srex.regions) {

@@ -1,4 +1,4 @@
-#Function to extract the metadata form NetCDF files on OPeNDAP servers
+#Function to extract the metadata from NetCDF files on OPeNDAP servers
 metaextract.opendap <- function(url=NULL, verbose=FALSE) {
   if(verbose) print("metaextract_opendap")
   

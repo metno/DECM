@@ -8,7 +8,7 @@ getERA <- function(variable.name,start=1979,end=2017,griddes="cmip_1.25deg_to_2.
   griddes <- find.file(griddes)[1]
   if(any(match(c("tas","tmp","temp","temperature","t2m"),variable.name,nomatch=0))) {
     if(verbose) print("variable: temperature")
-    varID<- "167.128"
+    varID <- "167.128"
     stream <- "moda"
     steps <- "0"
     type <- "an"
@@ -16,7 +16,7 @@ getERA <- function(variable.name,start=1979,end=2017,griddes="cmip_1.25deg_to_2.
     input <- c("","","",griddes,"2t,tas")
   } else if(any(match(c("pre","prc","prec","precipitation","pr"),variable.name,nomatch=0))) {
     if(verbose) print("variable: precipitation")
-    varID<- "228.128"
+    varID <- "228.128"
     stream <- "mdfa"
     # Step 0-12 is recommended for ERAinterim precipitation. Spin-up effect should not be an issue with ERAinterim forecasts.
     steps <- "0-12"
@@ -33,7 +33,7 @@ getERA <- function(variable.name,start=1979,end=2017,griddes="cmip_1.25deg_to_2.
       python.getEra(start, end, varID, steps, type, stream, destfile, verbose=verbose)
     }
     if(verbose) print("Regrid with CDO and save as netCDF.")
-    cdo.command(commands,input,infile=destfile,outfile=outfile)
+    cdo.command(commands,input,destfile,outfile)
   }
   if(verbose) print("Retrieve data from netCDF file.")
   X <- esd::retrieve(outfile)

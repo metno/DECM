@@ -7,7 +7,7 @@ subset.commonEOF <- function(x,it=NULL,is=NULL,ip=NULL,im=NULL,verbose=FALSE) {
       attr(x[[2]],"longitude")<=max(is$lon)
     ok.lat <- attr(x[[2]],"latitude")>=min(is$lat) & 
       attr(x[[2]],"latitude")<=max(is$lat)
-    clim.i <- Y.mean[[i]][ok.lon,ok.lat]
+    #clim.i <- Y.mean[[i]][ok.lon,ok.lat]
   }
   attr(Y,"mean") <- Y.mean
   return(Y)

@@ -1,6 +1,6 @@
 cmip5.urls <- function(experiment='rcp45',varid='tas',
                        url="http://climexp.knmi.nl/CMIP5/monthly/",#path=NULL,
-                       off=FALSE,force=FALSE,verbose=FALSE) {
+                       force=FALSE,verbose=FALSE) {
   if(verbose) print("cmip5.urls")
   if(!requireNamespace("RCurl",quietly=TRUE)) {
     stop("Package 'RCurl' required to run 'cmip5.urls'. Please install it.")

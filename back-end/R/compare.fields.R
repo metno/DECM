@@ -73,7 +73,7 @@ compare.fields <- function(x,y=NULL,plot=FALSE,type=c("correlation","rmsd"),
       cb.i <- select.colbar(z.i)
       fig.i <- c((i-1)/length(type),i/length(type),0,1)
       if(i==1) par(fig=fig.i) else par(fig=fig.i,new=TRUE)
-      esd::map(z.i,colbar=cb.i)
+      esd::map.corfield(z.i,colbar=cb.i)
     }
     if(!is.null(filename)) dev.off()
   }

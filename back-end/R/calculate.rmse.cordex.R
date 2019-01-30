@@ -31,7 +31,7 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
   
   if(!file.exists(ref.mon.file)) {
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
-                infile=ref.mulc,outfile=ref.mon.file)
+                ref.mulc, ref.mon.file)
   }
   
   ## Check which files are processed
@@ -54,8 +54,8 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
                                        destfile=file.path(path.gcm,gcm.file))
     gcm.mon.file <- file.path(path,"cm.monmean.nc")
     cdo.command(c("-ymonmean","-selyear"),c("",paste(period,collapse="/")),
-                infile=gcm.file,outfile=gcm.mon.file)
-    gcm <- zoo::coredata(retrieve(gcm.mon.file))
+                gcm.file, gcm.mon.file)
+    gcm <- zoo::coredata(esd::retrieve(gcm.mon.file))
     ref.i <- subset(ref,is=list(lon=range(attr(gcm,"longitude")),lat=range(attr(gcm,"latitude"))))
     weights <- calculate.mon.weights(attr(ref.i,"longitude"),attr(ref.i,"latitude"))
     ref.i <- zoo::coredata(ref.i)

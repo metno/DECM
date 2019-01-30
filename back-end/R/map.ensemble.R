@@ -46,12 +46,12 @@ map.ensemble <- function(ceof,im=NULL,ip=NULL,is=NULL,type=NULL,new=TRUE,FUN="me
   Y <- esd::as.field(Y,1,attr(Y1,"longitude"),attr(Y1,"latitude"),
                 param=attr(Y1,"variable"),unit=attr(Y1,"unit"))
   if(is.null(colbar$breaks))  {
-    if(grepl("cc",typ)) {
+    if(grepl("cc",type)) {
       colbar$breaks <- pretty(c(-max(abs(Y),na.rm=TRUE),max(abs(Y),na.rm=TRUE)),n=10)
     } else {
       colbar$breaks <- pretty(range(Y,na.rm=TRUE),n=10)
     }
   }
-  esd::map(Y,new=new,colbar=colbar,main=label.title)
+  esd::map.field(Y,new=new,colbar=colbar,main=label.title)
   invisible(Y)
 } 

@@ -21,7 +21,7 @@ dx <- function(ceof,im=NULL,is=NULL,ip=NULL,
     for(i in seq(length(dx))) {
       dx.i <- unlist(dx[[i]])
       dim(dx.i) <- c(1,length(dx.i))
-      dx.i <- as.field(dx.i, 1, lon(x1[[i]]), lat(x1[[i]]), 
+      dx.i <- esd::as.field(dx.i, 1, attr(x1[[i]],"longitude"), attr(x1[[i]],"latitude"), 
                        paste(attr(x1[[i]],"variable"),"change"),attr(x1,"unit"))
       attr(dx.i,"longname") <- paste(attr(x1[[i]],"variable"),"change from",
                                      paste(it1,collapse="-"),"to",paste(it2,collapse="-"))

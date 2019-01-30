@@ -2,6 +2,7 @@
 \alias{metaextract}
 \alias{metaextract.cmip5}
 \alias{metaextract.cordex}
+\alias{metaextract.opendap}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Extract metadata
@@ -10,43 +11,31 @@ Extract metadata
 Extract metadata for GCMs and RCMs.
 }
 \usage{
-metaextract(x)
+metaextract(x=NULL,add=TRUE,file="metaextract.rda",verbose=FALSE)
+metaextract.cmip5(x=NULL, experiment="rcp45", verbose=FALSE)
+metaextract.cordex(x=NULL, experiment="rcp45", verbose=FALSE)
+metaextract.opendap(url=NULL, verbose=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
-}
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
+  \item{x}{List of netCDF files, generated with e.g. getCM, getGCMs, or getRCMs.}
+  \item{add}{If TRUE add to existing metadata file, if FALSE create new.}
+  \item{file}{Filename for output.}
+  \item{url}{URL of data to extract metadata from.}
+  \item{verbose}{If TRUE, display information on progress.}
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
+\item{meta}{List containing metadata of files x.}
 }
 \author{
 Kajsa Parding, kajsamp@met.no
 }
-\note{
-%%  ~~further notes~~
-}
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
 \examples{
-x <- getGCMs(select=1:5)
+\dontrun{
+x <- getGCMs(select=1:5, varid="tas")
 M <- metaextract(x)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
+}
+
 \keyword{metadata}

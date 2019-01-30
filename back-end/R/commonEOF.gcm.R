@@ -10,7 +10,7 @@ commonEOF.gcm <- function(select=1:9,varid='tas',destfile=NULL,destfile.ceof=NUL
     x <- esd::retrieve(fname,verbose=verbose)
     if (!is.null(it)) {
       if (tolower(it)=='annual') {
-        x <- esd::annual(esd::subset(x,is=is),verbose=verbose) 
+        x <- esd::annual(esd::subset.field(x,is=is),verbose=verbose) 
       } else {
         x <- esd::subset.field(x,it=it,is=is,verbose=verbose)
       }
@@ -38,7 +38,7 @@ commonEOF.gcm <- function(select=1:9,varid='tas',destfile=NULL,destfile.ceof=NUL
   gcmrip <- attr(ceof,'parent_experiment_rip')
   for (i in 1:attr(ceof,'n.apps')) {
     x1 <- attr(ceof,paste('appendix.',i,sep=''))
-    Z[[paste('rcm.',i+1,sep='')]] <- zoo::zoo(coredata(x1),order.by=zoo::index(x1))
+    Z[[paste('rcm.',i+1,sep='')]] <- zoo::zoo(zoo::coredata(x1),order.by=zoo::index(x1))
     gcmnames <- c(gcmnames,attr(x1,'model_id'))
     gcmrip <- c(gcmrip,attr(x1,'parent_experiment_rip'))
     clim[[paste('rcm.',i+1,sep='')]] <- esd::map.field(attr(X,paste('appendix.',i,sep='')),plot=FALSE)

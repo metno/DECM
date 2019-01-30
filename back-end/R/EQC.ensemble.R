@@ -6,7 +6,6 @@ EQC.ensemble <- function(obs=c('air.mon.mean.nc','ETAINT_t2m.mon.nc','MERRA'),
                          path='CMIP5.monthly',pattern='tas_',it=c(1980,2015),is=NULL,
                          anomaly=FALSE) {
   ## Get all the GCM data
-  browser()
   gcms <- list.files(path=path,pattern=pattern,full.names=TRUE)
   n <- length(gcms)
   N <- n + length(obs)

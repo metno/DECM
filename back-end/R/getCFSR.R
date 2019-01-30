@@ -15,7 +15,7 @@ getCFSR <- function(variable="tas",destfile=NULL,lon=NULL,lat=NULL,
   }
   if(!file.exists(filename)) download.file(paste(url.path,filename,sep="/"),destfile=filename)
   if(is.null(destfile)) destfile <- paste(sub("\\.[[:alnum:]]+$", "", filename, perl=TRUE),"mon.nc",sep="_")
-  if(!file.exists(destfile)) cdo.command(commands,input,infile=filename,outfile=destfile)
+  if(!file.exists(destfile)) cdo.command(commands,input, filename,destfile)
   X <- esd::retrieve(destfile,lon=lon,lat=lat,verbose=verbose)
   cid <- getatt(destfile) 
   cid$url <- paste(url.path,filename,sep="/")

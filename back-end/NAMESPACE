@@ -1,9 +1,11 @@
 ## Imports from packages that come with R - functions from other external packages 
 ## are called explicitly when used.
+#importFrom("raster", "raster")
 importFrom("grDevices", "dev.new", "dev.off", "pdf", "adjustcolor", "rainbow")
 importFrom("graphics", "grid", "image", "lines", "par", "plot", "text")
 importFrom("stats", "median")
-importFrom("utils", "download.file", "read.csv", "tail")
+importFrom("utils", "download.file", "head", "read.csv", "tail")
+importFrom("sp", "coordinates")
 
 # Exports - in alphabetic order
 export(calculate.mon.weights)
@@ -18,7 +20,6 @@ export(cdo.gridcor)
 export(cdo.command)
 export(cmip5.urls)
 export(cordex.urls)
-#export(EQC.ensemble)
 export(find.file)
 export(getatt)
 export(getCM)
@@ -43,11 +44,11 @@ export(metaextract.cordex)
 export(metaextract.opendap)
 export(python.getEra)
 export(scatterplot)
+## Functions that are not used
+## and may not even work:
+#export(EQC.ensemble)
 #export(thredds.urls)
 #export(testrank)
-## Common EOF functions are not used
-## and may not even work because of 
-## changes in the esd package:
 #export(subset.commonEOF)
 #export(commonEOF.gcm)
 #export(commonEOF.rcm)

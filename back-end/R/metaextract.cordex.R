@@ -1,7 +1,7 @@
-metaextract.cordex <- function(x=NULL, verbose=FALSE) {
+metaextract.cordex <- function(x=NULL, experiment="rcp45", verbose=FALSE) {
   if(verbose) print("metaextract.cordex")
   ## argument 'x' is input from getGCMs, getRCMs, testGCM, etc
-  if (is.null(x)) x <- getRCMs(verbose=verbose)
+  if (is.null(x)) x <- getRCMs(experiment=experiment, verbose=verbose)
   
   if(!inherits(x,"list")) x <- list(gcm.1=x)
   gcms <- names(x)

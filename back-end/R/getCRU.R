@@ -20,7 +20,7 @@ getCRU <- function(username,passwd,variable="tmp",version="4.00",
     griddes <- find.file(griddes)
     commands <- c("-f","nc","-copy","-remapcon")
     input <- c("","","",griddes)
-    cdo.command(commands,input,infile=destfile,outfile=outfile) 
+    cdo.command(commands,input,destfile,outfile) 
   }
   X <- esd::retrieve(outfile)
   cid <- getatt(outfile)

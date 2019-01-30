@@ -2,9 +2,8 @@
 \alias{getCM}
 \alias{getGCMs}
 \alias{getRCMs}
-\name{cmip5.urls}
-\name{cordex.urls}
-\name{thredds.urls}
+\alias{cmip5.urls}
+\alias{cordex.urls}
 \alias{getatt}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
@@ -13,20 +12,16 @@ Download GCM and RCM data
 \description{\code{getCM} downloads GCM or RCM data from given a URL. \code{getGCMs} and \code{getRCMs} retrieves CMIP5 and CORDEX data from the KNMI climate data explorer, generating the URLs with \code{cmip5.urls} and \code{cordex.urls}. \code{getatt} reads and extracts the attribute information in a netCDF files and stores this in a list object.
 }
 \usage{
-getCM(url=NULL,destfile='CM.nc',lon=NULL,lat=NULL,force=FALSE,verbose=FALSE)
-getatt(url=NULL,destfile='CM.nc',lon=NULL,lat=NULL,force=FALSE,verbose=FALSE)
+getCM(url=NULL,destfile='CM.nc',path=NULL,lon=NULL,lat=NULL,force=FALSE,verbose=FALSE)
+getatt(fname)
 cmip5.urls(experiment='rcp45',varid='tas',
            url="http://climexp.knmi.nl/CMIP5/monthly/", 
-           path=NULL,off=FALSE,force=FALSE,verbose=FALSE)
+           force=FALSE,verbose=FALSE)
 cordex.urls(experiment='rcp45',varid='tas',
-           url="http://climexp.knmi.nl/CMIP5/monthly/", 
-           path=NULL,off=FALSE,force=FALSE,verbose=FALSE)
-thredds.urls(url.rel="raw/tas",pattern=".*EUR-11.*.nc",select=NULL,
-           url.catalog="http://thredds.met.no/thredds/catalog/postclim/data/CORDEX-EUR11",
-           url.data="http://thredds.met.no/thredds/dodsC/postclim/data/CORDEX-EUR11",
-           verbose=FALSE)
-getGCMs(select=1:3,varid='tas',destfile=destfile=paste(rep('GCM',3),1:3,'.nc',sep=''))
-getRCMs(select=1:3,varid='tas',destfile=destfile=paste(rep('RCM',3),1:3,'.nc',sep=''))
+           url="http://climexp.knmi.nl/CORDEX/EUR-44/mon/",
+           force=FALSE,verbose=FALSE)
+getGCMs(select=1:9,varid='tas',experiment='rcp45',destfile=NULL,path=NULL,verbose=FALSE)
+getRCMs(select=1:9,varid='tas',experiment='rcp45',destfile=NULL,path=NULL,verbose=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -38,11 +33,7 @@ getRCMs(select=1:3,varid='tas',destfile=destfile=paste(rep('RCM',3),1:3,'.nc',se
   \item{select}{index for selecting a subset of files/models to download}
   \item{varid}{variable name - see \code{link[esd]{retrieve}}}
   \item{path}{local file path to the destination file}
-  \item{it}{Time index for subsetting - see \code{link[esd]{subset}}}
-  \item{is}{Space index for subsetting - see \code{link[esd]{subset}}}
-  \item{url.rel}{URL relative to \code{url.base} (and \code{url.download)}}
-  \item{url.base}{Base URL to a catalog of available files.}
-  \item{url.download}{Base URL to location where data can be downloaded. If NULL, url.base is used. (I had problems listing and downloading files from the same location on the metno THREDDS server and solved it by including two different base URLs.)}
+  \item{experiment}{Parent experiment of the model data, either representative concentration pathway RCP4.5 ("rcp45"), RCP2.6 ("rcp26"), or RCP8.5 ("rcp85").}
   \item{force}{Logical value defaulting to FALSE. If FALSE, do not
     download data from source if a local file \code{path/destfile} is available. If TRUE, download data and overwrite local file.}
   \item{verbose}{Logical value defaulting to FALSE. If FALSE, do not
@@ -50,25 +41,14 @@ getRCMs(select=1:3,varid='tas',destfile=destfile=paste(rep('RCM',3),1:3,'.nc',se
     progress.}
 }
 \value{
-\code{getCM} downloads the data and returns a "zoo" "field" object. 
-\code{getGCMs} and \code{getRCMs} returns a list of "zoo" "field" objects corresponding to different models.
-}
-\references{
-%% ~put references to the literature/web site here ~
+\code{getCM} downloads the data and returns a "ncdf4" object containing information about the file (e.g. "filename", "url", "model"). 
+\code{getGCMs} and \code{getRCMs} returns a list of "ncdf4" objects corresponding to different models.
 }
 \author{
 Kajsa Parding <kajsamp@met.no>
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
 \examples{
+\dontrun{
 x <- getCM(url='http://climexp.knmi.nl/CMIP5/monthly/tas/tas_Amon_ACCESS1-0_historical_000.nc',
       destfile='GCM1.nc',lon=c(-60,60),lat=c(45,80),force=TRUE,verbose=TRUE)
     
@@ -76,6 +56,7 @@ fname <- x$filename
 x.info <- getatt(fname)
 
 y <- getGCMs(select=1:3)
+}
 }
 
 \keyword{ cds }

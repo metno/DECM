@@ -7,12 +7,12 @@ commonEOF.rcm <- function(select=1:9,varid='tas',destfile=NULL,destfile.ceof=NUL
   X <- NULL
   for (fname in destfile) {
     if(verbose) print(paste("retrieve",fname))
-    x <- retrieve(fname)
+    x <- esd::retrieve(fname)
     if (!is.null(it)) {
       if (tolower(it)=='annual') {
-        x <- esd::annual(esd::subset(x,is=is),verbose=verbose)
+        x <- esd::annual(esd::subset.field(x,is=is),verbose=verbose)
       } else {
-        x <- esd::subset(x,it=it,is=is,verbose=verbose)
+        x <- esd::subset.field(x,it=it,is=is,verbose=verbose)
       }
     }
     if (is.null(X)) {
@@ -23,7 +23,7 @@ commonEOF.rcm <- function(select=1:9,varid='tas',destfile=NULL,destfile.ceof=NUL
   }
   if(verbose) print("Calculate common EOF")
   ceof <- esd::EOF(X,verbose=verbose)
-  if(plot) esd::plot(ceof)
+  if(plot) esd::plot.eof(ceof)
   
   ## Need to reformat the ceof-object to fit the set-up for the R-shiny app in the front-end.
   if(verbose) print("Reformat the common EOF object")
@@ -42,7 +42,7 @@ commonEOF.rcm <- function(select=1:9,varid='tas',destfile=NULL,destfile.ceof=NUL
     rcmnames <- c(rcmnames,attr(xi,'model_id'))
     gcmnames <- c(gcmnames,attr(xi,'driving_model_id'))
     gcmrip <- c(gcmrip,attr(xi,'driving_model_ensemble_member'))
-    Z[[paste('rcm.',i+1,sep='')]] <- zoo::zoo(coredata(xi),order.by=zoo::index(xi))
+    Z[[paste('rcm.',i+1,sep='')]] <- zoo::zoo(zoo::coredata(xi),order.by=zoo::index(xi))
     clim[[paste('rcm.',i+1,sep='')]] <- esd::map.field(attr(X,paste('appendix.',i,sep="")),plot=FALSE)
   }
   attr(Z,'mean') <- clim

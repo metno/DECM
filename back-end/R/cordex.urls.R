@@ -1,6 +1,6 @@
 cordex.urls <- function(experiment='rcp45',varid='tas',
                         url="http://climexp.knmi.nl/CORDEX/EUR-44/mon/",#path=NULL,
-                        off=FALSE,force=FALSE,verbose=FALSE) {
+                        force=FALSE,verbose=FALSE) {
   if(verbose) print("cordex.urls")
   urlfiles <- c()
   #if(is.null(path)) path <- getwd()
@@ -22,7 +22,7 @@ cordex.urls <- function(experiment='rcp45',varid='tas',
         urlfile  <- paste(urlfile,iexp,"mon",sep="_")         # add exp.name
         urlfile  <- paste(urlfile,run.id,sep="_")      # add exp ID number
         urlfile  <- paste(urlfile,".nc",sep="")        # add file ex
-        if(url.exists(urlfile)) {
+        if(RCurl::url.exists(urlfile)) {
           if (verbose) print(urlfile)
           urlfiles <- c(urlfiles,urlfile)
         }

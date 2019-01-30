@@ -3,20 +3,20 @@ get.srex.region <- function(destfile,region=NULL,print.srex=FALSE,verbose=FALSE)
   if(verbose) print("get.srex.region")
   home <- system("echo $HOME",intern=TRUE)
   shape <-  get.shapefile("referenceRegions.shp")
-  X <- retrieve(destfile,lon=NULL,lat=NULL,verbose=verbose)
+  X <- esd::retrieve(destfile,lon=NULL,lat=NULL,verbose=verbose)
   srex <- list()
   if(is.null(region)){
     for (i in 1:length(levels(shape$LAB))){
       polygon <- shape[i,]
-      mask <- gen.mask.srex(destfile=destfile, mask=polygon, 
+      mask <- gen.mask.srex(destfile=destfile, mask.polygon=polygon, 
                             ind=FALSE, inverse=FALSE, mask.values=1)
       if(verbose){
         if(i==1){
           plot(shape)
         }
         plot.mask <- mask
-        extent(plot.mask) <- c(-180,180,-90,90)
-        projection(plot.mask) <- projection(shape)
+        raster::extent(plot.mask) <- c(-180,180,-90,90)
+        raster::projection(plot.mask) <- raster::projection(shape)
         plot(plot.mask,col=rainbow(100, alpha=0.35)[sample(1:100,1)],
              legend=FALSE,add=TRUE)
       }
@@ -29,13 +29,13 @@ get.srex.region <- function(destfile,region=NULL,print.srex=FALSE,verbose=FALSE)
     }  
   } else {
     polygon <- shape[levels(shape$LAB)==region,]
-    mask <- gen.mask.srex(destfile=destfile, mask=polygon, ind=FALSE, 
+    mask <- gen.mask.srex(destfile=destfile, mask.polygon=polygon, ind=FALSE, 
                           inverse=FALSE, mask.values=1)
     if(verbose) {
       plot(shape)
       plot.mask <- mask
-      extent(plot.mask) <- c(-180,180,-90,90)
-      projection(plot.mask) <- projection(shape)
+      raster::extent(plot.mask) <- c(-180,180,-90,90)
+      raster::projection(plot.mask) <- raster::projection(shape)
       plot(plot.mask,col=rainbow(100, alpha=0.35)[sample(1:100,1)],
            legend=FALSE,add=TRUE)
     }

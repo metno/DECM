@@ -2,7 +2,7 @@
 # Is this function affected by the error that Abdelkader discovered with -timmean? No.
 
 cdo.mean <- function(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
-                     monthly=FALSE,is.temp=TRUE,out.file=NULL,verbose=FALSE) {
+                     monthly=FALSE,is.temp=TRUE,outfile=NULL,verbose=FALSE) {
   
   commands <- c("-fldmean","-timmean","-selyear")
   input <- c("","",paste(period,collapse="/"))
@@ -17,19 +17,19 @@ cdo.mean <- function(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
     commands <- replace(commands,commands=="-timmean","-yseasmean")
   }
   
-  if(is.null(out.file)) {
-    out.file <- "tmp.nc"
+  if(is.null(outfile)) {
+    outfile <- "tmp.nc"
     save.file <- FALSE
   } else {
     save.file <- TRUE
   }
   
-  cdo.command(commands,input,model.file,out.file)
+  cdo.command(commands,input,model.file,outfile)
   
   command <- ("output")
   input <- c("")
   
-  out <- as.numeric(cdo.command(command,input,out.file,NULL,intern=TRUE))
+  out <- as.numeric(cdo.command(command,input,outfile,NULL,intern=TRUE))
   if(monthly) {
     names(out) <- c("jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec")
   } else if(seasonal) {
@@ -39,6 +39,6 @@ cdo.mean <- function(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
   } 
   # If applying to e.g. slp data, set is.temp to FALSE to skip this correction:
   if(out>200 & is.temp) out <- out-273.15 
-  if(!save.file) system(paste("rm",out.file,sep=" "))
+  if(!save.file) system(paste("rm",outfile,sep=" "))
   invisible(out)
 }

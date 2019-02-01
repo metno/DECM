@@ -28,7 +28,8 @@ get.srex.region <- function(destfile,region=NULL,print.srex=FALSE,verbose=FALSE)
       srex[[name]]$area.sd <- esd::aggregate.area(X.region,FUN="sd",na.rm=TRUE)
     }  
   } else {
-    polygon <- shape[levels(shape$LAB)==region,]
+    i <- which(levels(shape$LAB)==region)
+    polygon <- shape[i,]
     mask <- gen.mask.srex(destfile=destfile, mask.polygon=polygon, ind=FALSE, 
                           inverse=FALSE, mask.values=1)
     if(verbose) {

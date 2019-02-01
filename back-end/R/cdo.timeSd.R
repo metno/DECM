@@ -2,17 +2,17 @@
 cdo.timeSd <- function(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
                        monthly=FALSE,verbose=FALSE) {
   if(verbose) print("cdo.timeSd")
-  commands <- c("-timstd","-fldmean","-ymean","-selyear")
-  input <- c("","",paste(period,collapse="/"))
+  commands <- c("-timstd","-fldmean","-yearmean","-selyear")
+  input <- c("","","",paste(period,collapse="/"))
   
   if(!is.null(mask)) {
     commands <- append(commands,"-maskregion",after=3)
     input <- append(input,mask,after=3) 
   }
   if(monthly) {
-    commands <- replace(commands,commands=="-ymean","-monmean")
+    commands <- replace(commands,commands=="-yearmean","-monmean")
   } else if(seasonal) {
-    commands <- replace(commands,commands=="-ymean","-seasmean")
+    commands <- replace(commands,commands=="-yearmean","-seasmean")
   }
   
   out.file <- "tmp.nc"

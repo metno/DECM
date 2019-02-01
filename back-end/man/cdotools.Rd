@@ -45,34 +45,26 @@ cdo.gridcor(model.file,reference.file,period=c(1981,2010),mask=NULL,
 Olle Raty
 }
 \examples{
-# Download reference data (ERAinterim temperature)
-ref.file <- getReference("era", "tas")
-#if(is.logical(ref.file)) {
-#  getERA("tas")
-#  ref.file <- getReference("era", "tas")
-#}
-
+# Example files: 
+gcm.file <- system.file("extdata", "gcm.nc", package = "DECM")
+ref.file <- system.file("extdata", "ref.nc", package = "DECM")
 # Set period
-period <- c(1981,2010)
+period <- c(1990,1993)
 
 # Calculate annual mean spatial standard deviation
-spsd <- cdo.spatSd(ref.file, period, monthly=FALSE)
-tsd <- cdo.timeSd(ref.file, period, monthly=FALSE)
+sd.space <- cdo.spatSd(ref.file, period, monthly=FALSE)
+sd.time <- cdo.timeSd(ref.file, period, monthly=FALSE)
 
 # Calculate monthly mean
 meanval <- cdo.mean(ref.file, period, monthly=TRUE)
 
-\dontrun{
-# Download GCM data 
-gcms <- getGCMs(select=1, varid="tas")
-gcm.file <- gcms[[1]]$filename
-
 # Calculate spatial correlation between GCM and reference data
 cor <- cdo.gridcor(gcm.file, ref.file, period)
 
-# Use cdo.command to calculate the monthly mean 
-cdo.command(commands="-ymonmean", input="", 
-            infile=ref.file, outfile="ref.monmean.nc")
+\dontrun{
+# Use cdo.command to calculate the monthly mean
+cdo.command(c("-ymonmean","-fldmean"), c("",""), ref.file, "tmp.nc")
+out <- as.numeric(cdo.command("output","","tmp.nc",NULL,intern=TRUE))
 }
 }
 

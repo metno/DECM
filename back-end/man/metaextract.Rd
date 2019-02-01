@@ -22,6 +22,7 @@ metaextract.opendap(url=NULL, verbose=FALSE)
   \item{add}{If TRUE add to existing metadata file, if FALSE create new.}
   \item{file}{Filename for output.}
   \item{url}{URL of data to extract metadata from.}
+  \item{experiment}{parent experiment, e.g. emission scenario 'rcp45' or 'rcp85'}
   \item{verbose}{If TRUE, display information on progress.}
 }
 \value{

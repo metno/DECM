@@ -1,13 +1,14 @@
-#Get daily EOBS data and convert it to monthly averages. Version and resolution
-#selection not implemented yet.
-getEOBS <- function(variable="tas", destfile=NULL, resolution="0.50", version="14",
+# Get daily EOBS data and convert it to monthly averages. Version and resolution
+# selection not implemented yet.
+getEOBS <- function(variable="tas", destfile=NULL, version="17",#resolution="0.50", 
                     lon=NULL, lat=NULL, verbose=FALSE) {
   if(verbose) print("getEOBS")
   url.path <- "http://www.ecad.eu/download/ensembles/data/Grid_0.50deg_reg"
+  if(is.numeric(version)) version <- as.character(version)
   if(variable=="tas") {
-    filename <- "tg_0.50deg_reg_v16.0.nc.gz"
+    filename <- paste("tg_0.50deg_reg_v",version,".0.nc.gz",sep="")
   } else if(variable=="pr") {
-    filename <- "rr_0.50deg_reg_v16.0.nc.gz"
+    filename <- paste("rr_0.50deg_reg_v",version,".0.nc.gz",sep="")
   } else{
     return("Not implemented yet!")
   }
@@ -24,8 +25,8 @@ getEOBS <- function(variable="tas", destfile=NULL, resolution="0.50", version="1
   X <- esd::retrieve(destfile,lon=lon,lat=lat,verbose=verbose)
   cid <- getatt(destfile) 
   cid$url <- paste(url.path,filename,sep="/")
-  cid$area.mean <- esd::aggregate.area(X,FUN='mean',na.rm=T)
-  cid$area.sd <- esd::aggregate.area(X,FUN='sd',na.rm=T)
+  cid$area.mean <- esd::aggregate.area(X,FUN='mean',na.rm=TRUE)
+  cid$area.sd <- esd::aggregate.area(X,FUN='sd',na.rm=TRUE)
   ncid <- ncdf4::nc_open(destfile)
   model <- ncdf4::ncatt_get(ncid,0)
   ncdf4::nc_close(ncid)

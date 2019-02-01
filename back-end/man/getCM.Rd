@@ -56,6 +56,7 @@ fname <- x$filename
 x.info <- getatt(fname)
 
 y <- getGCMs(select=1:3)
+z <- getRCMs(select=1:3)
 }
 }
 

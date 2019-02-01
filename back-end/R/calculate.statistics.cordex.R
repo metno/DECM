@@ -1,5 +1,6 @@
 calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010), 
-                                        variable="tas", path.rcm=NULL, mask="PrudenceCoords.txt",
+                                        variable="tas", path.rcm=NULL, continue=TRUE,
+                                        mask="PrudenceCoords.txt",
                                         experiment="rcp45", verbose=FALSE) {
   
   if(verbose) print("calculate.statistics.cordex")
@@ -20,6 +21,7 @@ calculate.statistics.cordex <- function(reference="eobs", period=c(1981,2010),
   }
   
   store <- list()
+  if(file.exists(store.file) & continue) load(store.file)
   
   if(!is.null(reference)) {
     ref.file <- switch(paste(reference, variable, sep = "."), 

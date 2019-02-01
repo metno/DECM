@@ -2,7 +2,8 @@
 
 ## Calculate the mean annual cycle and spatial correlation for CMIP models
 calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), variable="tas", 
-                                      experiment="rcp45", nfiles=5, path.gcm=NULL, continue=TRUE, 
+                                      experiment="rcp45", nfiles=5,  
+                                      path.gcm=NULL, continue=TRUE, 
                                       mask="coords.txt", verbose=FALSE) {
   if(verbose) print("calculate.statistics.cmip")
   shape <- get.shapefile("referenceRegions.shp")
@@ -23,7 +24,7 @@ calculate.statistics.cmip <- function(reference="era", period=c(1981,2010), vari
                         experiment, "rda", sep=".")
   }
   store <- list()
-  if(file.exists(store.file)) load(store.file)
+  if(file.exists(store.file) && !force) load(store.file)
   units <- NULL
   if(!is.null(reference)) {
     #reference.raster <- raster::raster(ref.file)

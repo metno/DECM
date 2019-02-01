@@ -1,22 +1,4 @@
-
-library(shiny)
-library(DECM)
-source("helpers.R")
-
-## Load statistics calculated with script 'calculate_statistics.R'
-stats <- NULL
-data("statistics.cmip.era.tas.1981-2010")
-stats$tas$present <- store
-data("statistics.cmip.tas.2021-2050")
-stats$tas$nf <- store
-data("statistics.cmip.tas.2071-2100")
-stats$tas$ff <- store
-data("statistics.cmip.era.pr.1981-2010")
-stats$pr$present <- store
-data("statistics.cmip.pr.2021-2050")
-stats$pr$nf <- store
-data("statistics.cmip.pr.2071-2100")
-stats$pr$ff <- store
+source("global.R")
 
 ## Function 'regions' is defined in helpers.R
 srex <- regions("srex")
@@ -35,7 +17,7 @@ shinyServer(function(input, output) {
                      "present day (1981-2010)"='present',
                      "far future (2071-2100)"='ff',
                      "near future (2021-2050)"='nf')
-    gcms <- names(stats$tas$ff)
+    gcms <- names(stats[[var]]$ff)[switch(var,"tas"=im.tas,"pr"=im.pr)]
     ref <- NULL
     if(tolower(input$region)=="global") {
       region <- "global"
@@ -44,12 +26,17 @@ shinyServer(function(input, output) {
       region <- srex$label[i.srex]
     }
     x <- lapply(gcms, function(gcm) stats[[var]][[period]][[gcm]][[region]][["mean"]][2:13])
-    if(period=="present") ref <- stats[[var]][[period]][[1]][[region]][["mean"]][2:13]
+    if(period=="present") {
+      im.ref <- which(!grepl("gcm",names(stats[[var]]$present)))
+      ref <- stats[[var]][[period]][[im.ref]][[region]][["mean"]][2:13]
+    }
+    
+    # Unit correction of precip data
     if(var=="pr") {
       x <- lapply(x, function(y) y*60*60*24) ## mm/s to mm/day
       ref <- ref*1E3 ## m/day to mm/day
     }
-    #if(var=="pr") ref <- NULL
+
     ylim <- c(NULL,NULL)
     if(!is.na(input$y0)) {
       ylim[1] <- input$y0
@@ -61,20 +48,21 @@ shinyServer(function(input, output) {
     } else {
       ylim[2] <- max(c(unlist(x),ref)) + 0.15*diff(range(c(unlist(x),ref)))
     }
-      
+    
     im <- as.numeric(gsub(":.*","",input$gcms))
     par(xpd = T, mar = par()$mar + c(4,0,0,0))
     plot(1:12, x[[1]], col = "white", xlim = c(0.5,12.5), ylim = ylim, 
-         xaxt = "n", xlab = "",#Month",
+         xaxt = "n", xlab = "",
          ylab=paste(input$variable," (",switch(var,"tas"="deg C","pr"="mm/day"),")",sep=""))
-    axis(1, at=1:12, labels=FALSE)#names(x[[1]]))
+    axis(1, at=1:12, labels=FALSE)
     text(1:12-0.1, par("usr")[3] - 0.05*diff(ylim), labels = names(x[[1]]), srt = 45, pos = 1, xpd = TRUE)
     
-    lapply(1:length(x),function(i) lines(1:12,x[[i]],col="grey80"))
-    lapply(im,function(i) lines(1:12,x[[i]],col="blue"))
+    for(i in 1:length(x)) lines(1:12,x[[i]],col="grey80")
+    for(i in im) lines(1:12,x[[i]],col="blue")
+
     if(!is.null(ref)) {
       lines(1:12,ref,col="red",lty=2)
-      legend(0,par("usr")[3] - 0.25*diff(ylim),#"bottomleft",
+      legend(0,par("usr")[3] - 0.25*diff(ylim),
              legend=c("All GCMs","Selected GCMs","Reference data (ERA-interim)"),
              lty=c(1,1,2),col=c("grey80","blue","red"),box.lwd=0.5,cex=0.85)
     } else {
@@ -102,6 +90,6 @@ shinyServer(function(input, output) {
     axis(2,at=pretty(par("yaxp")[1:2],n=5),col='grey50')
     grid()
     lines(region$lon,region$lat,col="blue",lwd=1.5,lty=1)
-  }, width=200,height=200*0.6)#width=250, height=175)
+  }, width=200,height=200*0.6)
   
 })

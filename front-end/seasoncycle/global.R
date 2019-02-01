@@ -1,11 +1,40 @@
-## helpers.R
+## global.R
 ## Help functions for the shiny app "seasoncycle"
+library(esd)
+library(shiny)
+library(sp)
+library(DECM)
 
+data("metaextract")
+
+## Load statistics calculated with script 'calculate_statistics.R'
+stats <- NULL
+data("statistics.cmip.era.tas.1981-2010.rcp45")
+stats$tas$present <- store
+data("statistics.cmip.tas.2021-2050.rcp45")
+stats$tas$nf <- store
+data("statistics.cmip.tas.2071-2100.rcp45")
+stats$tas$ff <- store
+data("statistics.cmip.era.pr.1981-2010.rcp45")
+stats$pr$present <- store
+data("statistics.cmip.pr.2021-2050.rcp45")
+stats$pr$nf <- store
+data("statistics.cmip.pr.2071-2100.rcp45")
+stats$pr$ff <- store
+
+im.tas <- meta$project_id=="CMIP5" & meta$var=="tas" & meta$experiment=="RCP4.5"
+im.pr <- meta$project_id=="CMIP5" & meta$var=="pr" & meta$experiment=="RCP4.5"
+gcms.tas <- paste(meta$gcm[im.tas],".",meta$gcm_rip[im.tas],sep="")
+gcms.pr <- paste(meta$gcm[im.pr],".",meta$gcm_rip[im.pr],sep="")
+gcms.both <- gcms.tas[gcms.tas %in% gcms.pr]
+im.tas <- which(gcms.tas %in% gcms.both)
+im.pr <- which(gcms.pr %in% gcms.both)
+gcmnames <- paste(seq(length(gcms.both)),": ",gcms.both,sep="")
+  
 regions <- function(type=c("srex","prudence"),region=NULL) {
   if(is.null(type) | length(type)>1) region <- NULL
   if(is.null(type) | "srex" %in% tolower(type)) {
-    f <- "referenceRegions.shp"#find.file("referenceRegions.shp")
-    x <- get.shapefile(f[1],with.path=TRUE)
+    x <- get.shapefile("referenceRegions.shp")
     ivec <- 1:nrow(x)
     if(!is.null(region)) {
       if(is.numeric(region)) {
@@ -27,8 +56,7 @@ regions <- function(type=c("srex","prudence"),region=NULL) {
     y <- NULL
   }
   if(is.null(type) | "prudence" %in% tolower(type)) {
-    f <- "RegionSpecifications.csv"#find.file("RegionSpecifications.csv")
-    x <- read.table(f,sep=",")
+    x <- read.table("RegionSpecifications.csv",sep=",")
     ivec <- 2:nrow(x)
     names <- as.character(x[2:nrow(x),1])
     labels <- as.character(x[2:nrow(x),2])

@@ -1,12 +1,4 @@
 
-library(shiny)
-library(DECM)
-
-#data("statistics.cmip.tas.2071-2100")
-data("metaextract")
-im <- meta$project_id=="CMIP5" & meta$var=="tas"
-gcmnames <- paste(seq(sum(im)),": ",meta$gcm[im],".",meta$gcm_rip[im],sep="")
-
 navbarPage(title = 'Projections of temperature and precipitation', 
            id = 'x0',
            header=img(src="banner_c3s.png", 

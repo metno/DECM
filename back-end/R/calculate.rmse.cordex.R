@@ -6,7 +6,7 @@ calculate.rmse.cordex <- function(reference="eobs", period=c(1981,2010), variabl
   store <- list()
   store.file <- paste("statistics.cordex", reference, variable, paste(period, collapse="-"),
                       experiment, "rda", sep=".")
-  #if(is.character(find.file(store.file)[1])) store.file <- find.file(store.file)[1]
+  if(!is.null(path)) store.file <- file.path(path,store.file)
   if(file.exists(store.file)) load(store.file)
   
   ## Pre-process reference file if necessary

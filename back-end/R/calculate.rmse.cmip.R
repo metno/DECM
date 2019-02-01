@@ -8,7 +8,7 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
   store <- list()
   store.file <- paste("statistics.cmip", reference, variable, paste(period, collapse="-"),
                       experiment, "rda", sep=".")
-  #if(is.character(find.file(store.file)[1])) store.file <- find.file(store.file)[1]
+  if(!is.null(path)) store.file <- file.path(path,store.file)
   if(file.exists(store.file)) load(store.file)
   
   ## Pre-process reference file if necessary
@@ -55,9 +55,6 @@ calculate.rmse.cmip <- function(reference="era", period=c(1981,2010), variable="
       start <- min(ngcm, as.numeric(tail(sub('.*\\.', '', gcmnames, perl=TRUE),n=1)))
     }
   }
-  #if(continue && file.exists(store.file)) {
-  #  start <- as.numeric(tail(sub('.*\\.', '', names(store), perl=TRUE), n=1)) + 1
-  #}
   if(nfiles=="all") {
     end <- ngcm
   } else {

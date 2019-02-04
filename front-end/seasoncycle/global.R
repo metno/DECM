@@ -5,21 +5,30 @@ library(shiny)
 library(sp)
 library(DECM)
 
-data("metaextract")
+## Load geographical data for map
+data(package="esd", "geoborders",envir=environment())
+  
+data(package="DECM", "metaextract", envir=environment())
 
 ## Load statistics calculated with script 'calculate_statistics.R'
 stats <- NULL
-data("statistics.cmip.era.tas.1981-2010.rcp45")
+data(package="DECM", "statistics.cmip.era.tas.1981-2010.rcp45",
+     envir=environment())
 stats$tas$present <- store
-data("statistics.cmip.tas.2021-2050.rcp45")
+data(package="DECM","statistics.cmip.tas.2021-2050.rcp45",
+     envir=environment())
 stats$tas$nf <- store
-data("statistics.cmip.tas.2071-2100.rcp45")
+data(package="DECM","statistics.cmip.tas.2071-2100.rcp45",
+     envir=environment())
 stats$tas$ff <- store
-data("statistics.cmip.era.pr.1981-2010.rcp45")
+data(package="DECM","statistics.cmip.era.pr.1981-2010.rcp45",
+     envir=environment())
 stats$pr$present <- store
-data("statistics.cmip.pr.2021-2050.rcp45")
+data(package="DECM","statistics.cmip.pr.2021-2050.rcp45",
+     envir=environment())
 stats$pr$nf <- store
-data("statistics.cmip.pr.2071-2100.rcp45")
+data(package="DECM","statistics.cmip.pr.2071-2100.rcp45",
+     envir=environment())
 stats$pr$ff <- store
 
 im.tas <- meta$project_id=="CMIP5" & meta$var=="tas" & meta$experiment=="RCP4.5"
@@ -34,7 +43,8 @@ gcmnames <- paste(seq(length(gcms.both)),": ",gcms.both,sep="")
 regions <- function(type=c("srex","prudence"),region=NULL) {
   if(is.null(type) | length(type)>1) region <- NULL
   if(is.null(type) | "srex" %in% tolower(type)) {
-    x <- get.shapefile("referenceRegions.shp")
+    f <- "../../back-end/inst/extdata/SREX_regions/referenceRegions.shp"
+    x <- get.shapefile(f, with.path=TRUE)
     ivec <- 1:nrow(x)
     if(!is.null(region)) {
       if(is.numeric(region)) {
@@ -56,7 +66,8 @@ regions <- function(type=c("srex","prudence"),region=NULL) {
     y <- NULL
   }
   if(is.null(type) | "prudence" %in% tolower(type)) {
-    x <- read.table("RegionSpecifications.csv",sep=",")
+    f <- "../../back-end/inst/extdata/PRUDENCE_regions/RegionSpecifications.csv"
+    x <- read.table(f,sep=",")
     ivec <- 2:nrow(x)
     names <- as.character(x[2:nrow(x),1])
     labels <- as.character(x[2:nrow(x),2])
@@ -87,3 +98,6 @@ regions <- function(type=c("srex","prudence"),region=NULL) {
   }
   invisible(y)
 }
+
+## Function 'regions' is defined in helpers.R
+srex <- regions("srex")

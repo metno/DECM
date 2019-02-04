@@ -1,12 +1,6 @@
+## Define a server for the Shiny app
 source("global.R")
 
-## Function 'regions' is defined in helpers.R
-srex <- regions("srex")
-
-## Load geographical data for map
-data("geoborders",envir=environment())
-  
-## Define a server for the Shiny app
 shinyServer(function(input, output) {
   
   output$seasoncycle <- renderPlot({

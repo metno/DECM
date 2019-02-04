@@ -1,27 +1,32 @@
 ## global.R
 ## Help functions for the shiny app "dpdt"
 library(shiny)
+library(sp)
 library(DT)
 library(DECM)
 
 ## Load statistics calculated with script 'calculate_statistics.R'
 stats <- NULL
-data("statistics.cmip.era.tas.1981-2010.rcp45")
+data(package="DECM","statistics.cmip.era.tas.1981-2010.rcp45",
+     envir=environment())
 stats$tas$present <- store
-data("statistics.cmip.tas.2021-2050.rcp45")
+data(package="DECM", "statistics.cmip.tas.2021-2050.rcp45",
+     envir=environment())
 stats$tas$nf <- store
-data("statistics.cmip.tas.2071-2100.rcp45")
+data(package="DECM", "statistics.cmip.tas.2071-2100.rcp45",
+     envir=environment())
 stats$tas$ff <- store
-data("statistics.cmip.era.pr.1981-2010.rcp45")
+data(package="DECM", "statistics.cmip.era.pr.1981-2010.rcp45",
+     envir=environment())
 stats$pr$present <- store
-data("statistics.cmip.pr.2021-2050.rcp45")
+data(package="DECM", "statistics.cmip.pr.2021-2050.rcp45",
+     envir=environment())
 stats$pr$nf <- store
-data("statistics.cmip.pr.2071-2100.rcp45")
+data(package="DECM", "statistics.cmip.pr.2071-2100.rcp45",
+     envir=environment())
 stats$pr$ff <- store
 
-#data("metaextract")
-#im <- meta$project_id=="CMIP5" & meta$var=="tas" & meta$experiment=="RCP4.5"
-#gcmnames <- paste(seq(sum(im)),": ",meta$gcm[im],".",meta$gcm_rip[im],sep="")
+data(package="DECM", "metaextract", envir=environment())
 im.tas <- meta$project_id=="CMIP5" & meta$var=="tas" & meta$experiment=="RCP4.5"
 im.pr <- meta$project_id=="CMIP5" & meta$var=="pr" & meta$experiment=="RCP4.5"
 gcms.tas <- paste(meta$gcm[im.tas],".",meta$gcm_rip[im.tas],sep="")
@@ -32,7 +37,7 @@ im.pr <- which(gcms.pr %in% gcms.both)
 gcmnames <- paste(seq(length(gcms.both)),": ",gcms.both,sep="")
 
 ## Load geographical data for map
-data("geoborders",envir=environment())
+data(package="esd", "geoborders", envir=environment())
 
 regions <- function(type=c("srex","prudence"),region=NULL) {
   if(is.null(type) | length(type)>1) region <- NULL

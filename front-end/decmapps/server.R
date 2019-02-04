@@ -23,7 +23,7 @@ function(input, output,session) {
   data(Oslo)
   
   # Model explorer
-  data("metaextract")
+  data(package='DECM', "metaextract")
   M <- data.frame(list(Project=meta$project_id,
                        Experiment=meta$experiment_id,
                        GCM=meta$gcm,
@@ -75,7 +75,7 @@ function(input, output,session) {
   
   output$glossary <- DT::renderDataTable({
     DT::datatable(
-      rbind(c('Project','Name of the project that run the simulations'),
+      rbind(c('Project','Name of the project that runs the simulations'),
             c('GCM','Global Climate Model or General Circulation Model'),
             c('RIP','Realisation, initialisation method, and physics version of a GCM'),
             c('RCM','Regional Climate Model'),
@@ -679,7 +679,6 @@ function(input, output,session) {
       region <- gsub(' ','',region)
     }
     x <- lapply(rcms, function(rcm) stats[[param]][[period]][[rcm]][[region]][[stat]][2:13])
-    #browser()
     #if(period=="present") {
     id.ref <- grep('eobs',names(stats[[param]][['present']])) 
     if (is.element(stat,c('mean','spatial.sd')))
@@ -715,7 +714,7 @@ function(input, output,session) {
       else
         showNotification('Please select a model from the meta data table!')
     }
-    #browser()
+    
     if (!is.null(ref))
       df <- data.frame(rcm.vals,ref,stringsAsFactors = FALSE)
     else
@@ -2475,7 +2474,6 @@ function(input, output,session) {
           colsa <- rgbcolsa
           cols <- rgbcols
         }
-        # browser()
         ## Add all Simulations
         if (is.null(input$rowsGcm)) {
           for (gcm in gcms) {
@@ -2646,7 +2644,6 @@ function(input, output,session) {
         # Color by
         colsa <- rgbcolsa
         cols <- rgbcols
-        # browser()
         ## Add all Simulations
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
@@ -2792,7 +2789,6 @@ function(input, output,session) {
         # Color by
         colsa <- rgbcolsa
         cols <- rgbcols
-        # browser()
         ## Add all Simulations
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
@@ -2930,7 +2926,6 @@ function(input, output,session) {
         # Color by
         colsa <- rgbcolsa
         cols <- rgbcols
-        # browser()
         ## Add all Simulations
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
@@ -3375,10 +3370,11 @@ function(input, output,session) {
                      ticks = 'outside',
                      zeroline = TRUE))
       
-      if (input$gcm.legend.sc == 'Hide')
+      if (input$gcm.legend.sc == 'Hide') {
         p.sc <- p.sc %>% layout(showlegend = FALSE)
-      else
+      } else {
         p.sc <- p.sc %>% layout(showlegend = TRUE)
+      }
       #gcm.dtdp$elementId <- NULL
       # gcm.dtdp
       p.sc$elementId <- NULL
@@ -3408,8 +3404,9 @@ function(input, output,session) {
       gcmall <- c(sapply(1:dim(gcm.meta.pr)[1],gcm.name),'ERAINT')
       gcm.inst <- c(sapply(1:dim(gcm.meta.pr)[1],inst.name),'ERAINT')
       
-      df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),dpr = as.numeric(round(colMeans(dpr),digits = 2)),
-                       gcm.name = gcmall, inst.name = gcm.inst,stringsAsFactors = FALSE)
+      df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),
+                       dpr = as.numeric(round(colMeans(dpr),digits = 2)),
+                       gcm.name = gcmall, inst.name = gcm.inst, stringsAsFactors = FALSE)
       
       id <- 1 : (length(df$dtas) - 1)
       lev <- levels(factor(id))
@@ -3897,10 +3894,8 @@ function(input, output,session) {
     output$hydro.sc.tas <- rcm.sc.tas
     
     output$rcm.sc.bias.tas.pu <- renderPlotly({
-      #browser()
       rcm.meta.tas <- rcm.meta.tas.reactive.pu()
       df <- rcm.sc.tas.reactive.pu()
-      
       df <- df - df[,dim(df)[2]]      
       
       #df <- df[,-36] # AM Quick fix but has to be removed ... once meta is updated.
@@ -5244,7 +5239,7 @@ function(input, output,session) {
         return(paste(as.character(as.matrix(rcmi)),collapse = '_'))
       }
       inst.name <- function(i) {
-        rcmi <- rcm.meta.pr[i,c('model_id')]
+        rcmi <- rcm.meta.pr[i,c('rcm')]#'model_id')]
         rcmi[is.na(rcmi)] <- ''
         return(paste(as.character(as.matrix(rcmi)),collapse = '_'))
       }
@@ -5416,10 +5411,11 @@ function(input, output,session) {
                      ticks = 'outside',
                      zeroline = TRUE))
       
-      if (input$rcm.legend.sc == 'Hide')
+      if (input$rcm.legend.sc == 'Hide') {
         p.sc <- p.sc %>% layout(showlegend = FALSE)
-      else
+      } else {
         p.sc <- p.sc %>% layout(showlegend = TRUE)
+      }
       #rcm.dtdp$elementId <- NULL
       # rcm.dtdp
       p.sc$elementId <- NULL
@@ -5443,19 +5439,19 @@ function(input, output,session) {
         return(paste(as.character(as.matrix(rcmi)),collapse = '_'))
       }
       inst.name <- function(i) {
-        rcmi <- rcm.meta.pr[i,c('model_id')]
+        rcmi <- rcm.meta.pr[i,c('rcm')]#'model_id')]
         rcmi[is.na(rcmi)] <- ''
         return(paste(as.character(as.matrix(rcmi)),collapse = '_'))
       }
-      rcmall <- c(sapply(1:dim(rcm.meta.pr)[1],rcm.name),'ERAINT')
-      rcm.inst <- c(sapply(1:dim(rcm.meta.pr)[1],inst.name),'ERAINT')
       
-      df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),dpr = as.numeric(round(colMeans(dpr),digits = 2)),
+      rcmall <- c(sapply(1:nrow(rcm.meta.pr),rcm.name),'ERAINT')
+      rcm.inst <- c(sapply(1:nrow(rcm.meta.pr),inst.name),'ERAINT')
+      df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),
+                       dpr = as.numeric(round(colMeans(dpr),digits = 2)),
                        rcm.name = rcmall, inst.name = rcm.inst,stringsAsFactors = FALSE)
       
       id <- 1 : (length(df$dtas) - 1)
       lev <- levels(factor(id))
-      
       rgbcolsa <- c('rgba(45,51,38,0.5)', 'rgba(87,77,102,0.5)', 'rgba(255,191,200,0.5)', 'rgba(140,129,105,0.5)', 'rgba(234,191,255,0.5)', 'rgba(172,230,195,0.5)',
                     'rgba(86,105,115,0.5)', 'rgba(115,86,94,0.5)', 'rgba(230,195,172,0.5)', 'rgba(255,234,191,0.5)', 'rgba(124,140,105,0.5)', 'rgba(51,26,43,0.5)',
                     'rgba(191,96,172,0.5)', 'rgba(184,204,102,0.5)', 'rgba(153,87,77,0.5)', 'rgba(96,134,191,0.5)', 'rgba(230,115,145,0.5)', 'rgba(255,145,128,0.5)', 
@@ -5520,9 +5516,9 @@ function(input, output,session) {
       
       
       
-      if ((input$rcm.cc.chart.type == 'Ensemble of All Simulations') | (input$rcm.cc.chart.type == "Both - Ensemble & Individual Simulations"))
+      if ((input$rcm.cc.chart.type == 'Ensemble of All Simulations') | (input$rcm.cc.chart.type == "Both - Ensemble & Individual Simulations")) {
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
-      #}
+      }
       
       if (input$rcm.legend.sc == 'Display') {
         p.sc <- p.sc %>% add_trace(x = ~mean(df$dtas[-length(df$dpr)]),y = ~ mean(df$dpr[-length(df$dpr)]),type = 'scatter',mode = 'markers',
@@ -5563,10 +5559,11 @@ function(input, output,session) {
                      ticks = 'outside',
                      zeroline = TRUE))
       
-      if (input$rcm.legend.sc == 'Hide')
+      if (input$rcm.legend.sc == 'Hide') {
         p.sc <- p.sc %>% layout(showlegend = FALSE)
-      else
+      } else {
         p.sc <- p.sc %>% layout(showlegend = TRUE)
+      }
       #rcm.dtdp$elementId <- NULL
       # rcm.dtdp
       p.sc$elementId <- NULL
@@ -5579,9 +5576,9 @@ function(input, output,session) {
       rcm.meta.pr <- rcm.meta.pr.reactive()
       dpr <- rcm.sc.pr.reactive()
       rcms <- names(dpr)
-      if (input$rcm.outputValues == 'Bias')
+      if (input$rcm.outputValues == 'Bias') {
         dpr <- ((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]) * 100
-      else if (input$rcm.outputValues == 'RMSE') {
+      } else if (input$rcm.outputValues == 'RMSE') {
         dpr <- sqrt((((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]))^2) * 100
       } else if (input$rcm.outputValues == 'Anomaly') {
         DF <- t(dpr)
@@ -5593,9 +5590,9 @@ function(input, output,session) {
       rcm.meta.tas <- rcm.meta.tas.reactive()
       
       dtas <- rcm.sc.tas.reactive()
-      if (input$rcm.outputValues == 'Bias')
+      if (input$rcm.outputValues == 'Bias') {
         dtas <- dtas - dtas[,dim(dtas)[2]]
-      else if (input$rcm.outputValues == 'RMSE') {
+      } else if (input$rcm.outputValues == 'RMSE') {
         dtas <- sqrt((dtas-dtas[,dim(dtas)[2]])^2)
       } else if (input$rcm.outputValues == 'Anomaly') {
         DF <- t(dtas)
@@ -5604,7 +5601,7 @@ function(input, output,session) {
         dtas <- dtas - rcm.sc.tas.present()
       }
       
-      if (!is.null(input$rowsRcm))
+      if (!is.null(input$rowsRcm)) {
         if (input$rcm.sim.sc == 'Selected Simulations') {
           dpr <- dpr[input$rowsRcm,]
           dtas <- dtas[input$rowsRcm,]
@@ -5612,6 +5609,7 @@ function(input, output,session) {
           rcm.meta.pr <- rcm.meta.pr[input$rowsRcm,]
           rcms <- rcms[input$rowsRcm]
         } 
+      }
       
       rcm.name <- function(i) {
         rcmi <- rcm.meta.pr[i,c('gcm','gcm_rip','rcm')]

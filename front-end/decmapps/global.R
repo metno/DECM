@@ -529,7 +529,7 @@ META <- meta[,c('source','experiment','institute_id','model_id','parent_experime
                 'resolution','longitude','latitude',"experiment_id",'dim1','index','calendar','creation_date',
                 'tracking_id','physics_version','forcing','reference','contact','comment','table_id','file')]
 
-gcm.meta.tas <- subset(META, subset = (source == 'CMIP5') & (variable == 'tas'))
+gcm.meta.tas <- subset(META, subset = (source == 'CMIP5') & (variable == 'tas') & (experiment == 'RCP4.5'))
 gcm.meta.tas <- merge.meta.ipcc(meta = gcm.meta.tas,ipcc = IPCC.AR5.Table.9.A.1)
 
 load('data/metaextract_pr.rda')
@@ -538,7 +538,7 @@ META <- meta[,c('source','experiment','institute_id','model_id','parent_experime
                 'resolution','longitude','latitude',"experiment_id",'dim1','index','calendar','creation_date',
                 'tracking_id','physics_version','forcing','reference','contact','comment','table_id','file')]
 
-gcm.meta.pr <- subset(META, subset = (source == 'CMIP5') & (variable == 'pr'))
+gcm.meta.pr <- subset(META, subset = (source == 'CMIP5') & (variable == 'pr') & (experiment == 'RCP4.5'))
 gcm.meta.pr <- merge.meta.ipcc(gcm.meta.pr,IPCC.AR5.Table.9.A.1)
 
 # Common meta data for all variables
@@ -559,16 +559,18 @@ gcm.meta.all <- gcm.meta.all[,-c(7,8,9,10)]
 ## Load meta data for RCMs
 data(package = 'DECM','metaextract')
 meta <- as.data.frame(meta)
-META <- meta[,c('project_id','gcm','gcm_rip','rcm','longname','var','longname','unit','frequency','dates',
-                'resolution','lon','lon_unit','lat','lat_unit',
+META <- meta[,c('project_id','experiment','gcm','gcm_rip','rcm',
+                'longname','var','unit','frequency','dates',
+                'resolution','lon','lon_unit','lat','lat_unit', 
                 'frequency','creation_date','url')]
 
-rcm.meta.tas <- subset(META, subset = (project_id == 'CORDEX') & (var == 'tas'))
+rcm.meta.tas <- subset(META, subset = (project_id == 'CORDEX') & (var == 'tas') & (experiment=="RCP4.5"))
+rcm.meta.pr <- subset(META, subset = (project_id == 'CORDEX') & (var == 'pr') & (experiment=="RCP4.5"))
+#rcm.meta.all <- rcm.meta.pr[,-c(6:9,16)]
+i.var <- which(grepl("longname|var|unit|frequency",colnames(rcm.meta.pr)) & 
+               !grepl("lon_unit|lat_unit",colnames(rcm.meta.pr)))
+rcm.meta.all <- rcm.meta.pr[,-i.var]
 
-rcm.meta.pr <- subset(META, subset = (project_id == 'CORDEX') & (var == 'pr'))
-
-rcm.meta.all <- rcm.meta.pr[,-c(5:8,15)]
-  
 # RCM statistics ...
 rcms <- NULL
 ## KMP 2019-01-30: Changed to relative paths 

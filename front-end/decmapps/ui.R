@@ -1,8 +1,6 @@
 # Choices for drop-downs
 # Show a tabset that includes a plot, summary, and
 # table view of the generated distribution
-
-
 library(shinydashboard)
 library(shinyBS)
 

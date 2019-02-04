@@ -304,17 +304,51 @@ shinyServer(function(input, output, session) {
   ## Output: scatterplot of temperature and precip. change 
   output$dtdpr <- renderPlotly({
     
+    colvec <- two.colors(n=length(dtas()), start="green", end="red", middle="orange")
+    colrank <- colvec[weightedrank_all()]
     c1 <- rgb(116,196,215,150,maxColorValue=255)
     c2 <- rgb(0,144,168,255,maxColorValue=255)
     clr <- reactive({
-      x <- rep(c1,length(gcmnames))
-      x[im()] <- c2
-      return(x)})
+      if(input$show.ranking) {
+        x <- adjustcolor(colrank, alpha.f=0.4)
+        x[im()] <- adjustcolor(colrank[im()], alpha=0.9)
+      } else {
+        x <- rep(c1,length(gcmnames))
+        x[im()] <- c2
+      }
+      return(x)
+    })
+    
+    clr.line <- reactive({
+      x <- clr()
+      x[im()] <- "black"
+      return(x)
+    })
+    
+    sz <- reactive({
+      x <- rep(8, length(gcmnames))
+      x[im()] <- 10
+      return(x)
+    })
+    
+    emphasize.data <- reactive({
+      data.frame(x=dtas()[im()],y=dpr()[im()])
+    })
+    
+    emphasize.marker <- reactive({
+      list(color=clr()[im()],size=sz()[im()],
+           line=list(clr.line()[im()], width=2))
+    })
+    
     p <- plot_ly(data.frame(x=dtas(),y=dpr()), x=~x, y=~y, type="scatter", mode="markers",
-            marker=list(color=clr()), text=gcmnames, source="A")
+            marker=list(color=clr(), size=sz(), line=list(color=clr.line(), width=2)),
+            text=paste(gcmnames,"\nWeighted rank:",weightedrank_all()), source="A") %>%
     layout(p, title=paste("Present day (1981-2010) to",tolower(input$period)),
-           xaxis=list(title="Temperature change (deg C)",range=c(-7,7)),
-           yaxis=list(title="Precipitation change (mm/day)",range=c(-1,1)))#, dragmode="lasso")
+           xaxis=list(title="Temperature change (deg C)",range=c(-5,5)),
+           yaxis=list(title="Precipitation change (mm/day)",range=c(-1,1))) %>%
+    add_trace(emphasize.data(), x=~x, y=~y, marker=emphasize.marker(),
+              showlegend=FALSE)
+    
   })
 
   output$clickevent <- renderPrint({

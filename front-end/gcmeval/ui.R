@@ -78,10 +78,11 @@ dashboardPage(
               "first", label = "First", width = '110px'
             ),
             br(),
-            checkboxInput("gcm.repeat", "1 simulation per GCM", 
-              value=FALSE,
-              width='110px'
-            ),
+            br(),
+            #checkboxInput("gcm.repeat", "1 simulation per GCM", 
+            #  value=FALSE,
+            #  width='110px'
+            #),
             checkboxGroupInput(
               "gcms",
               label = "Climate models (GCMs)",
@@ -394,6 +395,10 @@ dashboardPage(
                  12,
                  #useShinyjs(),
                  #extendShinyjs(text = jsresetclick, functions = c("resetClick")),
+                 checkboxInput("show.ranking", 
+                               label=HTML("<font size=-1<i>Show model ranking as color scale</i></font>"), 
+                               value=FALSE),
+                 br(),
                  plotlyOutput("dtdpr", width = '100%', height = 550),
                  br(),
                  br()

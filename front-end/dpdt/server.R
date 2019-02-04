@@ -1,29 +1,5 @@
+source("global.R")
 
-library(shiny)
-library(DECM)
-source("helpers.R")
-
-## Load statistics calculated with script 'calculate_statistics.R'
-stats <- NULL
-data("statistics.cmip.era.tas.1981-2010")
-stats$tas$present <- store
-data("statistics.cmip.tas.2021-2050")
-stats$tas$nf <- store
-data("statistics.cmip.tas.2071-2100")
-stats$tas$ff <- store
-data("statistics.cmip.era.pr.1981-2010")
-stats$pr$present <- store
-data("statistics.cmip.pr.2021-2050")
-stats$pr$nf <- store
-data("statistics.cmip.pr.2071-2100")
-stats$pr$ff <- store
-
-## Function 'regions' is defined in helpers.R
-srex <- regions("srex")
-
-## Load geographical data for map
-data("geoborders",envir=environment())
-  
 ## Define a server for the Shiny app
 shinyServer(function(input, output) {
   
@@ -39,18 +15,19 @@ shinyServer(function(input, output) {
     period <- switch(tolower(as.character(input$period)),
                      "far future (2071-2100)"='ff',
                      "near future (2021-2050)"='nf')
-    gcms <- names(stats$tas$ff)
+    gcms.tas <- names(stats$tas$ff)[im.tas]
+    gcms.pr <- names(stats$pr$ff)[im.pr]
     if(tolower(input$region)=="global") {
       region <- "global"
     } else {
       i.srex <- which(srex$name==input$region)
       region <- srex$label[i.srex]
     }
-    dtas <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
+    dtas <- sapply(gcms.tas, function(gcm) mean(sapply(season, function(s)
       stats$tas[[period]][[gcm]][[region]][["mean"]][[s]])) - 
         mean(sapply(season, function(s) 
           stats$tas$present[[gcm]][[region]][["mean"]][[s]])))
-    dpr <- sapply(gcms, function(gcm) mean(sapply(season, function(s)
+    dpr <- sapply(gcms.pr, function(gcm) mean(sapply(season, function(s)
       stats$pr[[period]][[gcm]][[region]][["mean"]][[s]])) - 
         mean(sapply(season, function(s) 
           stats$pr$present[[gcm]][[region]][["mean"]][[s]])))
@@ -60,7 +37,10 @@ shinyServer(function(input, output) {
                 main=paste("Climate change assuming RCP4.5\npresent day (1981-2010) to",input$period),
                 show.legend=FALSE,im=im,
                 legend=seq(length(dtas)),pal=NULL,#pal="cat",pch=21,
-                pch=as.character(seq(length(dtas))),cex=1.5,lwd=1.5,new=FALSE)
+                pch=".",#pch=as.character(seq(length(dtas))),
+                cex=0,lwd=1.5,new=FALSE)
+    text(dtas,dpr*(60*60*24),as.character(seq(length(dtas))),col=adjustcolor("blue",alpha.f=0.1),cex=1.5)
+    text(dtas[im],dpr[im]*(60*60*24),as.character(im),col=adjustcolor("blue",alpha.f=0.8),cex=1.5)
   }, width=450, height=450)
   
   output$map <- renderPlot({

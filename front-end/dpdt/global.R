@@ -1,10 +1,43 @@
-## helpers.R
+## global.R
 ## Help functions for the shiny app "dpdt"
+library(shiny)
+library(DT)
+library(DECM)
+
+## Load statistics calculated with script 'calculate_statistics.R'
+stats <- NULL
+data("statistics.cmip.era.tas.1981-2010.rcp45")
+stats$tas$present <- store
+data("statistics.cmip.tas.2021-2050.rcp45")
+stats$tas$nf <- store
+data("statistics.cmip.tas.2071-2100.rcp45")
+stats$tas$ff <- store
+data("statistics.cmip.era.pr.1981-2010.rcp45")
+stats$pr$present <- store
+data("statistics.cmip.pr.2021-2050.rcp45")
+stats$pr$nf <- store
+data("statistics.cmip.pr.2071-2100.rcp45")
+stats$pr$ff <- store
+
+#data("metaextract")
+#im <- meta$project_id=="CMIP5" & meta$var=="tas" & meta$experiment=="RCP4.5"
+#gcmnames <- paste(seq(sum(im)),": ",meta$gcm[im],".",meta$gcm_rip[im],sep="")
+im.tas <- meta$project_id=="CMIP5" & meta$var=="tas" & meta$experiment=="RCP4.5"
+im.pr <- meta$project_id=="CMIP5" & meta$var=="pr" & meta$experiment=="RCP4.5"
+gcms.tas <- paste(meta$gcm[im.tas],".",meta$gcm_rip[im.tas],sep="")
+gcms.pr <- paste(meta$gcm[im.pr],".",meta$gcm_rip[im.pr],sep="")
+gcms.both <- gcms.tas[gcms.tas %in% gcms.pr]
+im.tas <- which(gcms.tas %in% gcms.both)
+im.pr <- which(gcms.pr %in% gcms.both)
+gcmnames <- paste(seq(length(gcms.both)),": ",gcms.both,sep="")
+
+## Load geographical data for map
+data("geoborders",envir=environment())
 
 regions <- function(type=c("srex","prudence"),region=NULL) {
   if(is.null(type) | length(type)>1) region <- NULL
   if(is.null(type) | "srex" %in% tolower(type)) {
-    f <- "referenceRegions.shp"#find.file("referenceRegions.shp")
+    f <- "../../back-end/inst/extdata/SREX_regions/referenceRegions.shp"
     x <- get.shapefile(f,with.path=TRUE)
     ivec <- 1:nrow(x)
     if(!is.null(region)) {
@@ -23,15 +56,11 @@ regions <- function(type=c("srex","prudence"),region=NULL) {
               usage=as.character(x$USAGE[ivec]),
               type=rep("srex",length(ivec)),
               coords=lapply(ivec, function(i) t(coordinates(x@polygons[[i]]@Polygons[[1]]))))
-              #west=sapply(ivec, function(i) xmin(extent(x[i,]))),
-              #east=sapply(ivec, function(i) xmax(extent(x[i,]))),
-              #south=sapply(ivec, function(i) ymin(extent(x[i,]))),
-              #north=sapply(ivec, function(i) ymax(extent(x[i,]))))
   } else {
     y <- NULL
   }
   if(is.null(type) | "prudence" %in% tolower(type)) {
-    f <- "RegionSpecifications.csv"#find.file("RegionSpecifications.csv")
+    f <- "../../back-end/inst/extdata/PRUDENCE_regions/RegionSpecifications.csv"
     x <- read.table(f,sep=",")
     ivec <- 2:nrow(x)
     names <- as.character(x[2:nrow(x),1])
@@ -55,10 +84,6 @@ regions <- function(type=c("srex","prudence"),region=NULL) {
                     t(matrix(sapply(c(4,5,5,4,4,6,6,7,7,6), 
                              function(j) factor2numeric(x[i,j])),
                              nrow=5,ncol=2))))
-                  #west=as.numeric(x[2:nrow(x),4]),
-                  #east=as.numeric(x[2:nrow(x),5]),
-                  #south=as.numeric(x[2:nrow(x),6]),
-                  #north=as.numeric(x[2:nrow(x),7]))
     if(is.null(y)) {
       y <- prudence 
     } else {
@@ -67,3 +92,7 @@ regions <- function(type=c("srex","prudence"),region=NULL) {
   }
   invisible(y)
 }
+
+## Function 'regions' is defined in helpers.R
+srex <- regions("srex")
+

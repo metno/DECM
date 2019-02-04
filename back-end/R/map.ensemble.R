@@ -2,8 +2,9 @@ map.ensemble <- function(ceof,im=NULL,ip=NULL,is=NULL,type=NULL,new=TRUE,FUN="me
                          colbar=list(pal=NULL,breaks=NULL,show=TRUE,rev=FALSE),
                          verbose=FALSE) {
   if(verbose) print("map.ensemble")
+  browser()
   if(grepl("cc",type)) {
-    if(grepl("t2m|tas|temp",attr(ceof[[2]],"variable"))) {
+    if(grepl("t2m|tas|temp",attr(ceof$eof,"variable"))) {
       colbar$breaks <- seq(-10,10,1)
       if(is.null(colbar$pal)) colbar$pal <- "burd"
     }

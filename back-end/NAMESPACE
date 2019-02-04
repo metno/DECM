@@ -43,14 +43,15 @@ export(metaextract.cordex)
 export(metaextract.opendap)
 export(python.getEra)
 export(scatterplot)
-## Functions that are not used:
+## Functions that are not used or do not work:
 #export(get.name)
 #export(EQC.ensemble)
 #export(thredds.urls)
 #export(testrank)
 #export(subset.commonEOF)
+#export(map.ensemble)
+#export(map.commonEOF)
 #export(commonEOF.gcm)
 #export(commonEOF.rcm)
 #export(EQC.commonEOF)
-#export(map.commonEOF)
-#export(map.ensemble)
+

@@ -12,25 +12,26 @@ shinyServer(function(input, output) {
                      "far future (2071-2100)"='ff',
                      "near future (2021-2050)"='nf')
     gcms <- names(stats[[var]]$ff)[switch(var,"tas"=im.tas,"pr"=im.pr)]
-    ref <- NULL
+    
     if(tolower(input$region)=="global") {
       region <- "global"
     } else {
       i.srex <- which(srex$name==input$region)
       region <- srex$label[i.srex]
     }
-    x <- lapply(gcms, function(gcm) stats[[var]][[period]][[gcm]][[region]][["mean"]][2:13])
+
+    x <- lapply(gcms, function(gcm) {
+      stats[[var]][[period]][[gcm]][[region]][["mean"]][2:13] })
+    if(var=="pr") x <- lapply(x, function(y) y*60*60*24) ## mm/s to mm/day
+
     if(period=="present") {
       im.ref <- which(!grepl("gcm",names(stats[[var]]$present)))
       ref <- stats[[var]][[period]][[im.ref]][[region]][["mean"]][2:13]
+      if(var=="pr") ref <- ref*1E3 ## m/day to mm/day
+    } else {
+      ref <- NULL
     }
     
-    # Unit correction of precip data
-    if(var=="pr") {
-      x <- lapply(x, function(y) y*60*60*24) ## mm/s to mm/day
-      ref <- ref*1E3 ## m/day to mm/day
-    }
-
     ylim <- c(NULL,NULL)
     if(!is.na(input$y0)) {
       ylim[1] <- input$y0
@@ -53,7 +54,7 @@ shinyServer(function(input, output) {
     
     for(i in 1:length(x)) lines(1:12,x[[i]],col="grey80")
     for(i in im) lines(1:12,x[[i]],col="blue")
-
+    
     if(!is.null(ref)) {
       lines(1:12,ref,col="red",lty=2)
       legend(0,par("usr")[3] - 0.25*diff(ylim),

@@ -390,17 +390,23 @@ models.85 <- apply(as.matrix(1:length(gcmnames.85)),1, getModel)
 
 ## Load statistics calculated with script 'calculate_statistics.R'
 stats <- NULL
-data("statistics.cmip.era.tas.1981-2010")
+data(package="DECM", "statistics.cmip.era.tas.1981-2010",
+     envir=environment())
 stats$tas$present <- store
-data("statistics.cmip.tas.2021-2050")
+data(package="DECM", "statistics.cmip.tas.2021-2050",
+     envir=environment())
 stats$tas$nf <- store
-data("statistics.cmip.tas.2071-2100")
+data(package="DECM", "statistics.cmip.tas.2071-2100",
+     envir=environment())
 stats$tas$ff <- store
-data("statistics.cmip.era.pr.1981-2010")
+data(package="DECM", "statistics.cmip.era.pr.1981-2010",
+     envir=environment())
 stats$pr$present <- store
-data("statistics.cmip.pr.2021-2050")
+data(package="DECM", "statistics.cmip.pr.2021-2050",
+     envir=environment())
 stats$pr$nf <- store
-data("statistics.cmip.pr.2071-2100")
+data(package="DECM", "statistics.cmip.pr.2071-2100",
+     envir=environment())
 stats$pr$ff <- store
 
 ## Help functions for the shiny app "seasoncycle"
@@ -557,7 +563,7 @@ gcm.meta.all <- gcm.meta.all[,-c(7,8,9,10)]
 
 # ---- RCMs -------
 ## Load meta data for RCMs
-data(package = 'DECM','metaextract')
+data(package='DECM', 'metaextract', envir=environment())
 meta <- as.data.frame(meta)
 META <- meta[,c('project_id','experiment','gcm','gcm_rip','rcm',
                 'longname','var','unit','frequency','dates',

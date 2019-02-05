@@ -20,8 +20,6 @@ shinyjs.resetClick = function() {
   Shiny.onInputChange('.clientValue-plotly_click-A', 'null'); 
 }"
 
-#Seasons <- list("ann",c('dec','jan','feb'),c('mar','apr','may'),c('jun','jul','aug'),c('sep','oct','nov'))
-#Periods <- list("nf","ff")
 regionlist <- c(
   "Global",
   "Alaska/N.W. Canada [ALA:1]",
@@ -60,7 +58,7 @@ regionlist <- c(
 )
 
 # Load meta data
-data("metaextract")
+data(package="DECM", "metaextract", envir=environment())
 
 clean <- function(x) {
   gsub("[[:punct:]]|[[:space:]]","",tolower(x))
@@ -70,7 +68,7 @@ gcm.i <- clean(substr(meta$filename,1,
 meta$gcmtag <- gcm.i
 
 ## Load geographical data for map
-data("geoborders")
+data(package="esd", "geoborders", envir=environment())
 
 # Load stats and remove not common GCMs from stats
 metaPrep <- function(rcp="rcp45") {
@@ -133,11 +131,13 @@ dataPrep <- function(rcp="rcp45") {
     for(i in seq_along(period.yr)) {
       for(exp in rcp) {
         if(period.nm[i]=="present") {
-          eval(parse(text=paste('data("statistics.cmip.era.',var,".",
-                                period.yr[i],".",clean(exp),'")',sep="")))
+          eval(parse(text=paste('data(package="DECM", "statistics.cmip.era.',var,".",
+                                period.yr[i],".",clean(exp),
+                                '", envir=environment())',sep="")))
         } else {
-          eval(parse(text=paste('data("statistics.cmip.',var,".",
-                                period.yr[i],".",clean(exp),'")',sep="")))
+          eval(parse(text=paste('data(package="DECM", "statistics.cmip.',var,".",
+                                period.yr[i],".",clean(exp),
+                                '", envir=environment())',sep="")))
         }
         stats[[exp]][[var]][[period.nm[i]]] <- store
       }

@@ -169,9 +169,9 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                          font-family:Karla;
 			 font-weight: bold;
 			 position:fixed;
-                         top: calc(0%);
-                         left: calc(50%);
-                         right: calc(0%);
+                         top: calc(5.5%);
+                         left: calc(40%);
+                         right: calc(20%);
                          opacity : 1;}"
                     )
                   )
@@ -1180,7 +1180,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                 column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%')))   
                                                      ),
                                                      tabPanel("Temperature", p(),
-                                                              plotlyOutput("gcm.cc.tas.pu",height = '500'),
+                                                              plotlyOutput("gcm.cc.tas.pu",width='100%',height = '500'),
                                                               column(12,infoBoxOutput("figcaption.gcm.tas.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figTips.gcm.tas.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figMoreTips.gcm.tas.cc",width= '100%')),p(),
@@ -1194,7 +1194,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                               column(12,infoBoxOutput("figRemember.gcm.pr.cc",width= '100%'))
                                                      ),
                                                      tabPanel("Precipitation vs Temperature", p(),
-                                                              plotlyOutput("gcm.cc.scatter.pu",height = '500'),
+                                                              plotlyOutput("gcm.cc.scatter.pu",height = '500px'),
                                                               column(12,infoBoxOutput("figcaption.gcm.cc.scatter",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figTips.gcm.cc.scatter",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figMoreTips.gcm.cc.scatter",width= '100%')),p(),
@@ -1260,7 +1260,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                      ),
                                                      tabPanel("Precipitation vs Temperature", p(),
                                                               plotlyOutput("rcm.cc.scatter.pu",height = '500'),
-                                                              box(collapsible = TRUE, collapsed=TRUE, width = '100%', status = 'danger',title = tags$h4('Caption Details'),
+                                                              box(collapsible = TRUE, collapsed=TRUE, width = '100%', status = 'warning',title = 'Figure Details',
                                                                   column(12,infoBoxOutput("figcaption.rcm.cc.scatter",width= '100%')),p(),
                                                                   column(12,infoBoxOutput("figTips.rcm.cc.scatter",width= '100%')),p(),
                                                                   column(12,infoBoxOutput("figMoreTips.rcm.cc.scatter",width= '100%')),p(),

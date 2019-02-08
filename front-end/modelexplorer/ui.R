@@ -1,12 +1,7 @@
-
-library(shiny)
-if (!require("DT")) install.packages('DT')
-library(DT)
-library(DECM)
-
-data("statistics.cmip.tas.2071-2100")
-gcmnames <- paste(seq(length(store)),names(store),sep=". ")
-
+#library(shiny)
+#if (!require("DT")) install.packages('DT')
+#library(DT)
+#library(DECM)
 navbarPage(title = 'Climate model data explorer (Beta version)', 
            id = 'x0',
            header=img(src="banner_c3s.png", 
@@ -16,33 +11,33 @@ navbarPage(title = 'Climate model data explorer (Beta version)',
                     h3(textOutput('text')),
                     DT::dataTableOutput("table")
                     #plotOutput("plot")
-           ),
-           tabPanel('Map of climate change', 
-                    column(3,
-		                     selectInput("type",
-                           label = "What to show on map",
-                           choices = c("Climate change near future",
-                                       "Climate change far future",
-                                       "Mean value present day",
-                                       "Mean value near future",
-                                       "Mean value far future"),
-                           selected = "Climate change far future"),
-                         selectInput("varid",
-                           label = "Climate variable",
-                           choices = c("Temperature",
-                                       "Precipitation"),
-                           selected = "Temperature"),
-		                     selectInput("fn",
-		                       label = "Ensemble statistics",
-		                       choices = c("Mean","95th percentile",
-		                                   "5th percentile"),
-		                       selected = "Ensemble mean")),#,
-		                     #checkboxGroupInput("gcms",
-                         #  label = "Climate models",
-                         #  choices = gcmnames)),
-		                column(3,
-                      plotOutput("map"))
-           )
+           )#,
+           #tabPanel('Map of climate change', 
+           #         column(3,
+		       #              selectInput("type",
+           #                label = "What to show on map",
+           #                choices = c("Climate change near future",
+           #                            "Climate change far future",
+           #                            "Mean value present day",
+           #                            "Mean value near future",
+           #                            "Mean value far future"),
+           #                selected = "Climate change far future"),
+           #              selectInput("varid",
+           #                label = "Climate variable",
+           #                choices = c("Temperature",
+           #                            "Precipitation"),
+           #                selected = "Temperature"),
+		       #              selectInput("fn",
+		       #                label = "Ensemble statistics",
+		       #                choices = c("Mean","95th percentile",
+		       #                            "5th percentile"),
+		       #                selected = "Ensemble mean")),#,
+		       #              #checkboxGroupInput("gcms",
+           #              #  label = "Climate models",
+           #              #  choices = gcmnames)),
+		       #       column(3,
+           #          plotOutput("map"))
+           #)
            #tabPanel('View data', 
            #         #textInput('x2', 'Row ID'), 
            #         DT::dataTableOutput("selsta",width = 'auto'),

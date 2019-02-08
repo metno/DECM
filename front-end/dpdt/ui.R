@@ -1,14 +1,3 @@
-
-library(shiny)
-if (!require("DT")) install.packages('DT')
-library(DT)
-library(DECM)
-
-#data("statistics.cmip.tas.2071-2100")
-data("metaextract")
-im <- meta$project_id=="CMIP5" & meta$var=="tas"
-gcmnames <- paste(seq(sum(im)),": ",meta$gcm[im],".",meta$gcm_rip[im],sep="")
-
 navbarPage(title = 'Projections of temperature and precipitation', 
            id = 'x0',
            header=img(src="banner_c3s.png", 
@@ -31,7 +20,7 @@ navbarPage(title = 'Projections of temperature and precipitation',
                            sliderInput("tlim", "temperature range:",
                                        min = -20, max = 20, value = c(-5,5), step=0.5),
                            sliderInput("plim", "precipitation range:",
-                                       min = -2, max = 2, value = c(-0.4,0.4), step=0.2)),
+                                       min = -2, max = 2, value = c(-0.5,0.5), step=0.1)),
                     column(6,
                            plotOutput("dtdpr")),
                     column(3,

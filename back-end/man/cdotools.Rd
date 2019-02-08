@@ -1,6 +1,10 @@
-\name{cdo.mean}
+\name{cdo.command}
+\alias{cdo.command}
 \alias{cdo.mean}
-%- Also NEED an '\alias' for EACH other topic documented here.
+\alias{cdo.spatSd}
+\alias{cdo.timeSd}
+\alias{cdo.gridcor}
+
 \title{
    CDO calculations in R
 }
@@ -8,50 +12,61 @@
   Do operations on netCDF files with CDO. More efficient than doing the calculations directly in R.
 }
 \usage{
-cdo.mean(x)
+cdo.command(commands,input,infile,outfile,intern=FALSE)
+cdo.mean(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
+         monthly=FALSE,is.temp=TRUE,outfile=NULL,verbose=FALSE)
+cdo.spatSd(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
+           monthly=FALSE,verbose=FALSE)
+cdo.timeSd(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
+           monthly=FALSE,verbose=FALSE)
+cdo.gridcor(model.file,reference.file,period=c(1981,2010),mask=NULL,
+            seasonal=FALSE,monthly=FALSE,verbose=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
-}
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
+  \item{commands}{the system commands to be invoked}
+  \item{input}{input to the commands}
+  \item{infile}{path to input netCDF file}
+  \item{outfile}{path to output netCDF file}
+  \item{intern}{A logical (not NA) which indicates whether to capture the output of the command as an R character vector.}
+  \item{model.file}{path to netCDF file}
+  \item{reference.file}{path to netCDF another file}
+  \item{period}{a subset of years to include in calculations}
+  \item{mask}{a spatial mask}
+  \item{seasonal}{if TRUE return seasonal mean values}
+  \item{monthly}{if TRUE return monthly mean values}
+  \item{is.temp}{a logical indicating if the input is temperature data, in which case some corrections may be applied}
+  \item{verbose}{if TRUE display information on progress}
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
+\item{out}{A vector containing statistical values}
 }
 \author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+Olle Raty
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+# Example files: 
+gcm.file <- system.file("extdata", "gcm.nc", package = "DECM")
+ref.file <- system.file("extdata", "ref.nc", package = "DECM")
+# Set period
+period <- c(1990,1993)
 
-## The function is currently defined as
-function (x) 
-{
-  }
+# Calculate annual mean spatial standard deviation
+sd.space <- cdo.spatSd(ref.file, period, monthly=FALSE)
+sd.time <- cdo.timeSd(ref.file, period, monthly=FALSE)
+
+# Calculate monthly mean
+meanval <- cdo.mean(ref.file, period, monthly=TRUE)
+
+# Calculate spatial correlation between GCM and reference data
+cor <- cdo.gridcor(gcm.file, ref.file, period)
+
+\dontrun{
+# Use cdo.command to calculate the monthly mean
+cdo.command(c("-ymonmean","-fldmean"), c("",""), ref.file, "tmp.nc")
+out <- as.numeric(cdo.command("output","","tmp.nc",NULL,intern=TRUE))
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+}
+
+\keyword{cdo}
+\keyword{cdotools}

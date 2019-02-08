@@ -23,7 +23,7 @@ function(input, output,session) {
   data(Oslo)
   
   # Model explorer
-  data("metaextract")
+  data(package='DECM', "metaextract")
   M <- data.frame(list(Project=meta$project_id,
                        Experiment=meta$experiment_id,
                        GCM=meta$gcm,
@@ -81,7 +81,7 @@ function(input, output,session) {
   
   output$glossary <- DT::renderDataTable({
     DT::datatable(
-      rbind(c('Project','Name of the project that run the simulations'),
+      rbind(c('Project','Name of the project that runs the simulations'),
             c('GCM','Global Climate Model or General Circulation Model'),
             c('RIP','Realisation, initialisation method, and physics version of a GCM'),
             c('RCM','Regional Climate Model'),
@@ -302,7 +302,6 @@ function(input, output,session) {
       region <- gsub(' ','',region)
     }
     x <- lapply(rcms, function(rcm) stats[[param]][[period]][[rcm]][[region]][[stat]][2:13])
-    #browser()
     #if(period=="present") {
     id.ref <- grep('eobs',names(stats[[param]][['present']])) 
     if (is.element(stat,c('mean','spatial.sd')))
@@ -338,7 +337,7 @@ function(input, output,session) {
       else
         showNotification('Please select a model from the meta data table!')
     }
-    #browser()
+    
     if (!is.null(ref))
       df <- data.frame(rcm.vals,ref,stringsAsFactors = FALSE)
     else
@@ -597,6 +596,29 @@ function(input, output,session) {
     invisible(m)
   }
   
+<<<<<<< HEAD
+=======
+  ## Sectoral communication example 
+  spi <- function(freq=1,group='ED',stat='nEvents',period='1981-2010') {
+    
+    spi.file <- paste('~/Downloads/rda_files/spei_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
+    load(spi.file)
+    #browser()
+    spi <- array(NA,dim=c(length(droughtStatistics), dim(droughtStatistics[[1]][[stat]])))
+    for (i in 1:length(droughtStatistics))
+      spi[i,,] <- droughtStatistics[[i]][[stat]]
+    attr(spi,'longitude') <- attr(droughtStatistics[[1]][[1]],'dimnames')[[1]]
+    attr(spi,'latitude') <- attr(droughtStatistics[[1]][[1]],'dimnames')[[2]]
+    invisible(spi)
+  }
+  
+  spi.reactive <- reactive({
+    invisible(spi(input$spi.freq,substr(input$spi.group,1,2),input$spi.stat,substr(input$spi.period,1,9)))
+  })
+  
+  
+  observe(priority = 0, { # 
+>>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
     
     ## Global Climate Models Menu item ---      
     ## Metadata table
@@ -1857,7 +1879,6 @@ function(input, output,session) {
           colsa <- rgbcolsa
           cols <- rgbcols
         }
-        # browser()
         ## Add all Simulations
         if (is.null(input$rowsGcm)) {
           for (gcm in gcms) {
@@ -2038,7 +2059,6 @@ function(input, output,session) {
         # Color by
         colsa <- rgbcolsa
         cols <- rgbcols
-        # browser()
         ## Add all Simulations
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
@@ -2194,7 +2214,6 @@ function(input, output,session) {
         # Color by
         colsa <- rgbcolsa
         cols <- rgbcols
-        # browser()
         ## Add all Simulations
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
@@ -2342,7 +2361,6 @@ function(input, output,session) {
         # Color by
         colsa <- rgbcolsa
         cols <- rgbcols
-        # browser()
         ## Add all Simulations
         for (gcm in gcms) {
           i <- which(is.element(gcms,gcm))
@@ -2807,10 +2825,11 @@ function(input, output,session) {
                                            )
 				)
       
-      if (input$gcm.legend.sc == 'Hide')
+      if (input$gcm.legend.sc == 'Hide') {
         p.sc <- p.sc %>% layout(showlegend = FALSE)
-      else
+      } else {
         p.sc <- p.sc %>% layout(showlegend = TRUE)
+      }
       #gcm.dtdp$elementId <- NULL
       # gcm.dtdp
       p.sc$elementId <- NULL
@@ -2840,8 +2859,9 @@ function(input, output,session) {
       gcmall <- c(sapply(1:dim(gcm.meta.pr)[1],gcm.name),'ERAINT')
       gcm.inst <- c(sapply(1:dim(gcm.meta.pr)[1],inst.name),'ERAINT')
       
-      df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),dpr = as.numeric(round(colMeans(dpr),digits = 2)),
-                       gcm.name = gcmall, inst.name = gcm.inst,stringsAsFactors = FALSE)
+      df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),
+                       dpr = as.numeric(round(colMeans(dpr),digits = 2)),
+                       gcm.name = gcmall, inst.name = gcm.inst, stringsAsFactors = FALSE)
       
       id <- 1 : (length(df$dtas) - 1)
       lev <- levels(factor(id))
@@ -3349,10 +3369,8 @@ function(input, output,session) {
     output$hydro.sc.tas <- rcm.sc.tas
     
     output$rcm.sc.bias.tas.pu <- renderPlotly({
-      #browser()
       rcm.meta.tas <- rcm.meta.tas.reactive.pu()
       df <- rcm.sc.tas.reactive.pu()
-      
       df <- df - df[,dim(df)[2]]      
       
       #df <- df[,-36] # AM Quick fix but has to be removed ... once meta is updated.
@@ -4766,7 +4784,7 @@ function(input, output,session) {
         return(paste(as.character(as.matrix(rcmi)),collapse = '_'))
       }
       inst.name <- function(i) {
-        rcmi <- rcm.meta.pr[i,c('model_id')]
+        rcmi <- rcm.meta.pr[i,c('rcm')]#'model_id')]
         rcmi[is.na(rcmi)] <- ''
         return(paste(as.character(as.matrix(rcmi)),collapse = '_'))
       }
@@ -4948,10 +4966,11 @@ function(input, output,session) {
                                            )
 				)
       
-      if (input$rcm.legend.sc == 'Hide')
+      if (input$rcm.legend.sc == 'Hide') {
         p.sc <- p.sc %>% layout(showlegend = FALSE)
-      else
+      } else {
         p.sc <- p.sc %>% layout(showlegend = TRUE)
+      }
       #rcm.dtdp$elementId <- NULL
       # rcm.dtdp
       p.sc$elementId <- NULL
@@ -4975,19 +4994,19 @@ function(input, output,session) {
         return(paste(as.character(as.matrix(rcmi)),collapse = '_'))
       }
       inst.name <- function(i) {
-        rcmi <- rcm.meta.pr[i,c('model_id')]
+        rcmi <- rcm.meta.pr[i,c('rcm')]#'model_id')]
         rcmi[is.na(rcmi)] <- ''
         return(paste(as.character(as.matrix(rcmi)),collapse = '_'))
       }
-      rcmall <- c(sapply(1:dim(rcm.meta.pr)[1],rcm.name),'ERAINT')
-      rcm.inst <- c(sapply(1:dim(rcm.meta.pr)[1],inst.name),'ERAINT')
       
-      df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),dpr = as.numeric(round(colMeans(dpr),digits = 2)),
+      rcmall <- c(sapply(1:nrow(rcm.meta.pr),rcm.name),'ERAINT')
+      rcm.inst <- c(sapply(1:nrow(rcm.meta.pr),inst.name),'ERAINT')
+      df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),
+                       dpr = as.numeric(round(colMeans(dpr),digits = 2)),
                        rcm.name = rcmall, inst.name = rcm.inst,stringsAsFactors = FALSE)
       
       id <- 1 : (length(df$dtas) - 1)
       lev <- levels(factor(id))
-      
       rgbcolsa <- c('rgba(45,51,38,0.5)', 'rgba(87,77,102,0.5)', 'rgba(255,191,200,0.5)', 'rgba(140,129,105,0.5)', 'rgba(234,191,255,0.5)', 'rgba(172,230,195,0.5)',
                     'rgba(86,105,115,0.5)', 'rgba(115,86,94,0.5)', 'rgba(230,195,172,0.5)', 'rgba(255,234,191,0.5)', 'rgba(124,140,105,0.5)', 'rgba(51,26,43,0.5)',
                     'rgba(191,96,172,0.5)', 'rgba(184,204,102,0.5)', 'rgba(153,87,77,0.5)', 'rgba(96,134,191,0.5)', 'rgba(230,115,145,0.5)', 'rgba(255,145,128,0.5)', 
@@ -5052,9 +5071,15 @@ function(input, output,session) {
       
       
       
+<<<<<<< HEAD
       if ((input$rcm.cc.chart.type == 'Ensemble of All Simulations') | (input$rcm.cc.chart.type == "Both - Ensemble & Individual Simulations"))
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
       #}
+=======
+      if ((input$rcm.cc.chart.type == 'Ensemble of All Simulations') | (input$rcm.cc.chart.type == "Both - Ensemble & Individual Simulations")) {
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+      }
+>>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
       
       if (input$rcm.legend.sc == 'Display') {
         p.sc <- p.sc %>% add_trace(x = ~mean(df$dtas[-length(df$dpr)]),y = ~ mean(df$dpr[-length(df$dpr)]),type = 'scatter',mode = 'markers',
@@ -5105,25 +5130,25 @@ function(input, output,session) {
                                            )
 				)
       
-      if (input$rcm.legend.sc == 'Hide')
+      if (input$rcm.legend.sc == 'Hide') {
         p.sc <- p.sc %>% layout(showlegend = FALSE)
-      else
+      } else {
         p.sc <- p.sc %>% layout(showlegend = TRUE)
+      }
       #rcm.dtdp$elementId <- NULL
       # rcm.dtdp
       p.sc$elementId <- NULL
       p.sc
       })
     
-    
     output$rcm.scatter.data <- DT::renderDataTable({
       
       rcm.meta.pr <- rcm.meta.pr.reactive()
       dpr <- rcm.sc.pr.reactive()
       rcms <- names(dpr)
-      if (input$rcm.outputValues == 'Bias')
+      if (input$rcm.outputValues == 'Bias') {
         dpr <- ((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]) * 100
-      else if (input$rcm.outputValues == 'RMSE') {
+      } else if (input$rcm.outputValues == 'RMSE') {
         dpr <- sqrt((((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]))^2) * 100
       } else if (input$rcm.outputValues == 'Anomaly') {
         DF <- t(dpr)
@@ -5135,9 +5160,9 @@ function(input, output,session) {
       rcm.meta.tas <- rcm.meta.tas.reactive()
       
       dtas <- rcm.sc.tas.reactive()
-      if (input$rcm.outputValues == 'Bias')
+      if (input$rcm.outputValues == 'Bias') {
         dtas <- dtas - dtas[,dim(dtas)[2]]
-      else if (input$rcm.outputValues == 'RMSE') {
+      } else if (input$rcm.outputValues == 'RMSE') {
         dtas <- sqrt((dtas-dtas[,dim(dtas)[2]])^2)
       } else if (input$rcm.outputValues == 'Anomaly') {
         DF <- t(dtas)
@@ -5146,7 +5171,7 @@ function(input, output,session) {
         dtas <- dtas - rcm.sc.tas.present()
       }
       
-      if (!is.null(input$rowsRcm))
+      if (!is.null(input$rowsRcm)) {
         if (input$rcm.sim.sc == 'Selected Simulations') {
           dpr <- dpr[input$rowsRcm,]
           dtas <- dtas[input$rowsRcm,]
@@ -5154,6 +5179,7 @@ function(input, output,session) {
           rcm.meta.pr <- rcm.meta.pr[input$rowsRcm,]
           rcms <- rcms[input$rowsRcm]
         } 
+      }
       
       rcm.name <- function(i) {
         rcmi <- rcm.meta.pr[i,c('gcm','gcm_rip','rcm')]
@@ -5232,6 +5258,72 @@ function(input, output,session) {
       )
     })
     
+<<<<<<< HEAD
+=======
+    ## compute summary statistics e.g. ens. mean, quantiles, etc ... use this form 
+    #spi.stat <- spi.reactive()
+    output$spi.settings <- renderText({
+      paste(input$spi.sim,' | ',input$spi.freq,' | ',input$spi.group,' | ',input$spi.period,' | ',input$spi.stat)
+    })
+    output$map.spi <- renderLeaflet({
+      zmap <- spi.reactive()
+      cat('Observe','SPI-Index',paste('SPI-',input$it,sep=''),'GROUP', input$group,'PERIOD',input$period)
+      cat(sep = '\n')
+      x <- as.numeric(attr(zmap,'longitude'))
+      y <- as.numeric(attr(zmap,'latitude'))
+      #z <- apply(zmap,c(2,3),mean,na.rm=TRUE)
+      z <- zmap[grep(input$spi.sim,rcm.names),,]
+      #z[is.na(z)] <- -999
+      ## 
+      #Create raster object
+      dat1 <- list(x=x,y = y, z = z)
+      dim(dat1$z) <- c(length(dat1$x),length(dat1$y))
+      r <- raster(dat1)
+      print(print(object.size(r),units = 'Mb'))
+      
+      rev <- FALSE
+      col <- 'warm'
+      rng <- round(range(r@data@values,na.rm=TRUE),digits = 1)
+      breaks <- c(0,max(rng))
+      #breaks <- seq(-5,5,0.5)
+      leg.title <- "SPI [-]"
+      
+      pal <- colorBin(colscal(col = col,rev=rev),breaks, bins = 10, pretty = TRUE,na.color = NA)
+      
+      ## custom label format function
+      myLabelFormat = function(..., reverse_order = FALSE){
+        if(reverse_order){
+          function(type = "numeric", cuts){
+            cuts <- sort(cuts, decreasing = T)
+          }
+        } else{
+          labelFormat(...)
+        }
+      }
+      m <- leaflet() %>%
+        addProviderTiles(providers$Esri.WorldStreetMap,
+                         #addProviderTiles(providers$Stamen.TonerLite,
+                         options = providerTileOptions(noWrap = TRUE)) %>%
+        setView(lat=55,lng = 8, zoom = 4) %>%
+        addRasterImage(x = r,colors = pal, opacity = 0.6)
+      # addPopups(lng = as.numeric(unlist(lapply(1:length(sta), function(i) lon(sta[[i]])))), 
+      #           lat = as.numeric(unlist(lapply(1:length(sta), function(i) lat(sta[[i]])))),
+      #           popup = content)
+      ##   
+      if (input$legend == 'Display')
+        m <- m %>% addLegend("bottomleft", values=round(r@data@values, digits = 2), 
+                             title=leg.title, colors = rev(colscal(col= col, rev = rev, n=length(pretty(breaks,n = 10)))),
+                             labels = rev(pretty(breaks,n = 10)),#pal=pal, 
+                             layerId="colorLegend")  # labFormat = myLabelFormat(reverse_order = F)
+      # m <- m %>% addLegend("topleft", values=round(r@data@values, digits = 2), title=leg.title, colors = pal(round(r@data@values, digits = 2)),labels = seq(1,10,1),#pal=pal, 
+      #                      labFormat = myLabelFormat(reverse_order = T),layerId="colorLegend") # labFormat = myLabelFormat(reverse_order = T),
+      if (input$minimap == 'Display')
+        m <- m %>% addMiniMap()
+      m
+    })
+  })
+  
+>>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
   observeEvent(input$gcm.groupBy,{
     if (!is.element(input$gcm.groupBy,c('None','---')))
       updateSelectInput(inputId = "gcm.chart.type",session = session,
@@ -5264,228 +5356,231 @@ function(input, output,session) {
     tags$iframe(src="http://157.249.177.25:3838/BarentsAtlas/",width = '100%', height = '950')
   })
   
-  # GCM info text output
-  output$simulation = renderInfoBox({
-    txt <- tags$h5('The climate simulations constitue a representation of possible climate outcomes and are based on 
+  ## Documentation
+  observe({
+    output$simulation = renderInfoBox({
+      txt <- tags$h5('The climate simulations constitue a representation of possible climate outcomes and are based on 
                    climate models that are run on different temporal and spatial scales to provide the best representation
                    of the climate signal over a region of interest and for a specific time horizon (past, present, or future). 
                    The climate simulations evaluated here are based on climate model ouptuts 
                    collected from the Climate Model Intercomparison Project - Phase5 (CMIP5), the Coordinated Regional Climate Downscaling Experiment over Europe (EURO-CORDEX),
                    and the Empirical-Statistical Downcaling project (ESD) at the Norwegian Meteorolocial Institute to produce the best estimates of 
                    global/regional/local climate signal that in turn can be used in impact studies.')   
-    infoBox('What Climate Simulations evaluated here !',txt, icon = shiny::icon("table"),color = 'olive')
-  })
-  
-  txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-  
-  # GCM info text output
-  output$figcaption.gcm.sc.tas = renderInfoBox({
+      infoBox('What Climate Simulations evaluated here !',txt, icon = shiny::icon("table"),color = 'olive')
+    })
+    
     txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.gcm.tas.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the bias in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.gcm.tas.cc = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the changes in simulated historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.gcm.sc.tas.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.gcm.sc.pr = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.gcm.pr.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the bias in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.gcm.sc.pr.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.gcm.pr.cc = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the changes in seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.gcm.scatter = renderInfoBox({
-    txt <- tags$h5('Interactive Scatter Plot showing surface air mean temperature VS mean monthly sums of precipitaiton. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulations. 
+    
+    # GCM info text output
+    output$figcaption.gcm.sc.tas = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.gcm.tas.pu = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the bias in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.gcm.tas.cc = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the changes in simulated historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.gcm.sc.tas.pu = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.gcm.sc.pr = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.gcm.pr.pu = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the bias in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.gcm.sc.pr.pu = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.gcm.pr.cc = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the changes in seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.gcm.scatter = renderInfoBox({
+      txt <- tags$h5('Interactive Scatter Plot showing surface air mean temperature VS mean monthly sums of precipitation. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulations. 
                    The black star shows the corresponding values from reanalysis data used as reference (ERAINT).')   
-    infoBox(strong('How to read the scatter plot!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.gcm.cc.scatter = renderInfoBox({
-    txt <- tags$h5('Interactive Scatter Plot showing changes in surface air mean temperature VS mean monthly sums of precipitaiton. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulated changes. 
+      infoBox(strong('How to read the scatter plot!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.gcm.cc.scatter = renderInfoBox({
+      txt <- tags$h5('Interactive Scatter Plot showing changes in surface air mean temperature VS mean monthly sums of precipitation. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulated changes. 
                    The black star shows the corresponding values from reanalysis data used as reference (ERAINT).')   
-    infoBox(strong('How to read the scatter plot!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  # RCM info text output
-  output$figcaption.rcm.sc.tas = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.rcm.tas.cc = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the future changes seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  output$figcaption.rcm.tas.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts  evaluating the bias in seasonal cycle of historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  output$figcaption.rcm.sc.tas.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.rcm.sc.pr = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.rcm.pr.cc = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the future changes in seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.rcm.pr.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the bias in seasonal cycle of historical and projected monthly precipitation totals assuming the intermediate (RCP4.5) emission scenario. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.rcm.sc.pr.pu = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.rcm.cc.scatter = renderInfoBox({
-    txt <- tags$h5('Interactive charts evaluating the future changes in seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
-    infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
-  })
-  
-  output$figcaption.rcm.scatter = renderInfoBox({
-    txt <- tags$h5('Interactive Scatter Plot showing surface air mean temperature VS mean monthly sums of precipitaiton. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulations. 
+      infoBox(strong('How to read the scatter plot!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    # RCM info text output
+    output$figcaption.rcm.sc.tas = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.rcm.tas.cc = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the future changes seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    output$figcaption.rcm.tas.pu = renderInfoBox({
+      txt <- tags$h5('Interactive charts  evaluating the bias in seasonal cycle of historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    output$figcaption.rcm.sc.tas.pu = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.rcm.sc.pr = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.rcm.pr.cc = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the future changes in seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.rcm.pr.pu = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the bias in seasonal cycle of historical and projected monthly precipitation totals assuming the intermediate (RCP4.5) emission scenario. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.rcm.sc.pr.pu = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.rcm.cc.scatter = renderInfoBox({
+      txt <- tags$h5('Interactive charts evaluating the future changes in seasonal cycle in historical and projected monthly precipitation totals. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
+    })
+    
+    output$figcaption.rcm.scatter = renderInfoBox({
+      txt <- tags$h5('Interactive Scatter Plot showing surface air mean temperature VS mean monthly sums of precipitation. The orange star and red envelope show the mean and the spread from the multi-model ensemble of simulations. 
                    The black star shows the corresponding values from reanalysis data used as reference (ERAINT).')   
-    infoBox(strong('How to read the scatter plot!'),txt, icon = shiny::icon("line-chart-o"),color = 'olive')
-  })
-  
-  # Text info
-  txtTips <- tags$h5('You can modify the type of output from the "Settings & Outputs" box and choose between options of showing individual simulations, envelope of the ensemble model simulations, or box plots. They let you show anomalies and group/colour the results according to the metadata. “Individual Simulations” allow double-click on specific climate models listed in the legend or the metadata table to isolate one or a group of simulations.')
-  txtMoreTips <- tags$h5('Other options include zooming in/out, comparing simulations, and downloading the graphic. The types of evaluation includes the mean seasonal cycle of the mean as well as the spatial standard deviation or spatial correlation, and you can download the data and further details about the simulations by selecting the tabs labelled “Data” or “Metadata”. The evaluation shown here are for multi-model ensemble of CMIP5 RCP4.5 simulations.')
-  txtRemember <- tags$h5('These simulations are based on models and data to represent the climate system. Those models are in turn based on coarse resolution, different parameterization schemes and simplifications of physical processes which systematically lead to deviations (biases) from the reference data.')
-  
-  figTips = renderInfoBox({
-    infoBox(strong('Tips on how to modify the chart to meet your needs!'),txtTips, icon = shiny::icon("info-sign", lib = "glyphicon"),color = 'orange')
-  })
-  
-  figMoreTips = renderInfoBox({
-    infoBox(strong('More Tips on how to use the chart!'),txtMoreTips, icon = shiny::icon("plus-sign", lib = "glyphicon"),color = 'light-blue')
-  })
-  
-  figRemember = renderInfoBox({
-    infoBox(strong('Recommendations on how to use the chart!'),txtRemember, icon = shiny::icon("asterisk", lib = "glyphicon"),color = 'red')
-  })
-  
-  output$figTips.gcm.tas <- figTips
-  output$figMoreTips.gcm.tas <- figMoreTips
-  output$figRemember.gcm.tas <- figRemember
-  
-  output$figTips.gcm.sc.tas.pu <- figTips
-  output$figMoreTips.gcm.sc.tas.pu <- figMoreTips
-  output$figRemember.gcm.sc.tas.pu <- figRemember
-  
-  output$figTips.gcm.tas.pu <- figTips
-  output$figMoreTips.gcm.tas.pu <- figMoreTips
-  output$figRemember.gcm.tas.pu <- figRemember
-  
-  output$figTips.gcm.pr <- figTips
-  output$figMoreTips.gcm.pr <- figMoreTips
-  output$figRemember.gcm.pr <- figRemember
-  
-  output$figTips.gcm.sc.pr.pu <- figTips
-  output$figMoreTips.gcm.sc.pr.pu <- figMoreTips
-  output$figRemember.gcm.sc.pr.pu <- figRemember
-  
-  output$figTips.gcm.pr.pu <- figTips
-  output$figMoreTips.gcm.pr.pu <- figMoreTips
-  output$figRemember.gcm.pr.pu <- figRemember
-  
-  output$figTips.gcm.pr.cc <- figTips
-  output$figMoreTips.gcm.pr.cc <- figMoreTips
-  output$figRemember.gcm.pr.cc <- figRemember
-  
-  output$figTips.gcm.tas.cc <- figTips
-  output$figMoreTips.gcm.tas.cc <- figMoreTips
-  output$figRemember.gcm.tas.cc <- figRemember
-  
-  output$figTips.gcm.scatter <- figTips
-  output$figMoreTips.gcm.scatter <- figMoreTips
-  output$figRemember.gcm.scatter <- figRemember
-  
-  output$figTips.gcm.cc.scatter <- figTips
-  output$figMoreTips.gcm.cc.scatter <- figMoreTips
-  output$figRemember.gcm.cc.scatter <- figRemember
-  
-  output$figTips.rcm.tas <- figTips
-  output$figMoreTips.rcm.tas <- figMoreTips
-  output$figRemember.rcm.tas <- figRemember
-  
-  output$figTips.rcm.tas.pu <- figTips
-  output$figMoreTips.rcm.tas.pu <- figMoreTips
-  output$figRemember.rcm.tas.pu <- figRemember
-  
-  output$figTips.rcm.sc.tas.pu <- figTips
-  output$figMoreTips.rcm.sc.tas.pu <- figMoreTips
-  output$figRemember.rcm.sc.tas.pu <- figRemember
-  
-  output$figTips.rcm.pr <- figTips
-  output$figMoreTips.rcm.pr <- figMoreTips
-  output$figRemember.rcm.pr <- figRemember
-  
-  output$figTips.rcm.pr.pu <- figTips
-  output$figMoreTips.rcm.pr.pu <- figMoreTips
-  output$figRemember.rcm.pr.pu <- figRemember
-  
-  output$figTips.rcm.sc.pr.pu <- figTips
-  output$figMoreTips.rcm.sc.pr.pu <- figMoreTips
-  output$figRemember.rcm.sc.pr.pu <- figRemember
-  
-  output$figTips.rcm.pr.cc <- figTips
-  output$figMoreTips.rcm.pr.cc <- figMoreTips
-  output$figRemember.rcm.pr.cc <- figRemember
-  
-  output$figTips.rcm.tas.cc <- figTips
-  output$figMoreTips.rcm.tas.cc <- figMoreTips
-  output$figRemember.rcm.tas.cc <- figRemember
-  
-  output$figTips.rcm.scatter <- figTips
-  output$figMoreTips.rcm.scatter <- figMoreTips
-  output$figRemember.rcm.scatter <- figRemember
-  
-  output$figTips.rcm.cc.scatter <- figTips
-  output$figMoreTips.rcm.cc.scatter <- figMoreTips
-  output$figRemember.rcm.cc.scatter <- figRemember
-  
-  output$figTips.rcm.cc.scatter <- figTips
-  output$figMoreTips.rcm.cc.scatter <- figMoreTips
-  output$figRemember.rcm.cc.scatter <- figRemember
-  
-  txtTable <- tags$h5('Monthly estimates of regional temperature assuming an intermediate emission scenarios for the present (1981-2010) averaged over Global region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the referance data set (Observation)')
-  
-  output$tabcaption = renderInfoBox({
-    infoBox('How to read the table!',txtTable, icon = shiny::icon("table"),color = 'orange')
+      infoBox(strong('How to read the scatter plot!'),txt, icon = shiny::icon("line-chart-o"),color = 'olive')
+    })
+    
+    # Text info
+    txtTips <- tags$h5('You can modify the type of output from the "Settings & Outputs" box and choose between options of showing individual simulations, envelope of the ensemble model simulations, or box plots. They let you show anomalies and group/colour the results according to the metadata. “Individual Simulations” allow double-click on specific climate models listed in the legend or the metadata table to isolate one or a group of simulations.')
+    txtMoreTips <- tags$h5('Other options include zooming in/out, comparing simulations, and downloading the graphic. The types of evaluation includes the mean seasonal cycle of the mean as well as the spatial standard deviation or spatial correlation, and you can download the data and further details about the simulations by selecting the tabs labelled “Data” or “Metadata”. The evaluation shown here are for multi-model ensemble of CMIP5 RCP4.5 simulations.')
+    txtRemember <- tags$h5('These simulations are based on models and data to represent the climate system. Those models are in turn based on coarse resolution, different parameterization schemes and simplifications of physical processes which systematically lead to deviations (biases) from the reference data.')
+    
+    figTips = renderInfoBox({
+      infoBox(strong('Tips on how to modify the chart to meet your needs!'),txtTips, icon = shiny::icon("info-sign", lib = "glyphicon"),color = 'orange')
+    })
+    
+    figMoreTips = renderInfoBox({
+      infoBox(strong('More Tips on how to use the chart!'),txtMoreTips, icon = shiny::icon("plus-sign", lib = "glyphicon"),color = 'light-blue')
+    })
+    
+    figRemember = renderInfoBox({
+      infoBox(strong('Recommendations on how to use the chart!'),txtRemember, icon = shiny::icon("asterisk", lib = "glyphicon"),color = 'red')
+    })
+    
+    output$figTips.gcm.tas <- figTips
+    output$figMoreTips.gcm.tas <- figMoreTips
+    output$figRemember.gcm.tas <- figRemember
+    
+    output$figTips.gcm.sc.tas.pu <- figTips
+    output$figMoreTips.gcm.sc.tas.pu <- figMoreTips
+    output$figRemember.gcm.sc.tas.pu <- figRemember
+    
+    output$figTips.gcm.tas.pu <- figTips
+    output$figMoreTips.gcm.tas.pu <- figMoreTips
+    output$figRemember.gcm.tas.pu <- figRemember
+    
+    output$figTips.gcm.pr <- figTips
+    output$figMoreTips.gcm.pr <- figMoreTips
+    output$figRemember.gcm.pr <- figRemember
+    
+    output$figTips.gcm.sc.pr.pu <- figTips
+    output$figMoreTips.gcm.sc.pr.pu <- figMoreTips
+    output$figRemember.gcm.sc.pr.pu <- figRemember
+    
+    output$figTips.gcm.pr.pu <- figTips
+    output$figMoreTips.gcm.pr.pu <- figMoreTips
+    output$figRemember.gcm.pr.pu <- figRemember
+    
+    output$figTips.gcm.pr.cc <- figTips
+    output$figMoreTips.gcm.pr.cc <- figMoreTips
+    output$figRemember.gcm.pr.cc <- figRemember
+    
+    output$figTips.gcm.tas.cc <- figTips
+    output$figMoreTips.gcm.tas.cc <- figMoreTips
+    output$figRemember.gcm.tas.cc <- figRemember
+    
+    output$figTips.gcm.scatter <- figTips
+    output$figMoreTips.gcm.scatter <- figMoreTips
+    output$figRemember.gcm.scatter <- figRemember
+    
+    output$figTips.gcm.cc.scatter <- figTips
+    output$figMoreTips.gcm.cc.scatter <- figMoreTips
+    output$figRemember.gcm.cc.scatter <- figRemember
+    
+    output$figTips.rcm.tas <- figTips
+    output$figMoreTips.rcm.tas <- figMoreTips
+    output$figRemember.rcm.tas <- figRemember
+    
+    output$figTips.rcm.tas.pu <- figTips
+    output$figMoreTips.rcm.tas.pu <- figMoreTips
+    output$figRemember.rcm.tas.pu <- figRemember
+    
+    output$figTips.rcm.sc.tas.pu <- figTips
+    output$figMoreTips.rcm.sc.tas.pu <- figMoreTips
+    output$figRemember.rcm.sc.tas.pu <- figRemember
+    
+    output$figTips.rcm.pr <- figTips
+    output$figMoreTips.rcm.pr <- figMoreTips
+    output$figRemember.rcm.pr <- figRemember
+    
+    output$figTips.rcm.pr.pu <- figTips
+    output$figMoreTips.rcm.pr.pu <- figMoreTips
+    output$figRemember.rcm.pr.pu <- figRemember
+    
+    output$figTips.rcm.sc.pr.pu <- figTips
+    output$figMoreTips.rcm.sc.pr.pu <- figMoreTips
+    output$figRemember.rcm.sc.pr.pu <- figRemember
+    
+    output$figTips.rcm.pr.cc <- figTips
+    output$figMoreTips.rcm.pr.cc <- figMoreTips
+    output$figRemember.rcm.pr.cc <- figRemember
+    
+    output$figTips.rcm.tas.cc <- figTips
+    output$figMoreTips.rcm.tas.cc <- figMoreTips
+    output$figRemember.rcm.tas.cc <- figRemember
+    
+    output$figTips.rcm.scatter <- figTips
+    output$figMoreTips.rcm.scatter <- figMoreTips
+    output$figRemember.rcm.scatter <- figRemember
+    
+    output$figTips.rcm.cc.scatter <- figTips
+    output$figMoreTips.rcm.cc.scatter <- figMoreTips
+    output$figRemember.rcm.cc.scatter <- figRemember
+    
+    output$figTips.rcm.cc.scatter <- figTips
+    output$figMoreTips.rcm.cc.scatter <- figMoreTips
+    output$figRemember.rcm.cc.scatter <- figRemember
+    
+    txtTable <- tags$h5('Monthly estimates of regional temperature assuming an intermediate emission scenarios for the present (1981-2010) averaged over Global region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the referance data set (Observation)')
+    
+    output$tabcaption = renderInfoBox({
+      infoBox('How to read the table!',txtTable, icon = shiny::icon("table"),color = 'orange')
+    })
+    
   })
   
   observeEvent(input$gcm.sc.period.pu,{
@@ -5581,8 +5676,12 @@ function(input, output,session) {
                         choices = c('Mean','Standard Deviation','Spatial Correlation')) 
     
   })
+<<<<<<< HEAD
 
  
+=======
+  
+>>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
 }
 
 

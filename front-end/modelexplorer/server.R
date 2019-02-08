@@ -1,56 +1,28 @@
 ## Kajsa Parding, 2017-05-15
 ## R-shiny app that presents GCM and RCM data.
+source("global.R")
 
-library(shiny)
-library(DECM)
-library(DT)
-source("helpers.R")
-#if ('RgoogleMaps' %in% installed.packages()) install.packages('RgoogleMaps')
-
-## Preparations
-## source scripts
-## load metadata
-data("metaextract")
-M <- data.frame(list(project_id=meta$project_id, experiment_id=meta$experiment_id, gcm=meta$gcm,
-                     rip=meta$gcm_rip, rcm=meta$rcm, var=meta$var, unit=meta$unit, resolution=paste(meta$resolution,"deg"),
-                     domain=paste(gsub(","," - ",meta$lon),"E"," / ",paste(gsub(","," - ",meta$lat)),"N",sep=""), 
-                     years=gsub(",","-",gsub("-[0-9]{2}","",meta$dates)), url=meta$url))
-
-## load and expand commonEOFs
-ceof.all <- NULL
-load("/home/ubuntu/git/DECM/back-end/data/ceof.gcm.tas.annual.rda")
-ceof.all$tas$CMIP5 <- ceof
-load("/home/ubuntu/git/DECM/back-end/data/ceof.gcm.pr.annual.rda")
-ceof.all$pr$CMIP5 <- ceof
-load("/home/ubuntu/git/DECM/back-end/data/ceof.rcm.tas.annual.rda")
-ceof.all$tas$CORDEX <- ceof
-load("/home/ubuntu/git/DECM/back-end/data/ceof.rcm.pr.annual.rda")
-ceof.all$pr$CORDEX <- ceof
-ceof <- ceof.all
-rm("ceof.all"); gc(reset=TRUE)
-selectrowindex <- 1
-
-select.ceof <- function(table_rows_selected=1,varid="Temperature") {
-  if (length(table_rows_selected)>0) {
-    selectedrowindex <- table_rows_selected[length(table_rows_selected)]
-    selectedrowindex <- as.numeric(selectedrowindex)
-  } else {
-    selectedrowindex <- 1
-  }
-  selectedrow <- (M[selectedrowindex,])
-  ceof.sel <- NULL
-  if (grepl("temp",tolower(varid))) {
-    ceof.sel <- ceof$tas
-  } else {
-    ceof.sel <- ceof$pr
-  }
-  ceof.sel <- ceof.sel[[selectedrow$project_id]]
-  im <- which(attr(ceof,"model_id")$rcm==selectedrow$rcm & 
-              attr(ceof,"model_id")$gcm==selectedrow$gcm & 
-              attr(ceof,"model_id")$gcm_rip==selectedrow$rip)
-  attr(ceof.sel,"im") <- im
-  return(ceof.sel)
-}
+#select.ceof <- function(table_rows_selected=1,varid="Temperature") {
+#  if (length(table_rows_selected)>0) {
+#    selectedrowindex <- table_rows_selected[length(table_rows_selected)]
+#    selectedrowindex <- as.numeric(selectedrowindex)
+#  } else {
+#    selectedrowindex <- 1
+#  }
+#  selectedrow <- (M[selectedrowindex,])
+#  ceof.sel <- NULL
+#  if (grepl("temp",tolower(varid))) {
+#    ceof.sel <- ceof$tas
+#  } else {
+#    ceof.sel <- ceof$pr
+#  }
+#  ceof.sel <- ceof.sel[[selectedrow$project_id]]
+#  im <- which(attr(ceof,"model_id")$rcm==selectedrow$rcm & 
+#              attr(ceof,"model_id")$gcm==selectedrow$gcm & 
+#              attr(ceof,"model_id")$gcm_rip==selectedrow$rip)
+#  attr(ceof.sel,"im") <- im
+#  return(ceof.sel)
+#}
 
 # Define a server for the Shiny app
 shinyServer(function(input, output) {
@@ -85,16 +57,16 @@ shinyServer(function(input, output) {
     selectedrow
   })
   
-  selected.ceof <- reactive({
-    select.ceof(input$table_rows_selected,input$varid)  
-  })
+  #selected.ceof <- reactive({
+  #  select.ceof(input$table_rows_selected,input$varid)  
+  #})
   
-  output$map <- renderPlot({
-    ceof <- selected.ceof()
-    map.ensemble(ceof,type=type.switch(input$type),new=FALSE,FUN=fn.switch(input$fn))
-  },height=450, width=650)
+  #output$map <- renderPlot({
+  #  ceof <- selected.ceof()
+  #  map.ensemble(ceof,type=type.switch(input$type),new=FALSE,FUN=fn.switch(input$fn))
+  #},height=450, width=650)
   
-  output$rawdata <- DT::renderDataTable({
+  #output$rawdata <- DT::renderDataTable({
     #browser()
     # if (length(input$table_rows_selected)>0) {
     #   selectedrowindex <- input$table_rows_selected[length(input$table_rows_selected)]
@@ -106,7 +78,7 @@ shinyServer(function(input, output) {
     # sel.sta <- station(select.station()[selectedrowindex,])  
     # # browser()
     # DT::datatable(data.frame(Date=index(sel.sta),Value=coredata(sel.sta)),filter='top',options = list(paging = TRUE))
-  })
+  #})
   
   
   # output$plots <- renderPlot({
@@ -126,7 +98,7 @@ shinyServer(function(input, output) {
   # plot(Oslo,new=FALSE)
   #})
   
-  output$downloadMeta <- downloadHandler(
+  #output$downloadMeta <- downloadHandler(
     
     # This function returns a string which tells the client
     # browser what name to use when saving the file.
@@ -157,9 +129,9 @@ shinyServer(function(input, output) {
     #   # Write to a file specified by the 'file' argument
     #   write.csv(as.data.frame(select.station()[selectedrowindex,]), file, row.names = FALSE)
     # }
-  )
+  #)
   
-  output$downloadData <- downloadHandler(
+  #output$downloadData <- downloadHandler(
     
     # This function returns a string which tells the client
     # browser what name to use when saving the file.
@@ -185,7 +157,7 @@ shinyServer(function(input, output) {
     #   #save(data,file=file)
     #   write.table(data.frame(Date=index(data),Value=coredata(data)), file=file, row.names = FALSE)
     # }
-  )
+  #)
   
 })
 

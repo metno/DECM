@@ -19,40 +19,9 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                       tags$style(".main-header .logo {text-align :left !important;}"),
                                       tags$style(".main-header {text-align :left !important;}"),
                                       tags$style(".main-header .sidebar-toggle {color:#EEE;margin: left !important;}")
-<<<<<<< HEAD
                               )
               ),
               dashboardSidebar(collapsed = FALSE,width = '400px',
-=======
-                              )#,
-                              #tags$li(h5("Menu",
-                              #	       style = "text-align: left !important;color: white;padding:10px;"),
-                              #         class = "dropdown")
-                              #tags$li(h3("Data Evaluation for Climate Models (DECM prototype)",
-                              #          style = "text-align: left !important;color: white;padding:0;"),
-                              #        class = "dropdown"),
-                              #tags$li(a(href = 'https://climate.copernicus.eu/data-evaluation-climate-models',
-                              #          img(src = 'https://climatedatasite.net/wp-content/uploads/2018/02/banner_c3s.png',
-                              #              title = "DECM website", height = "40px"),
-                              #          style = "padding-top:10px; padding-bottom:10px;"),
-                              #        class = "dropdown")
-                              # dropdownMenu(
-                              #   type = "messages", 
-                              #   badgeStatus =  "success",
-                              #   messageItem(from = 'Welcome to DECM Prototype tool', message = "Climate Data Web Site", icon = icon("file"),
-                              #               href = "https://climatedatasite.net/"),
-                              #   messageItem(from = 'Go to the shiny app', icon = icon("file"), message = 'Click here!',
-                              #               href = "https://esdlab.met.no/decmapps/"),
-                              #   messageItem(from = 'Shopping Box', icon = icon("shopping-cart", lib = "glyphicon"),
-                              #               message = "No model selected ")
-                              # ),
-                              #dropdownMenuOutput('messageMenu')
-              ),
-              # ,
-              # dropdownMenu(type = "messages", .list = msgs),
-              # dropdownMenu(type = "tasks",.list = tasks)),
-              dashboardSidebar(collapsed = TRUE,width = '250px',
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                sidebarMenu(
                                  menuItem("Product Users", tabName = 'pu',startExpanded = TRUE,
                                           menuSubItem("Explore the Simulations", tabName = "browse"),
@@ -286,7 +255,6 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                           )
                   ),
                   tabItem(tabName = "bias", 
-<<<<<<< HEAD
                           tags$br(),tags$br(),
 			  box(status = 'danger',solidHeader = TRUE, width = '100%',
                               'Here, you can',
@@ -297,26 +265,11 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                 tags$li("evaluate biases in monthly precipitaiton totals statistics")
                               ),
                               title = "Product Users | Models' biases",collapsible = TRUE, collapsed = FALSE
-=======
-                          fluidPage(box(status = 'danger',solidHeader = TRUE, width = '100%',
-                                        'In this web page, you can',
-                                        tags$ul(
-                                          tags$li("select a region to navigate through various predefined regions (EURO-CORDEX, PRUDENCE, European countries)"), 
-                                          tags$li("modify the default settings and select the output type (e.g. chart, boxplot) and values (e.g. bias, change)"), 
-                                          tags$li("evalutate future changes in monthly mean air Temperature statistics"),
-                                          tags$li("evaluate future changes in monthly precipitaiton totals statistics")
-                                        ),
-                                        title = "Product Users | Models' biases",collapsible = TRUE, collapsed = TRUE
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                           ),
                           box(status = 'danger',solidHeader = FALSE,width = '100%',collapsible = TRUE,title = 'TIPS',
                               tags$div(HTML('<p style="color:#871010;">TIPS | One way to assess the skill of climate models is to examine the model biases in reproducing the seasonal cycle. 
                                       Here, you can navigate between (CMIP5, A) global and (EURO-CORDEX, B) regional climate models, modify the settings so that they fit your needs, and explore how the models reproduce the monthly mean air temperature and precipitation totals over a number of pre-defined regions. You can additionally click on the dashboard menu to navigate between other evaluations of climate model simulations.</p>'))
-<<<<<<< HEAD
                           ),
-=======
-                          )),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                           tabsetPanel(type = "tabs",
                                       tabPanel("A | Global Climate Model Evaluation", p(), 
                                                fluidPage(
@@ -381,11 +334,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                  fluidRow(
                                                    box(
                                                      column(12,
-<<<<<<< HEAD
                                                             plotlyOutput("gcm.sc.bias.tas.pu",width = '100%',height = '500'))
-=======
-                                                            plotlyOutput("gcm.sc.bias.tas.pu",width = '100%',height = '600'))
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                      ,
                                                      fluidRow(
                                                        column(12,
@@ -448,11 +397,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                      ),
                                                      title = '4. Bias in monthly precipitation totals',
                                                      status = 'danger',solidHeader = TRUE,width = '100%',
-<<<<<<< HEAD
                                                      collapsible = TRUE,collapsed = FALSE)
-=======
-                                                     collapsible = TRUE,collapsed = TRUE)
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                  )
                                                )
                                       ),
@@ -553,11 +498,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                    box(
                                                      
                                                      column(12,
-<<<<<<< HEAD
                                                             plotlyOutput("rcm.sc.bias.pr.pu",height = '500'))
-=======
-                                                            plotlyOutput("rcm.sc.bias.pr.pu",height = '600'))
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                      ,
                                                      fluidRow(
                                                        column(12,
@@ -592,7 +533,6 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                           )
                   ),
                   tabItem(tabName = "seasonalCycle",
-<<<<<<< HEAD
                           fluidPage(
                             tags$br(),tags$br(),
 			    fluidRow(box(status = 'danger',solidHeader = TRUE, width = '100%', 
@@ -609,23 +549,6 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                          tags$div(HTML('<p style="color:#871010;">TIPS | One way to assess the skill of climate models is to examine how they reproduce the seasonal cycle. 
                                     Here, you can navigate between (CMIP5, A) global and (Euro-CORDEX, B) regional climate models, modify the settings so that they fit your needs, and explore how the models reproduce the monthly mean air temperature and precipitation totals over a number of pre-defined regions. Click on the dashboard to navigate between other evaluation items.<p/>'))
                             ))),
-=======
-                          fluidRow(),
-                          box(status = 'danger',solidHeader = TRUE, width = '100%', 
-                              'In this web page, you can',
-                              tags$ul(
-                                tags$li("select a region to navigate through various predefined regions (EURO-CORDEX, PRUDENCE, European countries)"), 
-                                tags$li("modify the default settings and select the output type (e.g. chart, boxplot) and values (e.g. bias, change)"), 
-                                tags$li("evalutate the seasonal cycle of monthly mean air Temperature statistics"),
-                                tags$li("evaluate the seasonal cycle of monthly precipitaiton totals statistics")
-                              ),
-                              title = "Product Users | Seasonal Cycle",collapsible = TRUE,collapsed = TRUE
-                          ),
-                          box(status = 'danger',solidHeader = TRUE,width = '100%',
-                              tags$div(HTML('<p style="color:#871010;">TIPS | One way to assess the skill of climate models is to examine how they reproduce the seasonal cycle. 
-                                    Here, you can navigate between (CMIP5, A) global and (Euro-CORDEX, B) regional climate models, modify the settings so that they fit your needs, and explore how the models reproduce the monthly mean air temperature and precipitation totals over a number of pre-defined regions. Click on the dashboard to navigate between other evaluation items.<p/>'))
-                          ),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                           tabsetPanel(type = "tabs",
                                       tabPanel("A | Global Climate Model Evaluation", p(),
                                                fluidPage(
@@ -689,11 +612,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                  fluidRow(
                                                    box(
                                                      column(12,
-<<<<<<< HEAD
                                                             plotlyOutput("gcm.sc.tas.pu",height = '500'))
-=======
-                                                            plotlyOutput("gcm.sc.tas.pu",height = '600'))
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                      ,
                                                      fluidRow(
                                                        column(12,
@@ -726,11 +645,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                  fluidRow(
                                                    box(
                                                      column(12,
-<<<<<<< HEAD
                                                             plotlyOutput("gcm.sc.pr.pu",height = '500'))
-=======
-                                                            plotlyOutput("gcm.sc.pr.pu",height = '600'))
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                      ,
                                                      fluidRow(
                                                        column(12,
@@ -758,11 +673,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                      ),
                                                      title = '4. Seasonal Cycle of monthly precipitation totals',
                                                      status = 'danger',solidHeader = TRUE,width = '100%',
-<<<<<<< HEAD
                                                      collapsible = TRUE,collaped = FALSE)
-=======
-                                                     collapsible = TRUE,collapsed = TRUE)
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                  )
                                                )
                                       ),
@@ -778,11 +689,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                                    selected = "Europe",width = '100%')),
                                                               column(8,helpText('You can navigate between the various predefined regions.'))
                                                        ),
-<<<<<<< HEAD
                                                        leafletOutput('rcm.sc.region.pu',width = '100%',height = '500'),
-=======
-                                                       leafletOutput('rcm.sc.region.pu',width = '100%',height = 500),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                        title = tags$p('1. Select a region : Explore and navigate through various predefined regions (EURO-CORDEX, PRUDENCE, European countries)'),
                                                        collapsible = TRUE, collapsed = TRUE)
                                                  ),
@@ -828,11 +735,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                  ),
                                                  fluidRow(
                                                    box(
-<<<<<<< HEAD
                                                      column(12,plotlyOutput("rcm.sc.tas.pu",height = '500'))
-=======
-                                                     column(12,plotlyOutput("rcm.sc.tas.pu",height = '600'))
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                      ,
                                                      fluidRow(
                                                        column(12,
@@ -860,11 +763,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                  fluidRow(
                                                    box(                                                   
                                                      column(12,
-<<<<<<< HEAD
                                                             plotlyOutput("rcm.sc.pr.pu",width = '100%',height = '500'))
-=======
-                                                            plotlyOutput("rcm.sc.pr.pu",width = '100%',height = '600'))
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                      ,
                                                      fluidRow(
                                                        column(12,
@@ -893,32 +792,8 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                       )
                           )
                   ),
-<<<<<<< HEAD
                   tabItem(tabName = "gcms",
 		  	  tags$br(),tags$br(),
-=======
-                  tabItem(tabName = "score3", 
-                          tabsetPanel(type = "tabs",
-                                      tabPanel("Map", p(), 
-                                               fluidPage(plotOutput("map"))),
-                                      tabPanel("Plot", p(), 
-                                               infoBox(title = 'How to read the chart', color = 'red',
-                                                       value = 'The chart shows the evolution as a function of years.'),
-                                               infoBox(title = 'Remember !', color = 'orange', icon = icon("list-alt"), 
-                                                       value = 'some text here '),
-                                               box(fluidPage(plotOutput("plot")))),
-                                      tabPanel("Summary", p(), infoBox(title = 'How to read !', color = 'orange', 
-                                                                       icon = icon("list-alt"), 
-                                                                       value = 'Monhtly Summary statistics'),
-                                               tableOutput("summary")
-                                      ),
-                                      tabPanel("Table", p(),tableOutput("table")),
-                                      tabPanel("Distribution", p(), box(fluidPage(plotOutput("hist")))),
-                                      tabPanel("Taylor Diagram", p(), fluidPage(plotOutput("taylor"))),
-                                      tabPanel("Scatter Plots", p() , fluidPage(plotOutput("scatter")))
-                          )),
-                  tabItem(tabName = "gcms",
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                           box(status = 'danger',solidHeader = TRUE, width = '100%',
                               tags$h4("Data Users | Global Climate Models")
                           ),
@@ -949,11 +824,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                          column(12,selectInput("gcm.region", label = NULL, 
                                                                choices = region.names,
                                                                selected = "Global",width = '100%')),
-<<<<<<< HEAD
                                          leafletOutput('gcm.region',width = '100%',height = '500'),
-=======
-                                         leafletOutput('gcm.region',width = '100%',height = 500),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                          title = tags$p('1. Select a region : Explore and navigate through various regions (AR5 predefined regions)'), 
                                          collapsible = TRUE, collapsed = TRUE))
                             ),
@@ -1010,11 +881,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                          tabsetPanel(
                                            tabPanel("Chart",p(),
                                                     #box(tags$h4('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled air mean temperature by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5). You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation instead of the mean. Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),width='100%',title = tags$figcaption('Info'),collapsible = TRUE, collapsed = TRUE,status = 'danger'),
-<<<<<<< HEAD
                                                     plotlyOutput("gcm.sc.tas",height = '500'),p(),
-=======
-                                                    plotlyOutput("gcm.sc.tas",height = '600'),p(),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                     column(12,infoBoxOutput("figcaption.gcm.sc.tas",width= '100%')),p(),
                                                     column(12,infoBoxOutput("figTips.gcm.tas",width= '100%')),p(),
                                                     column(12,infoBoxOutput("figMoreTips.gcm.tas",width= '100%')),p(),
@@ -1033,11 +900,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                     #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
                                                     #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation instead of the mean.
                                                     #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),
-<<<<<<< HEAD
                                                     plotlyOutput("gcm.sc.pr",height = '500'),p(),
-=======
-                                                    plotlyOutput("gcm.sc.pr",height = '600'),p(),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                     column(12,infoBoxOutput("figcaption.gcm.sc.pr",width= '100%')),p(),
                                                     column(12,infoBoxOutput("figTips.gcm.pr",width= '100%')),p(),
                                                     column(12,infoBoxOutput("figMoreTips.gcm.pr",width= '100%')),p(),
@@ -1055,11 +918,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                     #                 You can modify the type of the displayed output from the "Settings & Outputs" parameters to select different future time period. The shaded rectangles show the range and 90% confidence interval from the ensemble model simulations, respectively.
                                                     #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation instead of the mean. Please note that the spatial correlation only works for present (1981-2010) climate. 
                                                     #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, select/deselect individual simulations, and download the plot as png.'),
-<<<<<<< HEAD
                                                     plotlyOutput("gcm.scatter",height = '500'),p(),
-=======
-                                                    plotlyOutput("gcm.scatter",height = '600'),p(),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                     column(12,infoBoxOutput("figcaption.gcm.scatter",width= '100%')),p(),
                                                     column(12,infoBoxOutput("figTips.gcm.scatter",width= '100%')),p(),
                                                     column(12,infoBoxOutput("figMoreTips.gcm.scatter",width= '100%')),p(),
@@ -1067,19 +926,11 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                            tabPanel("Data", DT::dataTableOutput("gcm.scatter.data"))),
                                          #tabPanel('Metadata',DT::dataTableOutput("gcm.meta.pr"))),
                                          title = tags$p('5. Scatter Plots of Simulated Climate Variables'), 
-<<<<<<< HEAD
                                          collapsible = TRUE, collapsed = TRUE)))
                           )
                           #             ),
                           #             tabPanel("Scatter Plot", p(), 
                           #                      fluidPage(plotlyOutput("gcm.scatter",width = '100%',height = '500'),
-=======
-                                         collapsible = TRUE, collapsed = FALSE)))
-                          )
-                          #             ),
-                          #             tabPanel("Scatter Plot", p(), 
-                          #                      fluidPage(plotlyOutput("gcm.scatter",width = '100%',height = '600'),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                           #                                fluidRow(
                           #                                  column(3,selectInput("param7", label = "Element", 
                           #                                                       choices = c("Temperature","Wet-day freq.","Precip. intensity"),
@@ -1105,32 +956,14 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                           # )
                   ),
                   tabItem(tabName = "rcms",
-<<<<<<< HEAD
                           tags$br(),tags$br(),
 			  box(status = 'danger',solidHeader = TRUE, width = '100%',
-=======
-                          box(status = 'danger',solidHeader = TRUE, width = '100%',
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                               tags$h4('Data Users | Regional Climate Models')
                           ),
                           box(status = 'danger',solidHeader = TRUE,width = '100%',
                               tags$div(HTML('<p style="color:#871010;">TIPS | The regional climate model simulations constitute a better representation of regional climate outcomes than global climate outputs as they are run on higher spatial resolution, and include more local processes to provide the best representation of the climate signal over a region of interest. 
                     The climate simulations evaluated here are based on the Coordinated Regional Climate Downscaling Experiment over Europe (EURO-CORDEX) to produce the best estimates of regional/local climate signal that in turn can be used in impact studies. You can click on the dashboard to navigate between other items.</p>'))
                           ),
-<<<<<<< HEAD
-                          # tabsetPanel(id = 'rcms.tabs',type = "tabs",selected = "Seasonal Cycle",
-                          #             tabPanel("Metadata", p(),
-                          #                      fluidPage(
-                          #                        tabsetPanel(id = 'rcm.meta.tabs',type = 'tabs', 
-                          #                                    #tabPanel('Temperature',DT::dataTableOutput("rcm.meta.tas")),
-                          #                                    #tabPanel('Precipitation',DT::dataTableOutput("rcm.meta.pr")),
-                          #                                    tabPanel('All variables',DT::dataTableOutput("rcm.meta.all"))
-                          #                                    
-                          #                        ))
-                          #             ),
-                          #             tabPanel("Seasonal Cycle", p(),
-=======
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                           fluidPage(
                             p(),
                             fluidRow(
@@ -1213,11 +1046,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                     #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
                                                     #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation (only works on present (1981-2010) climate)  instead of the mean.
                                                     #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),
-<<<<<<< HEAD
                                                     plotlyOutput("rcm.sc.tas",height = '500'),p(),
-=======
-                                                    plotlyOutput("rcm.sc.tas",height = '600'),p(),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                     column(12,infoBoxOutput("figcaption.rcm.sc.tas",width= '100%')),p(),
                                                     column(12,infoBoxOutput("figTips.rcm.tas",width= '100%')),p(),
                                                     column(12,infoBoxOutput("figMoreTips.rcm.tas",width= '100%')),p(),
@@ -1236,11 +1065,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                     #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
                                                     #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation (only works on present (1981-2010) climate)  instead of the mean.
                                                     #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),
-<<<<<<< HEAD
                                                     plotlyOutput("rcm.sc.pr",height = '500'),p(),
-=======
-                                                    plotlyOutput("rcm.sc.pr",height = '600'),p(),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                     column(12,infoBoxOutput("figcaption.rcm.sc.pr",width= '100%')),p(),
                                                     column(12,infoBoxOutput("figTips.rcm.pr",width= '100%')),p(),
                                                     column(12,infoBoxOutput("figMoreTips.rcm.pr",width= '100%')),p(),
@@ -1258,11 +1083,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                     #               You can modify the type of the displayed output from the "Settings & Outputs" parameters to select different future time period. The shaded rectangles show the range and 90% confidence interval from the ensemble model simulations, respectively.
                                                     #               You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlations (only works on present (1981-2010) climate) instead of the mean.
                                                     #               Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, select/deselect individual simulations, and download the plot as png.'),
-<<<<<<< HEAD
                                                     plotlyOutput("rcm.scatter",height = '500'),p(),
-=======
-                                                    plotlyOutput("rcm.scatter",height = '600'),p(),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                     column(12,infoBoxOutput("figcaption.rcm.scatter",width= '100%')),p(),
                                                     column(12,infoBoxOutput("figTips.rcm.scatter",width= '100%')),p(),
                                                     column(12,infoBoxOutput("figMoreTips.rcm.scatter",width= '100%')),p(),
@@ -1270,28 +1091,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                            tabPanel("Data", DT::dataTableOutput("rcm.scatter.data"))),
                                          #tabPanel('Metadata',DT::dataTableOutput("gcm.meta.pr"))),
                                          title = tags$p('5. Scatter Plots of Simulated Climate Variables'), 
-<<<<<<< HEAD
                                          collapsible = TRUE, collapsed = TRUE)))
-                          )
-                  ),
-                  tabItem(tabName = "stations",
-                          tabsetPanel(id = 'sta.tabs',type = "tabs",
-                                      tabPanel("Metadata", p(),DT::dataTableOutput("station.meta")),
-                                      tabPanel("Map", p(), leafletOutput("station.map",width = '100%',height = '900')),
-                                      #                              fluidRow(
-                                      #                                column(3,selectInput("rcp7",label = "Scenario", choices = c("Intermediate emissions (RCP4.5)",
-                                      #                                                                                            "Low emissions (RCP2.6)", 
-                                      #                                                                                            "High emissions (RCP8.5)"),
-                                      #                                                     selected = "Intermediate emissions (RCP4.5)",width = '100%')),
-                                      #                                column(3,sliderInput("lon7",label = "Longitudes",
-                                      #                                                     min = 0, max = 30, value = c(0, 30),width = '100%')),
-                                      #                                column(3, sliderInput("lat7",label = "Latitudes",
-                                      #                                                      min = 55, max = 72, value = c(55, 72))),
-                                      #                                column(2,selectInput(inputId = 'im',label = "Model",
-                                      #                                                     choices = c('Ens. Mean','------',gcmnames.26),
-                                      #                                                     selected = 'Ens. Mean',width = '100%')))),
-                                      tabPanel("Chart", p(), plotlyOutput("station.ts",height = '900')),
-                                      tabPanel("Data", p(), DT::dataTableOutput('station.data'))
                           )
                   ),
                   tabItem(tabName = "score5", 
@@ -1299,24 +1099,11 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
 			  box(status = 'danger',solidHeader = TRUE, width = '100%',
                               'Here, you can',
                               tags$ol(
-=======
-                                         collapsible = TRUE, collapsed = FALSE)))
-                          )
-                  ),
-                  tabItem(tabName = "score5", 
-                          box(status = 'danger',solidHeader = TRUE, width = '100%',
-                              'In this web page, you can',
-                              tags$ul(
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                 tags$li("select a region to navigate through various predefined regions (EURO-CORDEX, PRUDENCE, European countries)"), 
                                 tags$li("modify the default settings and select the output type (e.g. chart, boxplot) and values (e.g. bias, change)"), 
                                 tags$li("evalutate future changes in monthly mean air Temperature statistics"),
                                 tags$li("evaluate future changes in monthly precipitaiton totals statistics")),
-<<<<<<< HEAD
                               title = 'Product Users | Changes in Climate',collapsible = TRUE,collapsed = FALSE
-=======
-                              title = 'Product Users | Changes in Climate',collapsible = TRUE,collapsed = TRUE
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                           ),
                           box(status = 'danger',solidHeader = TRUE,width = '100%',
                               tags$div(HTML('<p style="color:#871010;">TIPS | Changes in Climate can be obtained using various climate models such as global climate models, regional climate models, and empirical statistical climate models which constitute powerful tools to provide the best representation of the projected climate signal over a region of interest. 
@@ -1361,44 +1148,28 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                 column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%')))   
                                                      ),
                                                      tabPanel("Temperature", p(),
-<<<<<<< HEAD
                                                               plotlyOutput("gcm.cc.tas.pu",width='100%',height = '500'),
-=======
-                                                              plotlyOutput("gcm.cc.tas.pu",height = '600'),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                               column(12,infoBoxOutput("figcaption.gcm.tas.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figTips.gcm.tas.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figMoreTips.gcm.tas.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figRemember.gcm.tas.cc",width= '100%'))
                                                      ),
                                                      tabPanel("Precipitation", p(),
-<<<<<<< HEAD
                                                               plotlyOutput("gcm.cc.pr.pu",height = '500'),
-=======
-                                                              plotlyOutput("gcm.cc.pr.pu",height = '600'),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                               column(12,infoBoxOutput("figcaption.gcm.pr.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figTips.gcm.pr.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figMoreTips.gcm.pr.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figRemember.gcm.pr.cc",width= '100%'))
                                                      ),
                                                      tabPanel("Precipitation vs Temperature", p(),
-<<<<<<< HEAD
                                                               plotlyOutput("gcm.cc.scatter.pu",height = '500px'),
-=======
-                                                              plotlyOutput("gcm.cc.scatter.pu",height = '600'),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                               column(12,infoBoxOutput("figcaption.gcm.cc.scatter",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figTips.gcm.cc.scatter",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figMoreTips.gcm.cc.scatter",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figRemember.gcm.cc",width= '100%'))
                                                      )
                                                      #tabPanel("Scatter", p(),
-<<<<<<< HEAD
                                                      #         plotlyOutput("gcm.cc.scatter.pu",height = '500')
-=======
-                                                     #         plotlyOutput("gcm.cc.scatter.pu",height = '600')
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                      #)
                                          )
                                   ),
@@ -1442,29 +1213,20 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                 column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%')))   
                                                      ),
                                                      tabPanel("Temperature", p(), 
-<<<<<<< HEAD
                                                               plotlyOutput("rcm.cc.tas.pu",height = '500'),
-=======
-                                                              plotlyOutput("rcm.cc.tas.pu",height = '600'),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                               column(12,infoBoxOutput("figcaption.rcm.tas.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figTips.rcm.tas.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figMoreTips.rcm.tas.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figRemember.rcm.tas.cc",width= '100%'))
                                                      ),
                                                      tabPanel("Precipitation", p(),
-<<<<<<< HEAD
                                                               plotlyOutput("rcm.cc.pr.pu",height = '500'),
-=======
-                                                              plotlyOutput("rcm.cc.pr.pu",height = '600'),
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                               column(12,infoBoxOutput("figcaption.rcm.pr.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figTips.rcm.pr.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figMoreTips.rcm.pr.cc",width= '100%')),p(),
                                                               column(12,infoBoxOutput("figRemember.rcm.pr.cc",width= '100%'))
                                                      ),
                                                      tabPanel("Precipitation vs Temperature", p(),
-<<<<<<< HEAD
                                                               plotlyOutput("rcm.cc.scatter.pu",height = '500'),
                                                               box(collapsible = TRUE, collapsed=TRUE, width = '100%', status = 'warning',title = 'Figure Details',
                                                                   column(12,infoBoxOutput("figcaption.rcm.cc.scatter",width= '100%')),p(),
@@ -1472,29 +1234,11 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                   column(12,infoBoxOutput("figMoreTips.rcm.cc.scatter",width= '100%')),p(),
                                                                   column(12,infoBoxOutput("figRemember.rcm.cc.scatter",width= '100%'))
                                                               )
-=======
-                                                              plotlyOutput("rcm.cc.scatter.pu",height = '600'),
-                                                              column(12,infoBoxOutput("figcaption.rcm.cc.scatter",width= '100%')),p(),
-                                                              column(12,infoBoxOutput("figTips.rcm.cc.scatter",width= '100%')),p(),
-                                                              column(12,infoBoxOutput("figMoreTips.rcm.cc.scatter",width= '100%')),p(),
-                                                              column(12,infoBoxOutput("figRemember.rcm.cc.scatter",width= '100%'))
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                      )
                                          )
                                   ),
                                   title = 'EURO-CORDEX Regional Climate model Simulations',status = 'danger',solidHeader = TRUE,width = '100%')
                             )
-<<<<<<< HEAD
-                          )        
-                  ),
-                  tabItem(tabName = "hydro",
-                          fluidPage(
-                            p(),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tags$figcaption('The EURO-CORDEX domain',
-=======
                           )
                   ),
                   tabItem(tabName = 'spi',
@@ -1555,7 +1299,6 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                             column(12,
                                    box(width = '100%', solidHeader = TRUE, status = 'danger',
                                        tags$figcaption('The EURO-CORDEX domain',
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                                          tags$a(href = 'http://cordex.org/domains/cordex-region-euro-cordex/',"Read more")),
                                          tags$a(href = 'https://figshare.com/s/7b678c0f92c43f8e0aeb',"Demo video"),
                                          column(12,selectInput("rcm.region", label = NULL, 
@@ -1635,8 +1378,6 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                          tabsetPanel(
                                            tabPanel("Chart", p(), 
                                                     tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-<<<<<<< HEAD
-=======
                                                   You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
                                                   You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
                                                   Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
@@ -1726,118 +1467,6 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                   You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
                                                   Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
                                            tabPanel("Maps", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('4. Frost '), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps of flood risk and curves showing return values.", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-<<<<<<< HEAD
-                                         title = tags$p('4. River Runoff'), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            )
-                          )
-                          
-                  ),
-                  tabItem(tabName = "agriculture",
-                          fluidPage(
-                            p(),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         #tags$figcaption('The EURO-CORDEX domain',
-                                         #                tags$a(href = 'http://cordex.org/domains/cordex-region-euro-cordex/',"Read more")),
-                                         #tags$a(href = 'https://figshare.com/s/7b678c0f92c43f8e0aeb',"Demo video"),
-                                         column(12,selectInput("rcm.region", label = NULL, 
-                                                               choices = regions.all,
-                                                               selected = "Europe",width = '100%')),
-                                         #leafletOutput('rcm.region',width = '100%',height = 500),
-                                         title = tags$p('1. Select your region of interest'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         selectInput("rcm.period", label = "Period", 
-                                                     choices = c("Present (1981-2010)","Near Future (2021-2050)",
-                                                                 "Far Future (2071-2100)"),
-                                                     selected = "Present",width = '100%'),
-                                         selectInput("rcm.chart.type", label = "Chart Output", 
-                                                     choices = c("Individual Simulations",
-                                                                 "Ensemble of All Simulations",
-                                                                 "Box Plots of All Simulations"),
-                                                     selected = "Ensemble of All Simulations",width = '100%'),
-                                         selectInput("rcm.sim.sc", label = "Simulations", 
-                                                     choices = c("All simulations","Selected Simulations","Both (not yet implemented)"),
-                                                     selected = "All simulations",width = '100%'),
-                                         selectInput("rcm.legend.sc", label = "Legend", 
-                                                     choices = c("Display","Hide"),
-                                                     selected = "Hide Legend",width = '100%'),
-                                         selectInput("rcm.groupBy", label = "Group By", choices = c('None','---',names(rcm.meta.tas)),
-                                                     selected = 'None',width = '100%'),
-                                         selectInput("rcm.colorBy", label = "Color By", 
-                                                     choices = c('None','---','Group'),
-                                                     selected = 'None',width = '100%'),
-                                         selectInput("rcm.outputValues", label = "Displayed values", 
-                                                     choices = c('Absolute','Anomaly','Bias','Change'),
-                                                     selected = 'Absolute',width = '100%'),
-                                         selectInput("rcm.stat", label = "Statistics", 
-                                                     choices = c('Mean','Standard Deviation',
-                                                                 'Correlation')),
-                                         selectInput("rcm.var", label = "Variables", 
-                                                     choices = c('Individual','Synchronised'),
-                                                     selected = 'Synchronised',width = '100%'),
-                                         title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart",p(),
-                                                    tags$figcaption('The interactive figure shows the Intensity-Duration-Frequency curve simulated by the selected set of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))),
-                                         title = tags$p('3. Growing season'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-=======
-                                         title = tags$p('5. Rain during harvest'), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-<<<<<<< HEAD
-                                           tabPanel("Maps", p(), 
 =======
                                            tabPanel("Maps of flood risk and curves showing return values.", p(), 
 >>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
@@ -1846,11 +1475,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                   You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
                                                   Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
                                          ),
-<<<<<<< HEAD
-                                         title = tags$p('4. Frost '), 
-=======
                                          title = tags$p('6. Drought'), 
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                          collapsible = TRUE, collapsed = TRUE)
                               )
                             ),
@@ -1869,11 +1494,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                   You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
                                                   Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
                                          ),
-<<<<<<< HEAD
-                                         title = tags$p('5. Rain during harvest'), 
-=======
                                          title = tags$p('7. Hail'), 
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
                                          collapsible = TRUE, collapsed = TRUE)
                               )
                             ),
@@ -1892,7 +1513,6 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                   You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
                                                   Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
                                          ),
-<<<<<<< HEAD
                                          title = tags$p('6. Drought'), 
                                          collapsible = TRUE, collapsed = TRUE)
                               )

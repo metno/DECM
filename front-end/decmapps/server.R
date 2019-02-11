@@ -61,7 +61,7 @@ function(input, output,session) {
     return(filterSim(input$project,input$exp,input$gcm,input$run,input$rcm,input$var,input$dates,input$url))
   })
   
-  observe(
+  observe
   showNotification(
   tags$div(tags$p(tags$h1("Please wait ... loading ..."))),
   action = NULL, duration = 10, closeButton = FALSE,id = NULL, type = c("warning"),session = getDefaultReactiveDomain())
@@ -595,9 +595,7 @@ function(input, output,session) {
     
     invisible(m)
   }
-  
-<<<<<<< HEAD
-=======
+
   ## Sectoral communication example 
   spi <- function(freq=1,group='ED',stat='nEvents',period='1981-2010') {
     
@@ -618,7 +616,6 @@ function(input, output,session) {
   
   
   observe(priority = 0, { # 
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
     
     ## Global Climate Models Menu item ---      
     ## Metadata table
@@ -2005,7 +2002,7 @@ function(input, output,session) {
                                            showarrow=F,
                                            font=list(size=14,weight='bold')
                                            )
-					   )
+				)
       
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -2797,33 +2794,33 @@ function(input, output,session) {
       
       
       p.sc <- p.sc %>% layout(title = FALSE,
-        paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
-        xaxis = list(title = ylab,
-                     gridcolor = 'rgb(255,255,255)',
-                     showgrid = TRUE,
-                     showline = FALSE,
-                     showticklabels = TRUE,
-                     tickcolor = 'rgb(127,127,127)',
-                     ticks = 'outside',
-                     zeroline = TRUE),
-        yaxis = list(title = xlab,
-                     gridcolor = 'rgb(255,255,255)',
-                     showgrid = TRUE,
-                     showline = FALSE,
-                     showticklabels = TRUE,
-                     tickcolor = 'rgb(127,127,127)',
-                     ticks = 'outside',
-                     zeroline = TRUE),
-                              annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region |", input$gcm.region),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+      paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
+      xaxis = list(title = ylab,
+      gridcolor = 'rgb(255,255,255)',
+      showgrid = TRUE,
+      showline = FALSE,
+      showticklabels = TRUE,
+      tickcolor = 'rgb(127,127,127)',
+      ticks = 'outside',
+      zeroline = TRUE),
+      yaxis = list(title = xlab,
+      gridcolor = 'rgb(255,255,255)',
+      showgrid = TRUE,
+      showline = FALSE,
+      showticklabels = TRUE,
+      tickcolor = 'rgb(127,127,127)',
+      ticks = 'outside',
+      zeroline = TRUE),
+      annotations = list(
+      yref="paper",
+      xref="paper",
+      y=1.07,
+      x=0,
+      text=paste("Region |", input$gcm.region),
+      showarrow=F,
+      font=list(size=14,weight='bold')
+      )
+      )
       
       if (input$gcm.legend.sc == 'Hide') {
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -5071,15 +5068,9 @@ function(input, output,session) {
       
       
       
-<<<<<<< HEAD
       if ((input$rcm.cc.chart.type == 'Ensemble of All Simulations') | (input$rcm.cc.chart.type == "Both - Ensemble & Individual Simulations"))
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
       #}
-=======
-      if ((input$rcm.cc.chart.type == 'Ensemble of All Simulations') | (input$rcm.cc.chart.type == "Both - Ensemble & Individual Simulations")) {
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
-      }
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
       
       if (input$rcm.legend.sc == 'Display') {
         p.sc <- p.sc %>% add_trace(x = ~mean(df$dtas[-length(df$dpr)]),y = ~ mean(df$dpr[-length(df$dpr)]),type = 'scatter',mode = 'markers',
@@ -5258,8 +5249,6 @@ function(input, output,session) {
       )
     })
     
-<<<<<<< HEAD
-=======
     ## compute summary statistics e.g. ens. mean, quantiles, etc ... use this form 
     #spi.stat <- spi.reactive()
     output$spi.settings <- renderText({
@@ -5323,7 +5312,6 @@ function(input, output,session) {
     })
   })
   
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
   observeEvent(input$gcm.groupBy,{
     if (!is.element(input$gcm.groupBy,c('None','---')))
       updateSelectInput(inputId = "gcm.chart.type",session = session,
@@ -5676,12 +5664,6 @@ function(input, output,session) {
                         choices = c('Mean','Standard Deviation','Spatial Correlation')) 
     
   })
-<<<<<<< HEAD
-
- 
-=======
-  
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
 }
 
 

@@ -1252,8 +1252,17 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                   textOutput('spi.settings'),
                                   tags$hr(),
                                   leafletOutput("map.spi",height = '900'),
-                                  title = tags$p('2. Evaluate the Standardized Precipitaiton Index (SPI) over Europe'),
-                                  collapsible = TRUE, collapsed = FALSE))
+                                  title = tags$p('2. Evaluate the SPI - Standardized Precipitaiton Index - over Europe'),
+                                  collapsible = TRUE, collapsed = FALSE)),
+                            fluidRow(
+                              box(width = '100%', solidHeader = TRUE, status = 'danger',
+                                  'Your settings are the following:',
+                                  tags$hr(),
+                                  textOutput('spei.settings'),
+                                  tags$hr(),
+                                  leafletOutput("map.spei",height = '900'),
+                                  title = tags$p('3. Evaluate the SPEI - Standardized Precipitaiton and Evaporation Index - over Europe'),
+                                  collapsible = TRUE, collapsed = TRUE))
                           )
                   )
                   
@@ -1262,4 +1271,4 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
               )
               
 )
-    
+

@@ -1198,9 +1198,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region | ", input$gcm.region),
+                                text=paste(input$gcm.region, input$gcm.period,
+                                           input$gcm.chart.type,
+                                           input$gcm.stat,sep=' | '),
                                 showarrow=F,
-                                font=list(size=16,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       if (input$gcm.legend.sc == 'Hide')
@@ -1413,9 +1415,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region | ", input$gcm.region.pu),
+                                text=paste(input$gcm.region.pu, input$gcm.period.pu,
+                                           input$gcm.chart.type.pu,
+                                           input$gcm.stat.pu,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       if (input$gcm.legend.sc == 'Hide')
@@ -1811,9 +1815,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region |", input$gcm.cc.region),
+                                text=paste(input$gcm.cc.region, input$gcm.cc.period,
+                                                input$gcm.cc.chart.type,
+                                                input$gcm.cc.stat,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color='grey')
                               )
       )
       if (input$gcm.legend.sc == 'Hide')
@@ -2013,9 +2019,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region |", input$gcm.region),
+                                text=paste(input$gcm.region, input$gcm.period,
+                                                input$gcm.chart.type,
+                                                input$gcm.stat,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       
@@ -2168,9 +2176,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region |", input$gcm.region.pu),
+                                text=paste(input$gcm.region.pu, input$gcm.period.pu,
+                                                input$gcm.chart.type.pu,
+                                                input$gcm.stat.pu,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       
@@ -2316,9 +2326,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region | ", input$gcm.sc.region.pu),
+                                text=paste(input$gcm.sc.region.pu, input$gcm.sc.period.pu,
+                                           input$gcm.sc.chart.type.pu,
+                                           input$gcm.sc.stat.pu,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       
@@ -2463,9 +2475,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region |", input$gcm.cc.region),
+                                text=paste(input$gcm.cc.region, input$gcm.cc.period,
+                                           input$gcm.cc.chart.type,
+                                           input$gcm.cc.stat,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       
@@ -2831,9 +2845,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region |", input$gcm.region),
+                                text=paste(input$gcm.region, input$gcm.period,
+                                           input$gcm.chart.type,
+                                           input$gcm.stat,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color= 'grey')
                               )
       )
       
@@ -2991,9 +3007,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region | ", input$gcm.cc.region),
+                                text=paste(input$gcm.cc.region, input$gcm.cc.period,
+                                           input$gcm.cc.chart.type,
+                                           input$gcm.cc.stat,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color='grey')
                               )
       )
       
@@ -3341,7 +3359,7 @@ function(input, output,session) {
         ylab <- "Change in temperature [deg. C]"
       else 
         ylab <- "Temperature [deg. C]"
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$rcm.region),
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -3364,9 +3382,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region | ", input$rcm.region),
+                                text=paste(input$rcm.region, input$rcm.period,
+                                           input$rcm.chart.type,
+                                           input$rcm.stat,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color ='grey')
                               )
       )
       if (input$rcm.legend.sc == 'Hide')
@@ -3561,9 +3581,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region | ", input$rcm.region.pu),
+                                text=paste(input$rcm.region.pu, input$rcm.period.pu,
+                                           input$rcm.chart.type.pu,
+                                           input$rcm.stat.pu,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       if (input$rcm.chart.type.pu != 'Individual Simulations')
@@ -3753,9 +3775,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region: ", input$rcm.sc.region.pu),
+                                text=paste(input$rcm.sc.region.pu, input$rcm.sc.period.pu,
+                                           input$gcm.sc.chart.type.pu,
+                                           input$gcm.sc.stat.pu,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       
@@ -3944,9 +3968,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region | ", input$rcm.cc.region),
+                                text=paste(input$rcm.cc.region, input$rcm.cc.period,
+                                           input$rcm.cc.chart.type,
+                                           input$rcm.cc.stat,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       if (input$rcm.sc.chart.type.pu != 'Individual Simulations')
@@ -4142,9 +4168,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region | ", input$rcm.region.pu),
+                                text=paste(input$rcm.region.pu, input$rcm.period.pu,
+                                           input$rcm.chart.type.pu,
+                                           input$rcm.stat.pu,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       
@@ -4293,9 +4321,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region | ", input$rcm.region.pu),
+                                text=paste(input$gcm.region.pu, input$rcm.period.pu,
+                                           input$gcm.chart.type.pu,
+                                           input$gcm.stat.pu,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       
@@ -4442,9 +4472,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region | ", input$rcm.sc.region.pu),
+                                text=paste(input$rcm.sc.region.pu, input$rcm.sc.period.pu,
+                                           input$rcm.sc.chart.type.pu,
+                                           input$rcm.sc.stat.pu,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       
@@ -4585,9 +4617,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region | ", input$rcm.cc.region),
+                                text=paste(input$rcm.cc.region, input$rcm.cc.period,
+                                           input$rcm.cc.chart.type,
+                                           input$rcm.cc.stat,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       
@@ -4972,9 +5006,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region | ", input$rcm.region),
+                                text=paste(input$rcm.region, input$rcm.period,
+                                           input$rcm.chart.type,
+                                           input$rcm.stat,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       
@@ -5130,9 +5166,11 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste("Region | ", input$rcm.cc.region),
+                                text=paste(input$rcm.cc.region, input$rcm.cc.period,
+                                           input$rcm.cc.chart.type,
+                                           input$rcm.cc.stat,sep=' | '),
                                 showarrow=F,
-                                font=list(size=14,weight='bold')
+                                font=list(size=14,color = 'grey')
                               )
       )
       

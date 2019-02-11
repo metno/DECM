@@ -27,49 +27,13 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                           menuSubItem("Explore the Simulations", tabName = "browse"),
                                           menuSubItem("Seasonal Cycle", tabName = "seasonalCycle",selected = TRUE),
                                           menuSubItem("Models' Biases", tabName = "bias"),
-                                          #menuSubItem("test iframe", tabName = "score1"),
-                                          #menuSubItem("Individual Model", tabName = "score4"),
                                           menuSubItem("Changes in Climate", tabName = "score5"),
+                                          menuSubItem("Standardized Precipitation Index over Europe", tabName = "spi"),
                                           menuSubItem("Models' Spread (Cf. External App.)", href = 'https://esdlab.met.no/gcmeval/')),
                                  menuItem("Data Users", tabName = 'pu',startExpanded = TRUE,
                                           menuSubItem("Global Climate Models", tabName = "gcms"),
                                           menuSubItem("Regional Climate Models", tabName = "rcms"),
                                           menuSubItem("Models' Ranks (Cf. External App.)", href = 'https://esdlab.met.no/gcmeval/')
-                                          #menuSubItem("Reanalysis", tabName = "rea")
-                                          #menuSubItem("Weather Stations", tabName = "stations"),
-                                          #menuSubItem("Satellite Data",  tabName = "sat"), # href = 'https://esdlab.met.no/gcmeval/'
-                                          #menuSubItem("Storm tracks", href = 'http://157.249.177.25:3838/Storms/')
-                                 ),
-                                 menuItem("Sectoral Communication", tabName = 'sc',startExpanded = FALSE,
-                                          menuSubItem("Standardized Precipitation Index", tabName = "spi"),
-                                          menuSubItem("Water managmement", tabName = "hydro"),
-                                          menuSubItem("Agriculture and Forestry", tabName = "agriculture"),
-                                          menuSubItem("Tourism", tabName = "tourism"),
-                                          menuSubItem("Insurance", tabName = "insurance"),
-                                          menuSubItem("Energy", tabName = "energy"),
-                                          menuSubItem("Health", tabName = "health"),
-                                          menuSubItem("Transport", tabName = "transport"),
-                                          menuSubItem("Infrastructure", tabName = "infrastructure"),
-                                          menuSubItem("Disaster Risk Reduction", tabName = "disaster"),
-                                          menuSubItem("Coastal Areas", tabName = "coastareas"),
-                                          menuSubItem("Defense", tabName = "defense"),
-                                          menuSubItem("Cities and Urban areas", tabName = "cities")),
-                                 menuItem("Settings and filtering", tabName = "du", startExpanded = FALSE,
-                                          sliderInput("dates7", "Years",min=1900, max=2099,
-                                                      step = 5, value= c(1900,2099),
-                                                      sep="",width = "100%"),
-                                          bsPopover(id = 'dates7',title = 'Select the years to include in the simulations',
-                                                    content = 'The time span for the simulaitons. You can expand or reduce the time span at your convenience with a frequecny of 5 years. This input is useful when computing the changes (past or future) with regards to the base period.',
-                                                    placement = 'bottom',options = list(container = "body")),
-                                          sliderInput("datesref", "Base period",min=1900, max=2099,
-                                                      step = 5, value= c(1980,2010),
-                                                      sep="",width = "100%"),
-                                          textInput("threshold8",label = "Threshold", placeholder = "1",width = '100%'),
-                                          p('Map settings'),
-                                          selectInput("legend",label = "Legend",choices = c("Display","Hide"),
-                                                      selected = "Display",width = '100%'),
-                                          selectInput("minimap",label = "Mini Map",choices = c("Display","Hide"),
-                                                      selected = "Hide",width = '100%')
                                  )
                                )
               ),
@@ -191,7 +155,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                   tabItem(tabName = "browse", 
                           fluidPage(
                             tags$br(),tags$br(),
-			    fluidRow(
+                            fluidRow(
                               box(status = 'danger',solidHeader = TRUE, width = '100%',
                                   'Here, you can',
                                   tags$ol(
@@ -256,7 +220,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                   ),
                   tabItem(tabName = "bias", 
                           tags$br(),tags$br(),
-			  box(status = 'danger',solidHeader = TRUE, width = '100%',
+                          box(status = 'danger',solidHeader = TRUE, width = '100%',
                               'Here, you can',
                               tags$ol(
                                 tags$li("select a region to navigate through various predefined regions (EURO-CORDEX, PRUDENCE, European countries)"), 
@@ -535,7 +499,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                   tabItem(tabName = "seasonalCycle",
                           fluidPage(
                             tags$br(),tags$br(),
-			    fluidRow(box(status = 'danger',solidHeader = TRUE, width = '100%', 
+                            fluidRow(box(status = 'danger',solidHeader = TRUE, width = '100%', 
                                          'Here, you can',
                                          tags$ol(
                                            tags$li("select a region to navigate through various predefined regions (EURO-CORDEX, PRUDENCE, European countries)"), 
@@ -793,7 +757,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                           )
                   ),
                   tabItem(tabName = "gcms",
-		  	  tags$br(),tags$br(),
+                          tags$br(),tags$br(),
                           box(status = 'danger',solidHeader = TRUE, width = '100%',
                               tags$h4("Data Users | Global Climate Models")
                           ),
@@ -957,7 +921,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                   ),
                   tabItem(tabName = "rcms",
                           tags$br(),tags$br(),
-			  box(status = 'danger',solidHeader = TRUE, width = '100%',
+                          box(status = 'danger',solidHeader = TRUE, width = '100%',
                               tags$h4('Data Users | Regional Climate Models')
                           ),
                           box(status = 'danger',solidHeader = TRUE,width = '100%',
@@ -1096,7 +1060,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                   ),
                   tabItem(tabName = "score5", 
                           tags$br(),tags$br(),
-			  box(status = 'danger',solidHeader = TRUE, width = '100%',
+                          box(status = 'danger',solidHeader = TRUE, width = '100%',
                               'Here, you can',
                               tags$ol(
                                 tags$li("select a region to navigate through various predefined regions (EURO-CORDEX, PRUDENCE, European countries)"), 
@@ -1249,7 +1213,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                   'Here, you can',
                                   tags$ol(
                                     tags$li("Modify the default settings and select the GCM/RCM simulation"), 
-                                    tags$li("Evalutate statistics of the Standardized Precipitation Index")),
+                                    tags$li("Evaluate statistics of the Standardized Precipitation Index over European domain")),
                                   title = 'Sectoral Communication | Standardized Precipitation Index',collapsible = TRUE,collapsed = FALSE
                               )
                             ),
@@ -1278,659 +1242,24 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                   selectInput("spi.stat", label = "Statistic", 
                                               choices = c('nEvents','nMonths','meanEventLength'),
                                               selected = 'nEvents'),
-                              title = '1. Settings & Outputs : Modify the default settings and select the output type and values.', 
-                              collapsible = TRUE, collapsed = TRUE)
-                          ),
-                          fluidRow(
-                                   box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                       'Your settings are the following:',
-                                       tags$hr(),
-                                       textOutput('spi.settings'),
-                                       tags$hr(),
-                                       leafletOutput("map.spi",height = '900'),
-                                       title = tags$p('2. Evaluate the Standardized Precipitaiton Index (SPI) over Europe'),
-                                       collapsible = TRUE, collapsed = FALSE))
-                  )
-                ),
-                tabItem(tabName = "hydro",
-                        fluidPage(
-                          p(),
-                          fluidRow(
-                            column(12,
-                                   box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                       tags$figcaption('The EURO-CORDEX domain',
-                                                         tags$a(href = 'http://cordex.org/domains/cordex-region-euro-cordex/',"Read more")),
-                                         tags$a(href = 'https://figshare.com/s/7b678c0f92c43f8e0aeb',"Demo video"),
-                                         column(12,selectInput("rcm.region", label = NULL, 
-                                                               choices = regions.all,
-                                                               selected = "Europe",width = '100%')),
-                                         #leafletOutput('rcm.region',width = '100%',height = 500),
-                                         title = tags$p('1. Select a region (e.g. EURO-CORDEX definition)'), 
-                                         collapsible = TRUE, collapsed = TRUE))
+                                  title = '1. Settings & Outputs : Modify the default settings and select the output type and values.', 
+                                  collapsible = TRUE, collapsed = TRUE)
                             ),
                             fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         selectInput("rcm.period", label = "Period", 
-                                                     choices = c("Present (1981-2010)","Near Future (2021-2050)",
-                                                                 "Far Future (2071-2100)"),
-                                                     selected = "Present",width = '100%'),
-                                         selectInput("rcm.chart.type", label = "Chart Output", 
-                                                     choices = c("Individual Simulations",
-                                                                 "Ensemble of All Simulations",
-                                                                 "Box Plots of All Simulations"),
-                                                     selected = "Ensemble of All Simulations",width = '100%'),
-                                         selectInput("rcm.sim.sc", label = "Simulations", 
-                                                     choices = c("All simulations","Selected Simulations","Both (not yet implemented)"),
-                                                     selected = "All simulations",width = '100%'),
-                                         selectInput("rcm.legend.sc", label = "Legend", 
-                                                     choices = c("Display","Hide"),
-                                                     selected = "Hide Legend",width = '100%'),
-                                         selectInput("rcm.groupBy", label = "Group By", choices = c('None','---',names(rcm.meta.tas)),
-                                                     selected = 'None',width = '100%'),
-                                         selectInput("rcm.colorBy", label = "Color By", 
-                                                     choices = c('None','---','Group'),
-                                                     selected = 'None',width = '100%'),
-                                         selectInput("rcm.outputValues", label = "Displayed values", 
-                                                     choices = c('Absolute','Anomaly','Bias','Change'),
-                                                     selected = 'Absolute',width = '100%'),
-                                         selectInput("rcm.stat", label = "Statistics", 
-                                                     choices = c('Mean','Standard Deviation',
-                                                                 'Correlation')),
-                                         selectInput("rcm.var", label = "Variables", 
-                                                     choices = c('Individual','Synchronised'),
-                                                     selected = 'Synchronised',width = '100%'),
-                                         title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Projected Precipitaiton",p(),
-                                                    # tags$figcaption('The interactive figure shows the projected precipitation simulated by the selected set of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                    #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                    #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                    #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),
-                                                    plotlyOutput("hydro.sc.pr",height = '900'))
-                                         ),
-                                         title = tags$p('3. Water Resources'),
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Projected temperature",p(),
-                                                    # tags$figcaption('The interactive figure shows the projected temperature simulated by the selected set of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                    #                 You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                    #                 You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                    #                 Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'),
-                                                    plotlyOutput("hydro.sc.tas",height = '900'))
-                                         ),
-                                         title = tags$p('4. Drought'), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps of flood risk and curves showing return values.", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('4. River Runoff'), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            )
-                          )
-                          
-                  ),
-                  tabItem(tabName = "agriculture",
-                          fluidPage(
-                            p(),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         #tags$figcaption('The EURO-CORDEX domain',
-                                         #                tags$a(href = 'http://cordex.org/domains/cordex-region-euro-cordex/',"Read more")),
-                                         #tags$a(href = 'https://figshare.com/s/7b678c0f92c43f8e0aeb',"Demo video"),
-                                         column(12,selectInput("rcm.region", label = NULL, 
-                                                               choices = regions.all,
-                                                               selected = "Europe",width = '100%')),
-                                         #leafletOutput('rcm.region',width = '100%',height = 500),
-                                         title = tags$p('1. Select your region of interest'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         selectInput("rcm.period", label = "Period", 
-                                                     choices = c("Present (1981-2010)","Near Future (2021-2050)",
-                                                                 "Far Future (2071-2100)"),
-                                                     selected = "Present",width = '100%'),
-                                         selectInput("rcm.chart.type", label = "Chart Output", 
-                                                     choices = c("Individual Simulations",
-                                                                 "Ensemble of All Simulations",
-                                                                 "Box Plots of All Simulations"),
-                                                     selected = "Ensemble of All Simulations",width = '100%'),
-                                         selectInput("rcm.sim.sc", label = "Simulations", 
-                                                     choices = c("All simulations","Selected Simulations","Both (not yet implemented)"),
-                                                     selected = "All simulations",width = '100%'),
-                                         selectInput("rcm.legend.sc", label = "Legend", 
-                                                     choices = c("Display","Hide"),
-                                                     selected = "Hide Legend",width = '100%'),
-                                         selectInput("rcm.groupBy", label = "Group By", choices = c('None','---',names(rcm.meta.tas)),
-                                                     selected = 'None',width = '100%'),
-                                         selectInput("rcm.colorBy", label = "Color By", 
-                                                     choices = c('None','---','Group'),
-                                                     selected = 'None',width = '100%'),
-                                         selectInput("rcm.outputValues", label = "Displayed values", 
-                                                     choices = c('Absolute','Anomaly','Bias','Change'),
-                                                     selected = 'Absolute',width = '100%'),
-                                         selectInput("rcm.stat", label = "Statistics", 
-                                                     choices = c('Mean','Standard Deviation',
-                                                                 'Correlation')),
-                                         selectInput("rcm.var", label = "Variables", 
-                                                     choices = c('Individual','Synchronised'),
-                                                     selected = 'Synchronised',width = '100%'),
-                                         title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart",p(),
-                                                    tags$figcaption('The interactive figure shows the Intensity-Duration-Frequency curve simulated by the selected set of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))),
-                                         title = tags$p('3. Growing season'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps", p(), 
-=======
-                                           tabPanel("Maps of flood risk and curves showing return values.", p(), 
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('6. Drought'), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps of flood risk and curves showing return values.", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('7. Hail'), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps of flood risk and curves showing return values.", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('6. Drought'), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps of flood risk and curves showing return values.", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('7. Hail'), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps of flood risk and curves showing return values.", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-=======
->>>>>>> 86776234eb307d683fb1c1c7c7ea51dccd63b6f0
-                                         title = tags$p('8. Flood'), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps of flood risk and curves showing return values.", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('9. Sunlight'), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            )
-                          )
-                  ),
-                  tabItem(tabName = "tourism",
-                          fluidPage(
-                            p(),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         #tags$figcaption('The EURO-CORDEX domain',
-                                         #                tags$a(href = 'http://cordex.org/domains/cordex-region-euro-cordex/',"Read more")),
-                                         #tags$a(href = 'https://figshare.com/s/7b678c0f92c43f8e0aeb',"Demo video"),
-                                         column(12,selectInput("rcm.region", label = NULL, 
-                                                               choices = regions.all,
-                                                               selected = "Europe",width = '100%')),
-                                         #leafletOutput('rcm.region',width = '100%',height = 500),
-                                         title = tags$p('1. Select your region of interest'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         selectInput("rcm.period", label = "Period", 
-                                                     choices = c("Present (1981-2010)","Near Future (2021-2050)",
-                                                                 "Far Future (2071-2100)"),
-                                                     selected = "Present",width = '100%'),
-                                         selectInput("rcm.chart.type", label = "Chart Output", 
-                                                     choices = c("Individual Simulations",
-                                                                 "Ensemble of All Simulations",
-                                                                 "Box Plots of All Simulations"),
-                                                     selected = "Ensemble of All Simulations",width = '100%'),
-                                         selectInput("rcm.sim.sc", label = "Simulations", 
-                                                     choices = c("All simulations","Selected Simulations","Both (not yet implemented)"),
-                                                     selected = "All simulations",width = '100%'),
-                                         selectInput("rcm.legend.sc", label = "Legend", 
-                                                     choices = c("Display","Hide"),
-                                                     selected = "Hide Legend",width = '100%'),
-                                         selectInput("rcm.groupBy", label = "Group By", choices = c('None','---',names(rcm.meta.tas)),
-                                                     selected = 'None',width = '100%'),
-                                         selectInput("rcm.colorBy", label = "Color By", 
-                                                     choices = c('None','---','Group'),
-                                                     selected = 'None',width = '100%'),
-                                         selectInput("rcm.outputValues", label = "Displayed values", 
-                                                     choices = c('Absolute','Anomaly','Bias','Change'),
-                                                     selected = 'Absolute',width = '100%'),
-                                         selectInput("rcm.stat", label = "Statistics", 
-                                                     choices = c('Mean','Standard Deviation',
-                                                                 'Correlation')),
-                                         selectInput("rcm.var", label = "Variables", 
-                                                     choices = c('Individual','Synchronised'),
-                                                     selected = 'Synchronised',width = '100%'),
-                                         title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart",p(),
-                                                    tags$figcaption('The interactive figure shows the Intensity-Duration-Frequency curve simulated by the selected set of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))),
-                                         title = tags$p('3. Temperature'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('4. Precipitation '), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps of flood risk and curves showing return values.", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('5. Snow'), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps of flood risk and curves showing return values.", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('6. Wind'), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            )
-                          )
-                  ),
-                  tabItem(tabName = "insurance",
-                          fluidPage(
-                            p(),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         #tags$figcaption('The EURO-CORDEX domain',
-                                         #                tags$a(href = 'http://cordex.org/domains/cordex-region-euro-cordex/',"Read more")),
-                                         #tags$a(href = 'https://figshare.com/s/7b678c0f92c43f8e0aeb',"Demo video"),
-                                         column(12,selectInput("rcm.region", label = NULL, 
-                                                               choices = regions.all,
-                                                               selected = "Europe",width = '100%')),
-                                         #leafletOutput('rcm.region',width = '100%',height = 500),
-                                         title = tags$p('1. Select your region of interest'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         selectInput("rcm.period", label = "Period", 
-                                                     choices = c("Present (1981-2010)","Near Future (2021-2050)",
-                                                                 "Far Future (2071-2100)"),
-                                                     selected = "Present",width = '100%'),
-                                         selectInput("rcm.chart.type", label = "Chart Output", 
-                                                     choices = c("Individual Simulations",
-                                                                 "Ensemble of All Simulations",
-                                                                 "Box Plots of All Simulations"),
-                                                     selected = "Ensemble of All Simulations",width = '100%'),
-                                         selectInput("rcm.sim.sc", label = "Simulations", 
-                                                     choices = c("All simulations","Selected Simulations","Both (not yet implemented)"),
-                                                     selected = "All simulations",width = '100%'),
-                                         selectInput("rcm.legend.sc", label = "Legend", 
-                                                     choices = c("Display","Hide"),
-                                                     selected = "Hide Legend",width = '100%'),
-                                         selectInput("rcm.groupBy", label = "Group By", choices = c('None','---',names(rcm.meta.tas)),
-                                                     selected = 'None',width = '100%'),
-                                         selectInput("rcm.colorBy", label = "Color By", 
-                                                     choices = c('None','---','Group'),
-                                                     selected = 'None',width = '100%'),
-                                         selectInput("rcm.outputValues", label = "Displayed values", 
-                                                     choices = c('Absolute','Anomaly','Bias','Change'),
-                                                     selected = 'Absolute',width = '100%'),
-                                         selectInput("rcm.stat", label = "Statistics", 
-                                                     choices = c('Mean','Standard Deviation',
-                                                                 'Correlation')),
-                                         selectInput("rcm.var", label = "Variables", 
-                                                     choices = c('Individual','Synchronised'),
-                                                     selected = 'Synchronised',width = '100%'),
-                                         title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart",p(),
-                                                    tags$figcaption('The interactive figure shows the Intensity-Duration-Frequency curve simulated by the selected set of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))),
-                                         title = tags$p('3. Floods'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and correlations instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('4. Storms '), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            )
-                            
-                            
-                          )
-                  ),
-                  tabItem(tabName = "health",
-                          fluidPage(
-                            p(),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tags$figcaption('Meteorological elements such as temperature, wind, precipitation, and humidity may have some health issues (Epstein and Ferber, 2011), affecting conditions such as heat waves, pollution, pollen, flooding, storm surge, wind, snow, ice, or droughts. Heat waves pose a health hazards for an aging population in southern Europe, whereas higher temperatures in general can increase the spread of diseases and their vectors (eg. ticks and lyme disease). Changing temperatures also affect spread pollen affecting people with allergies, and temperature inversions can trap pollution (warmer winters may potentially reduce the frequency of inversions). Flooding and storm surge can lead to drowning, while strong winds can result in dangerous situations with flying debris. The presence of snow and ice can also lead to accidents, the former through shifting snow (causing cardiac arrest in older people) or avalanches, while icy condition can result in higher number of broken limbs. Droughts can lead to dangerous conditions with higher risks of wildfires.',
-                                                         'A typical user from the health sector may include planners within health authorities (ministry of health) and hospitals. To prepare outlooks for future demands, they need to look at various factors, and climate change may not necessarily be the most important one. Furthermore, the time horizon for their planning is usually shorter than a decade, unless there is a need to start a research project to develop new treatments or build new hospitals. Reliable seasonal to decadal predictions can benefit annual budgeting and planning, typically the time frame for society.',
-                                                         p(), tags$a(href = 'http://cordex.org/domains/cordex-region-euro-cordex/', p(), "Read more")),
-                                         tags$a(href = 'https://figshare.com/s/7b678c0f92c43f8e0aeb',"Demo video"),
-                                         column(12,checkboxGroupInput(inputId = "typical.user", label = 'Typical user' ,
-                                                                      choices = c('Health authorities','Hospitals'),
-                                                                      selected = 'Health authorities',width = '100%')),
-                                         #leafletOutput('rcm.region',width = '100%',height = 500),
-                                         title = tags$p("About KPI's for the Health Sector"), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         selectInput("rcm.period", label = "Period", 
-                                                     choices = c("Present (1981-2010)","Near Future (2021-2050)",
-                                                                 "Far Future (2071-2100)"),
-                                                     selected = "Present",width = '100%'),
-                                         selectInput("rcm.chart.type", label = "Chart Output", 
-                                                     choices = c("Individual Simulations",
-                                                                 "Ensemble of All Simulations",
-                                                                 "Box Plots of All Simulations"),
-                                                     selected = "Ensemble of All Simulations",width = '100%'),
-                                         selectInput("rcm.sim.sc", label = "Simulations", 
-                                                     choices = c("All simulations","Selected Simulations","Both (not yet implemented)"),
-                                                     selected = "All simulations",width = '100%'),
-                                         selectInput("rcm.legend.sc", label = "Legend", 
-                                                     choices = c("Display","Hide"),
-                                                     selected = "Hide Legend",width = '100%'),
-                                         selectInput("rcm.groupBy", label = "Group By", choices = c('None','---',names(rcm.meta.tas)),
-                                                     selected = 'None',width = '100%'),
-                                         selectInput("rcm.colorBy", label = "Color By", 
-                                                     choices = c('None','---','Group'),
-                                                     selected = 'None',width = '100%'),
-                                         selectInput("rcm.outputValues", label = "Displayed values", 
-                                                     choices = c('Absolute','Anomaly','Bias','Change'),
-                                                     selected = 'Absolute',width = '100%'),
-                                         selectInput("rcm.stat", label = "Statistics", 
-                                                     choices = c('Mean','Standard Deviation',
-                                                                 'Spatial Correlation')),
-                                         selectInput("rcm.var", label = "Variables", 
-                                                     choices = c('Individual','Synchronised'),
-                                                     selected = 'Synchronised',width = '100%'),
-                                         title = tags$p('1. Settings & Outputs : Modify the default settings and select the output type and values.'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart",p(),
-                                                    tags$figcaption('The interactive figure shows the Intensity-Duration-Frequency curve simulated by the selected set of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation (only works on present (1981-2010) climate) instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))),
-                                         title = tags$p('2. Heat waves and temperature changes'), 
-                                         collapsible = TRUE, collapsed = TRUE))
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation (only works on present (1981-2010) climate) instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation (only works on present (1981-2010) climate)  instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('3. Pollution '), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation (only works on present (1981-2010) climate)  instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation (only works on present (1981-2010) climate)  instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('4. Floods and Droughts '), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation (only works on present (1981-2010) climate)  instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                  You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                  You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation (only works on present (1981-2010) climate)  instead of the mean.
-                                                  Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('5. Storms and Storm Surge '), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            ),
-                            fluidRow(
-                              column(12,
-                                     box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                         tabsetPanel(
-                                           tabPanel("Chart", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                                    You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                                    You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation (only works on present (1981-2010) climate)  instead of the mean.
-                                                                    Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.')),
-                                           tabPanel("Maps", p(), 
-                                                    tags$figcaption('The interactive figure shows the seasonal cycle of pseudo-observed (dashed) and modeled precipitation by the multi-model ensemble of simulations assuming the intermediate emission scenario (RCP4.5).
-                                                                    You can modify the type of the output from the "Settings & Outputs" tab box into, for example, individual simulations, envelope of the ensemble model simulations, box plots of both, transform the values into anomalies, group the models by attributes, etc. 
-                                                                    You can additionally double click on specific climate models from the legend (once displayed) or the meta data table to isolate one or a group of simulations or modified the displyed statistic to, for example, spatial standard deviation and spatial correlation (only works on present (1981-2010) climate)  instead of the mean.
-                                                                    Other options are also included such as zoom in/out, show closest data by pointing with the mouse on the simulations, compare data between simulations, and download the plot as png by taking a snapshot. You can also check and download both the data and meta data tabs for furhter details about the simulations.'))
-                                         ),
-                                         title = tags$p('6. Snow and Ice '), 
-                                         collapsible = TRUE, collapsed = TRUE)
-                              )
-                            )
-                            
-                            
+                              box(width = '100%', solidHeader = TRUE, status = 'danger',
+                                  'Your settings are the following:',
+                                  tags$hr(),
+                                  textOutput('spi.settings'),
+                                  tags$hr(),
+                                  leafletOutput("map.spi",height = '900'),
+                                  title = tags$p('2. Evaluate the Standardized Precipitaiton Index (SPI) over Europe'),
+                                  collapsible = TRUE, collapsed = FALSE))
                           )
                   )
                   
+                  
                 )
               )
-)    
+              
+)
+    

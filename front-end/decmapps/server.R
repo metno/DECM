@@ -61,19 +61,19 @@ function(input, output,session) {
     return(filterSim(input$project,input$exp,input$gcm,input$run,input$rcm,input$var,input$dates,input$url))
   })
   
-  observe
-  showNotification(
-  tags$div(tags$p(tags$h1("Please wait ... loading ..."))),
-  action = NULL, duration = 10, closeButton = FALSE,id = NULL, type = c("warning"),session = getDefaultReactiveDomain())
+  observe(
+    showNotification(
+      tags$div(tags$p(tags$h1("Please wait ... loading ..."))),
+      action = NULL, duration = 10, closeButton = FALSE,id = NULL, type = c("warning"),session = getDefaultReactiveDomain())
   )
-
+  
   observe({
     output$browser <- DT::renderDataTable({
       #
       x <- filter.sim()
       dat <- x %>% mutate(URL = sprintf(paste0("<a href='", URL,"' target='_blank'>Get data</a>")))
       DT::datatable(dat,escape = FALSE)#,selection = 'single',options = list(), style="bootstrap")
-      })
+    })
     addPopover(session = session, id = "browser", title = "Climate Model Simulations", 
                content = 'Climate model simulations are the result of running a global climate model, a regional climate model, or a combination of the two, all constitute suitable tools are suitable tools (computer programs) to simulate climate variables such as temperature, wind, precipitation, humidity, radiation, … based on the laws of physics and physical processes from the past to decades ahead.',
                placement = 'top',options = list(container = 'body'))
@@ -586,7 +586,7 @@ function(input, output,session) {
       polygon_labelPt <- selected_polygon@polygons[[1]]@labpt
       #center the view on the polygon 
       m <- m %>% setView(lng=polygon_labelPt[1],lat=polygon_labelPt[2],zoom=6)
-     
+      
       m <- m %>% addPolylines(fill = TRUE, stroke = TRUE, color = I("#b21c1c"),weight = 1.5, opacity = 0.5,
                               data=selected_polygon,noClip = TRUE,
                               group="highlighted_polygon") 
@@ -595,7 +595,7 @@ function(input, output,session) {
     
     invisible(m)
   }
-
+  
   ## Sectoral communication example 
   spi <- function(freq=1,group='ED',stat='nEvents',period='1981-2010') {
     
@@ -660,7 +660,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-})
+    })
     
     output$gcm.meta.pr <- DT::renderDataTable({
       gcm.meta.pr <- gcm.meta.pr.reactive()
@@ -697,7 +697,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-  })
+    })
     
     output$gcm.meta.all <- DT::renderDataTable({
       ## Metadata table
@@ -728,7 +728,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-      })
+    })
     
     ## RCMs tablets 
     
@@ -766,7 +766,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-      })
+    })
     
     output$rcm.meta.pr <- DT::renderDataTable({
       ## Metadata table
@@ -801,7 +801,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-      })
+    })
     
     output$rcm.meta.all <- DT::renderDataTable({
       ## Metadata table
@@ -837,7 +837,7 @@ function(input, output,session) {
                                  select.style = 'os',
                                  scrollY = 800
                     ))
-      })
+    })
     
     ## Define reions
     output$gcm.region <- renderLeaflet({
@@ -1083,7 +1083,7 @@ function(input, output,session) {
             
             leg.name <- paste(im[i],paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
             leg.name.abb <- paste(im[i])
-	    grp.name <- paste('Group',id[im[i]],sep='')
+            grp.name <- paste('Group',id[im[i]],sep='')
             gcm <- gcms[i] #gcms[im[i]]
             if (is.element(input$gcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
@@ -1096,58 +1096,58 @@ function(input, output,session) {
                                       colors = colsa[im[",i,"]], hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }
-          }
+        }
         if (!is.null(df$ref))
           p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-          } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
-            
-            p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
-                            line = list(color = 'transparent'),
-                            showlegend = TRUE, name = 'High') %>%
-              add_trace(y = ~low, type = 'scatter', mode = 'lines', 
-                        fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),
-                        showlegend = TRUE, name = 'Low') %>%
-              add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',name = 'Ens. Mean',
-                        line = list(color='#b21c1c'), showlegend = TRUE,
-                        name = 'Average') 
-            
-            
-            if (!is.null(df$ref))
-              p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', showlegend = TRUE,
-                                         line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-            
-            p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
-            
-            if (input$gcm.legend.sc == 'Hide')
-              p.sc <- p.sc %>% layout(showlegend = FALSE)
-            
-          } else if (grepl('box',tolower(input$gcm.chart.type))) {
-            p.sc <- plot_ly(df, type = 'box')
-            
-            month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
-            col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
-                         'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
-                         'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
-                         'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
-                         'rgb(166,206,227)')
-            for (i in 1:12) {
-              leg.name <- month.abb[i]
-              leg.grp <- month.grp[i]
-              eval(parse(text = paste("p.sc <- p.sc %>% 
+      } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
+        
+        p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
+                        line = list(color = 'transparent'),
+                        showlegend = TRUE, name = 'High') %>%
+          add_trace(y = ~low, type = 'scatter', mode = 'lines', 
+                    fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),
+                    showlegend = TRUE, name = 'Low') %>%
+          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',name = 'Ens. Mean',
+                    line = list(color='#b21c1c'), showlegend = TRUE,
+                    name = 'Average') 
+        
+        
+        if (!is.null(df$ref))
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', showlegend = TRUE,
+                                     line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
+        
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
+        
+        if (input$gcm.legend.sc == 'Hide')
+          p.sc <- p.sc %>% layout(showlegend = FALSE)
+        
+      } else if (grepl('box',tolower(input$gcm.chart.type))) {
+        p.sc <- plot_ly(df, type = 'box')
+        
+        month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+        col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                     'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                     'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                     'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                     'rgb(166,206,227)')
+        for (i in 1:12) {
+          leg.name <- month.abb[i]
+          leg.grp <- month.grp[i]
+          eval(parse(text = paste("p.sc <- p.sc %>% 
                                       add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
                                       type = 'box', boxpoints = 'all',
                                       legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color=col.grp[",i,"],opacity=0.6),
                                       name = leg.name,showlegend =TRUE)",sep='')))
-              if (!is.null(df$ref))
-                p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
-                                           line = list(color = 'black', dash = 'dash', width = 2),
-                                           legendgroup = leg.grp,
-                                           showlegend = TRUE)
-            } 
-          }
+          if (!is.null(df$ref))
+            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
+                                       line = list(color = 'black', dash = 'dash', width = 2),
+                                       legendgroup = leg.grp,
+                                       showlegend = TRUE)
+        } 
+      }
       # Add these lines to modify colors in box plot
       # marker = list(color = 'rgb(135,206,250'),
       # line = list(color = 'rgb(135,206,250'),
@@ -1179,15 +1179,15 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region | ", input$gcm.region),
-                                           showarrow=F,
-                                           font=list(size=16,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region | ", input$gcm.region),
+                                showarrow=F,
+                                font=list(size=16,weight='bold')
+                              )
+      )
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       else
@@ -1195,7 +1195,7 @@ function(input, output,session) {
       
       p.sc$elementId <- NULL
       p.sc
-        })
+    })
     
     output$gcm.sc.bias.tas.pu <- renderPlotly({
       
@@ -1394,15 +1394,15 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region | ", input$gcm.region.pu),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region | ", input$gcm.region.pu),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       else
@@ -1574,7 +1574,7 @@ function(input, output,session) {
       ylab <- "Temperature [deg. C]"
       
       p.sc <- p.sc %>% layout(title = FALSE,
-      	      	       	      paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
+                              paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
                                            showgrid = TRUE,
@@ -1591,20 +1591,20 @@ function(input, output,session) {
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
                                            zeroline = FALSE), 
-			      annotations = list(
-					   yref="paper",
-					   xref="paper",
-					   y=1.07,
-					   x=0,
-					   text=paste(input$gcm.sc.region.pu, input$gcm.sc.period.pu,
-                                                      input$gcm.sc.chart.type.pu,
-                                                      input$gcm.sc.stat.pu,sep=' | '),
-					   showarrow=F,
-					   font=list(size=14,color="grey"))
-		              )
-			      
-
-    if (input$gcm.legend.sc == 'Hide')
+                              annotations = list(
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste(input$gcm.sc.region.pu, input$gcm.sc.period.pu,
+                                           input$gcm.sc.chart.type.pu,
+                                           input$gcm.sc.stat.pu,sep=' | '),
+                                showarrow=F,
+                                font=list(size=14,color="grey"))
+      )
+      
+      
+      if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       else
         p.sc <- p.sc %>% layout(showlegend = TRUE)
@@ -1707,7 +1707,7 @@ function(input, output,session) {
           leg.name.abb <- paste(lev[id[i]])
           leg.name <- paste(lev[id[i]], paste(as.character(as.matrix(gcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
           grp.name <- paste('Group',id[i],sep='')
-                    
+          
           #if (is.null(input$rowsGcm)) {
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter',
                                   name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
@@ -1792,15 +1792,15 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region |", input$gcm.cc.region),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region |", input$gcm.cc.region),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       else
@@ -1917,54 +1917,54 @@ function(input, output,session) {
                                       line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }            
           
-          }
+        }
         
         if (!is.null(df$ref))
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
-          p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
-                          line = list(color = 'transparent'),name = 'High',showlegend = TRUE) %>%
-            add_trace(y = ~low, type = 'scatter', mode = 'lines',showlegend = TRUE,
-                      fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),name = 'Low') %>%
-            add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',line = list(color='#b21c1c'),
-                      name = 'Ens. Mean',showlegend = TRUE) 
-          
-          if (!is.null(df$ref))
-            p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
-                                       line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-          
-          p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
-          
-          if (input$gcm.legend.sc == 'Hide') 
-            p.sc <- p.sc %>% layout(showlegend = FALSE)
-          
-        } else if (grepl('box',tolower(input$gcm.chart.type))) {
-          p.sc <- plot_ly(df, type = 'box')
-          
-          month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
-          col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
-                       'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
-                       'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
-                       'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
-                       'rgb(166,206,227)')
-          for (i in 1:12) {
-            leg.name <- month.abb[i]
-            leg.grp <- month.grp[i]
-            eval(parse(text = paste("p.sc <- p.sc %>% 
+      } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
+        p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
+                        line = list(color = 'transparent'),name = 'High',showlegend = TRUE) %>%
+          add_trace(y = ~low, type = 'scatter', mode = 'lines',showlegend = TRUE,
+                    fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),name = 'Low') %>%
+          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',line = list(color='#b21c1c'),
+                    name = 'Ens. Mean',showlegend = TRUE) 
+        
+        if (!is.null(df$ref))
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
+                                     line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
+        
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
+        
+        if (input$gcm.legend.sc == 'Hide') 
+          p.sc <- p.sc %>% layout(showlegend = FALSE)
+        
+      } else if (grepl('box',tolower(input$gcm.chart.type))) {
+        p.sc <- plot_ly(df, type = 'box')
+        
+        month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+        col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                     'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                     'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                     'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                     'rgb(166,206,227)')
+        for (i in 1:12) {
+          leg.name <- month.abb[i]
+          leg.grp <- month.grp[i]
+          eval(parse(text = paste("p.sc <- p.sc %>% 
                                     add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
                                     type = 'box', boxpoints = 'all',
                                     legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
                                     line = list(color=col.grp[",i,"],opacity=0.6),
                                     name = leg.name,showlegend =TRUE)",sep='')))
-            if (!is.null(df$ref))
-              p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
-                                         line = list(color = 'black', dash = 'dash', width = 2),
-                                         legendgroup = leg.grp,
-                                         showlegend = TRUE) 
-          } 
-        }
+          if (!is.null(df$ref))
+            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
+                                       line = list(color = 'black', dash = 'dash', width = 2),
+                                       legendgroup = leg.grp,
+                                       showlegend = TRUE) 
+        } 
+      }
       
       if (input$gcm.outputValues == 'Bias')  
         ylab <- "Bias in precipitation [%]"
@@ -1994,22 +1994,22 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region |", input$gcm.region),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region |", input$gcm.region),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       
       p.sc$elementId <- NULL
       p.sc
-        })
+    })
     
     output$gcm.sc.bias.pr.pu <- renderPlotly({
       gcm.meta.pr <- gcm.meta.pr.reactive.pu()
@@ -2061,7 +2061,7 @@ function(input, output,session) {
           i <- which(is.element(gcms,gcm))
           #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
           leg.name <- paste(lev[id[i]],paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
-	  leg.name.abb <- paste(lev[id[i]])
+          leg.name.abb <- paste(lev[id[i]])
           
           grp.name <- paste('Group',id[i],sep='')
           
@@ -2149,22 +2149,22 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region |", input$gcm.region.pu),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region |", input$gcm.region.pu),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       
       p.sc$elementId <- NULL
       p.sc
-      })
+    })
     
     output$gcm.sc.pr.pu <- renderPlotly({
       gcm.meta.pr <- gcm.meta.pr.reactive.pu()
@@ -2217,7 +2217,7 @@ function(input, output,session) {
           #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
           leg.name <- paste(lev[id[i]],paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
           leg.name.abb <- paste(lev[id[i]])
- 	  grp.name <- paste('Group',id[i],sep='')
+          grp.name <- paste('Group',id[i],sep='')
           
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",gcm,",type = 'scatter', 
                                   name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
@@ -2297,22 +2297,22 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region | ", input$gcm.sc.region.pu),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region | ", input$gcm.sc.region.pu),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       
       p.sc$elementId <- NULL
       p.sc
-      })
+    })
     
     output$gcm.cc.pr.pu <- renderPlotly({
       
@@ -2444,22 +2444,22 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region |", input$gcm.cc.region),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region |", input$gcm.cc.region),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       
       p.sc$elementId <- NULL
       p.sc
-      })
+    })
     
     output$gcm.sc.tas.data <- DT::renderDataTable({
       
@@ -2750,11 +2750,11 @@ function(input, output,session) {
                                       showlegend = TRUE, legendgroup = grp.name,
                                       marker = list(color = cols[im[",i,"]], symbol = 3,size = 12,opacity=0.7,line = list(width = 1))",sep='')))
           }
-          }
-          } 
+        }
+      } 
       
       if ((input$gcm.chart.type == 'Ensemble of All Simulations') | (input$gcm.chart.type == "Both - Ensemble & Individual Simulations"))
-       p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
       #}
       
       if (input$gcm.legend.sc == 'Display') {
@@ -2794,32 +2794,32 @@ function(input, output,session) {
       
       
       p.sc <- p.sc %>% layout(title = FALSE,
-      paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
-      xaxis = list(title = ylab,
-      gridcolor = 'rgb(255,255,255)',
-      showgrid = TRUE,
-      showline = FALSE,
-      showticklabels = TRUE,
-      tickcolor = 'rgb(127,127,127)',
-      ticks = 'outside',
-      zeroline = TRUE),
-      yaxis = list(title = xlab,
-      gridcolor = 'rgb(255,255,255)',
-      showgrid = TRUE,
-      showline = FALSE,
-      showticklabels = TRUE,
-      tickcolor = 'rgb(127,127,127)',
-      ticks = 'outside',
-      zeroline = TRUE),
-      annotations = list(
-      yref="paper",
-      xref="paper",
-      y=1.07,
-      x=0,
-      text=paste("Region |", input$gcm.region),
-      showarrow=F,
-      font=list(size=14,weight='bold')
-      )
+                              paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
+                              xaxis = list(title = ylab,
+                                           gridcolor = 'rgb(255,255,255)',
+                                           showgrid = TRUE,
+                                           showline = FALSE,
+                                           showticklabels = TRUE,
+                                           tickcolor = 'rgb(127,127,127)',
+                                           ticks = 'outside',
+                                           zeroline = TRUE),
+                              yaxis = list(title = xlab,
+                                           gridcolor = 'rgb(255,255,255)',
+                                           showgrid = TRUE,
+                                           showline = FALSE,
+                                           showticklabels = TRUE,
+                                           tickcolor = 'rgb(127,127,127)',
+                                           ticks = 'outside',
+                                           zeroline = TRUE),
+                              annotations = list(
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region |", input$gcm.region),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
       )
       
       if (input$gcm.legend.sc == 'Hide') {
@@ -2831,7 +2831,7 @@ function(input, output,session) {
       # gcm.dtdp
       p.sc$elementId <- NULL
       p.sc
-          })
+    })
     
     output$gcm.cc.scatter.pu <- renderPlotly({
       #
@@ -2916,7 +2916,7 @@ function(input, output,session) {
           #leg.name <- paste(as.character(as.matrix(rcm.meta.tas[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = '  ')
           leg.name <- paste(lev[id[i]],paste(as.character(as.matrix(gcm.meta.pr[i,c('institute_id','model_id','parent_experiment_rip','realization')])),collapse = ' '))
           leg.name.abb <- lev[id[i]]
-	  grp.name <- paste('Group',id[i],sep='')
+          grp.name <- paste('Group',id[i],sep='')
           
           eval(parse(text = paste("p.sc <- p.sc %>% add_trace(x = ~",df$dtas[i],",y = ~ ",df$dpr[i],",type = 'scatter',mode = 'markers',
                                   name = leg.name.abb, mode = 'lines', hoverinfo = 'text+x+y',text=leg.name,
@@ -2924,7 +2924,7 @@ function(input, output,session) {
                                   marker = list(color = ",i,",symbol = 3, size = 12,opacity = 0.7,line = list(width = 1,color = '#FFFFFF')))",sep='')))
         }
         ## Highlight selected Simulations in tab:models
-        } 
+      } 
       
       
       if ((input$gcm.cc.chart.type == 'Ensemble of All Simulations') | (input$gcm.cc.chart.type == "Both - Ensemble & Individual Simulations"))
@@ -2954,33 +2954,33 @@ function(input, output,session) {
       
       
       p.sc <- p.sc %>% layout(title = FALSE,
-        paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
-        xaxis = list(title = ylab,
-                     gridcolor = 'rgb(255,255,255)',
-                     showgrid = TRUE,
-                     showline = FALSE,
-                     showticklabels = TRUE,
-                     tickcolor = 'rgb(127,127,127)',
-                     ticks = 'outside',
-                     zeroline = TRUE),
-        yaxis = list(title = xlab,
-                     gridcolor = 'rgb(255,255,255)',
-                     showgrid = TRUE,
-                     showline = FALSE,
-                     showticklabels = TRUE,
-                     tickcolor = 'rgb(127,127,127)',
-                     ticks = 'outside',
-                     zeroline = TRUE),
+                              paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
+                              xaxis = list(title = ylab,
+                                           gridcolor = 'rgb(255,255,255)',
+                                           showgrid = TRUE,
+                                           showline = FALSE,
+                                           showticklabels = TRUE,
+                                           tickcolor = 'rgb(127,127,127)',
+                                           ticks = 'outside',
+                                           zeroline = TRUE),
+                              yaxis = list(title = xlab,
+                                           gridcolor = 'rgb(255,255,255)',
+                                           showgrid = TRUE,
+                                           showline = FALSE,
+                                           showticklabels = TRUE,
+                                           tickcolor = 'rgb(127,127,127)',
+                                           ticks = 'outside',
+                                           zeroline = TRUE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region | ", input$gcm.cc.region),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region | ", input$gcm.cc.region),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -2991,7 +2991,7 @@ function(input, output,session) {
       p.sc$elementId <- NULL
       p.sc
     })
- 
+    
     output$gcm.scatter.data <- DT::renderDataTable({
       
       gcm.meta.pr <- gcm.meta.pr.reactive()
@@ -3230,7 +3230,7 @@ function(input, output,session) {
             i <- which(is.element(rcms,rcm))
             
             leg.name <- paste(lev[id[i]],paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = ' '))
-	    leg.name.abb <- paste(i)
+            leg.name.abb <- paste(i)
             grp.name <- paste('Group',id[i],sep='')
             
             #if (is.null(input$rowsRcm)) {
@@ -3251,7 +3251,7 @@ function(input, output,session) {
           im <- input$rowsRcm
           for (i in 1:length(im)) {
             leg.name <- paste(i,paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = '  '))
-	    leg.name.abb <- paste(i)
+            leg.name.abb <- paste(i)
             grp.name <- paste('Group',id[im[i]],sep='')
             rcm <- rcms[i] #rcms[im[i]]
             if (is.element(input$rcm.colorBy, c('None','---')))
@@ -3265,55 +3265,55 @@ function(input, output,session) {
                                       colors = colsa[im[",i,"]], hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color = colsa[im[",i,"]], width = 1.5, shape ='spline'))",sep='')))
           }
-          }
+        }
         if (!is.null(df$ref))
           p.sc <- p.sc %>% add_trace(y = ~ref, type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-          } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
-            
-            p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
-                            line = list(color = 'transparent'),
-                            showlegend = FALSE, name = 'High') %>%
-              add_trace(y = ~low, type = 'scatter', mode = 'lines',
-                        fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),
-                        showlegend = TRUE, name = 'Low') %>%
-              add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                        line = list(color='#b21c1c'),
-                        name = 'Average') 
-            
-            
-            if (!is.null(df$ref))
-              p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
-                                         line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-            
-            p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
-            
-          } else if (grepl('box',tolower(input$rcm.chart.type))) {
-            p.sc <- plot_ly(df, type = 'box')
-            
-            month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
-            col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
-                         'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
-                         'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
-                         'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
-                         'rgb(166,206,227)')
-            for (i in 1:12) {
-              leg.name <- month.abb[i]
-              leg.grp <- month.grp[i]
-              eval(parse(text = paste("p.sc <- p.sc %>% 
+      } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
+        
+        p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
+                        line = list(color = 'transparent'),
+                        showlegend = FALSE, name = 'High') %>%
+          add_trace(y = ~low, type = 'scatter', mode = 'lines',
+                    fill = 'tonexty', fillcolor='rgba(255,145,145,0.2)', line = list(color = 'transparent'),
+                    showlegend = TRUE, name = 'Low') %>%
+          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
+                    line = list(color='#b21c1c'),
+                    name = 'Average') 
+        
+        
+        if (!is.null(df$ref))
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
+                                     line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
+        
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
+        
+      } else if (grepl('box',tolower(input$rcm.chart.type))) {
+        p.sc <- plot_ly(df, type = 'box')
+        
+        month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+        col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                     'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                     'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                     'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                     'rgb(166,206,227)')
+        for (i in 1:12) {
+          leg.name <- month.abb[i]
+          leg.grp <- month.grp[i]
+          eval(parse(text = paste("p.sc <- p.sc %>% 
                                       add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
                                       type = 'box', boxpoints = 'all',
                                       legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
                                       line = list(color=col.grp[",i,"],opacity=0.6),
                                       name = leg.name,showlegend =TRUE)",sep='')))
-              if (!is.null(df$ref))
-                p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
-                                           line = list(color = 'black', dash = 'dash', width = 2),
-                                           legendgroup = leg.grp,
-                                           showlegend = TRUE)
-            } 
-          }
+          if (!is.null(df$ref))
+            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
+                                       line = list(color = 'black', dash = 'dash', width = 2),
+                                       legendgroup = leg.grp,
+                                       showlegend = TRUE)
+        } 
+      }
       # Add these lines to modify colors in box plot
       # marker = list(color = 'rgb(135,206,250'),
       # line = list(color = 'rgb(135,206,250'),
@@ -3345,22 +3345,22 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region | ", input$rcm.region),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region | ", input$rcm.region),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       if (input$rcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       else
         p.sc <- p.sc %>% layout(showlegend = TRUE)
       p.sc$elementId <- NULL
       p.sc
-        })
+    })
     
     output$rcm.sc.tas <- rcm.sc.tas
     output$hydro.sc.tas <- rcm.sc.tas
@@ -3457,8 +3457,8 @@ function(input, output,session) {
         # Add all models
         for (rcm in rcms) {
           i <- which(is.element(rcms,rcm))
-	  leg.name <- paste(paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = ' '))          
-  	  leg.name.abb <- paste(i)
+          leg.name <- paste(paste(as.character(as.matrix(rcm.meta.tas[i,c('gcm','gcm_rip','rcm')])),collapse = ' '))          
+          leg.name.abb <- paste(i)
           grp.name <- paste('Group',id[i],sep='')
           
           #if (is.null(input$rowsRcm)) {
@@ -3542,15 +3542,15 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region | ", input$rcm.region.pu),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region | ", input$rcm.region.pu),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       if (input$rcm.chart.type.pu != 'Individual Simulations')
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
       p.sc$elementId <- NULL
@@ -3677,7 +3677,7 @@ function(input, output,session) {
                     line = list(color='#b21c1c'),
                     name = 'Average') 
         
- 
+        
         if (!is.null(df$ref))
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
@@ -3734,16 +3734,16 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region: ", input$rcm.sc.region.pu),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
-
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region: ", input$rcm.sc.region.pu),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
+      
       p.sc$elementId <- NULL
       p.sc
     })
@@ -3925,18 +3925,18 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region | ", input$rcm.cc.region),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region | ", input$rcm.cc.region),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       if (input$rcm.sc.chart.type.pu != 'Individual Simulations')
         
-      p.sc$elementId <- NULL
+        p.sc$elementId <- NULL
       p.sc
     })
     
@@ -4034,7 +4034,7 @@ function(input, output,session) {
           for (i in 1:length(im)) {
             leg.name <- paste(im[i],paste(as.character(as.matrix(rcm.meta.pr[i,c('gcm','rcm')])),collapse = ' '),sep =' ')
             leg.name.abb <- paste(im[i]) 
-	    grp.name <- paste('Group',id[i],sep='')
+            grp.name <- paste('Group',id[i],sep='')
             rcm <- rcms[i]
             if (is.element(input$rcm.colorBy, c('None','---')))
               eval(parse(text = paste("p.sc <- p.sc %>% add_trace(y = ~ ",rcm,",type = 'scatter', 
@@ -4048,52 +4048,52 @@ function(input, output,session) {
                                       line = list(color = colsa[im[",i,"]], width = 2, shape ='spline'))",sep='')))
           }            
           
-          }
+        }
         
         if (!is.null(df$ref))
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
-          p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
-                          line = list(color = 'transparent'),
-                          showlegend = TRUE, name = 'High') %>%
-            add_trace(y = ~low, type = 'scatter', mode = 'lines',
-                      fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),
-                      showlegend = TRUE, name = 'Low') %>%
-            add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
-                      line = list(color='rgb(35, 132, 170)'),
-                      name = 'Average') 
-          
-          if (!is.null(df$ref))
-            p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
-                                       line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-          p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))          
-        } else if (grepl('box',tolower(input$rcm.chart.type))) {
-          p.sc <- plot_ly(df, type = 'box')
-          
-          month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
-          col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
-                       'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
-                       'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
-                       'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
-                       'rgb(166,206,227)')
-          for (i in 1:12) {
-            leg.name <- month.abb[i]
-            leg.grp <- month.grp[i]
-            eval(parse(text = paste("p.sc <- p.sc %>% 
+      } else if (grepl('ensemble', tolower(input$rcm.chart.type))) { # Make an enveloppe instead of lines
+        p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
+                        line = list(color = 'transparent'),
+                        showlegend = TRUE, name = 'High') %>%
+          add_trace(y = ~low, type = 'scatter', mode = 'lines',
+                    fill = 'tonexty', fillcolor='rgba(135,206,250,0.2)', line = list(color = 'transparent'),
+                    showlegend = TRUE, name = 'Low') %>%
+          add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
+                    line = list(color='rgb(35, 132, 170)'),
+                    name = 'Average') 
+        
+        if (!is.null(df$ref))
+          p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
+                                     line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))          
+      } else if (grepl('box',tolower(input$rcm.chart.type))) {
+        p.sc <- plot_ly(df, type = 'box')
+        
+        month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
+        col.grp <- c('rgb(166,206,227)','rgb(166,206,227)',
+                     'rgb(253,191,111)','rgb(253,191,111)', 'rgb(253,191,111)',
+                     'rgb(251,154,153)','rgb(251,154,153)','rgb(251,154,153)', 
+                     'rgb(202,178,214)','rgb(202,178,214)','rgb(202,178,214)',
+                     'rgb(166,206,227)')
+        for (i in 1:12) {
+          leg.name <- month.abb[i]
+          leg.grp <- month.grp[i]
+          eval(parse(text = paste("p.sc <- p.sc %>% 
                                     add_trace(y = ~as.numeric(as.vector(df[",i,",1:(dim(df)[2]-2)])),
                                     type = 'box', boxpoints = 'all',
                                     legendgroup = leg.grp, hoverinfo = 'text+x+y',text=leg.name,
                                     line = list(color=col.grp[",i,"],opacity=0.6),
                                     name = leg.name,showlegend =TRUE)",sep='')))
-            if (!is.null(df$ref))
-              p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
-                                         line = list(color = 'black', dash = 'dash', width = 2),
-                                         legendgroup = leg.grp,
-                                         showlegend = TRUE) 
-          } 
-        }
+          if (!is.null(df$ref))
+            p.sc <- p.sc %>% add_trace(y = df$ref[i], type = 'box', name = leg.name,
+                                       line = list(color = 'black', dash = 'dash', width = 2),
+                                       legendgroup = leg.grp,
+                                       showlegend = TRUE) 
+        } 
+      }
       
       if (input$rcm.outputValues == 'Bias')  
         ylab <- "Bias in precipitation [%]"
@@ -4123,15 +4123,15 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region | ", input$rcm.region.pu),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region | ", input$rcm.region.pu),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       
       if (input$rcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -4274,22 +4274,22 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region | ", input$rcm.region.pu),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region | ", input$rcm.region.pu),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       
       if (grepl('ensemble',tolower(input$rcm.chart.type.pu)))
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
       
       p.sc$elementId <- NULL
       p.sc
-      })
+    })
     
     output$rcm.sc.pr.pu <- renderPlotly({
       rcm.meta.pr <- rcm.meta.pr.reactive.sc.pu()
@@ -4423,22 +4423,22 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region | ", input$rcm.sc.region.pu),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region | ", input$rcm.sc.region.pu),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       
       if (input$rcm.sc.chart.type.pu != 'Individual Simulations')
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
       
       p.sc$elementId <- NULL
       p.sc
-      })
+    })
     
     output$rcm.cc.pr.pu <- renderPlotly({
       rcm.meta.pr <- rcm.meta.pr.reactive.sc.pu()
@@ -4566,22 +4566,22 @@ function(input, output,session) {
                                            ticks = 'outside',
                                            zeroline = FALSE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region | ", input$rcm.cc.region),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region | ", input$rcm.cc.region),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       
       if (input$rcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       
       p.sc$elementId <- NULL
       p.sc
-      })
+    })
     
     output$rcm.sc.pr <- rcm.sc.pr
     
@@ -4897,7 +4897,7 @@ function(input, output,session) {
       
       
       if ((input$rcm.chart.type == 'Ensemble of All Simulations') | (input$rcm.chart.type == "Both - Ensemble & Individual Simulations"))
-       p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
       #}
       
       if (input$rcm.legend.sc == 'Display') {
@@ -4931,37 +4931,37 @@ function(input, output,session) {
         xlab <- 'Change in precitation [%]'
       } else  {
         ylab <- 'Precitation [mm/month]'
-	xlab <- 'Temperature [deg. C]'
+        xlab <- 'Temperature [deg. C]'
       }
       
       p.sc <- p.sc %>% layout(title = FALSE,
-        paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
-        xaxis = list(title = ylab,
-                     gridcolor = 'rgb(255,255,255)',
-                     showgrid = TRUE,
-                     showline = FALSE,
-                     showticklabels = TRUE,
-                     tickcolor = 'rgb(127,127,127)',
-                     ticks = 'outside',
-                     zeroline = TRUE),
-        yaxis = list(title = xlab,
-                     gridcolor = 'rgb(255,255,255)',
-                     showgrid = TRUE,
-                     showline = FALSE,
-                     showticklabels = TRUE,
-                     tickcolor = 'rgb(127,127,127)',
-                     ticks = 'outside',
-                     zeroline = TRUE),
+                              paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
+                              xaxis = list(title = ylab,
+                                           gridcolor = 'rgb(255,255,255)',
+                                           showgrid = TRUE,
+                                           showline = FALSE,
+                                           showticklabels = TRUE,
+                                           tickcolor = 'rgb(127,127,127)',
+                                           ticks = 'outside',
+                                           zeroline = TRUE),
+                              yaxis = list(title = xlab,
+                                           gridcolor = 'rgb(255,255,255)',
+                                           showgrid = TRUE,
+                                           showline = FALSE,
+                                           showticklabels = TRUE,
+                                           tickcolor = 'rgb(127,127,127)',
+                                           ticks = 'outside',
+                                           zeroline = TRUE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region | ", input$rcm.region),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region | ", input$rcm.region),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       
       if (input$rcm.legend.sc == 'Hide') {
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -4972,7 +4972,7 @@ function(input, output,session) {
       # rcm.dtdp
       p.sc$elementId <- NULL
       p.sc
-          })
+    })
     
     output$rcm.cc.scatter.pu <- renderPlotly({
       #
@@ -5093,33 +5093,33 @@ function(input, output,session) {
       xlab <- 'Change in precipitation [%]'
       
       p.sc <- p.sc %>% layout(title = FALSE,
-        paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
-        xaxis = list(title = ylab,
-                     gridcolor = 'rgb(255,255,255)',
-                     showgrid = TRUE,
-                     showline = FALSE,
-                     showticklabels = TRUE,
-                     tickcolor = 'rgb(127,127,127)',
-                     ticks = 'outside',
-                     zeroline = TRUE),
-        yaxis = list(title = xlab,
-                     gridcolor = 'rgb(255,255,255)',
-                     showgrid = TRUE,
-                     showline = FALSE,
-                     showticklabels = TRUE,
-                     tickcolor = 'rgb(127,127,127)',
-                     ticks = 'outside',
-                     zeroline = TRUE),
+                              paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
+                              xaxis = list(title = ylab,
+                                           gridcolor = 'rgb(255,255,255)',
+                                           showgrid = TRUE,
+                                           showline = FALSE,
+                                           showticklabels = TRUE,
+                                           tickcolor = 'rgb(127,127,127)',
+                                           ticks = 'outside',
+                                           zeroline = TRUE),
+                              yaxis = list(title = xlab,
+                                           gridcolor = 'rgb(255,255,255)',
+                                           showgrid = TRUE,
+                                           showline = FALSE,
+                                           showticklabels = TRUE,
+                                           tickcolor = 'rgb(127,127,127)',
+                                           ticks = 'outside',
+                                           zeroline = TRUE),
                               annotations = list(
-                                           yref="paper",
-                                           xref="paper",
-                                           y=1.07,
-                                           x=0,
-                                           text=paste("Region | ", input$rcm.cc.region),
-                                           showarrow=F,
-                                           font=list(size=14,weight='bold')
-                                           )
-				)
+                                yref="paper",
+                                xref="paper",
+                                y=1.07,
+                                x=0,
+                                text=paste("Region | ", input$rcm.cc.region),
+                                showarrow=F,
+                                font=list(size=14,weight='bold')
+                              )
+      )
       
       if (input$rcm.legend.sc == 'Hide') {
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -5130,7 +5130,7 @@ function(input, output,session) {
       # rcm.dtdp
       p.sc$elementId <- NULL
       p.sc
-      })
+    })
     
     output$rcm.scatter.data <- DT::renderDataTable({
       
@@ -5295,20 +5295,11 @@ function(input, output,session) {
                          options = providerTileOptions(noWrap = TRUE)) %>%
         setView(lat=55,lng = 8, zoom = 4) %>%
         addRasterImage(x = r,colors = pal, opacity = 0.6)
-      # addPopups(lng = as.numeric(unlist(lapply(1:length(sta), function(i) lon(sta[[i]])))), 
-      #           lat = as.numeric(unlist(lapply(1:length(sta), function(i) lat(sta[[i]])))),
-      #           popup = content)
-      ##   
-      if (input$legend == 'Display')
         m <- m %>% addLegend("bottomleft", values=round(r@data@values, digits = 2), 
                              title=leg.title, colors = rev(colscal(col= col, rev = rev, n=length(pretty(breaks,n = 10)))),
                              labels = rev(pretty(breaks,n = 10)),#pal=pal, 
                              layerId="colorLegend")  # labFormat = myLabelFormat(reverse_order = F)
-      # m <- m %>% addLegend("topleft", values=round(r@data@values, digits = 2), title=leg.title, colors = pal(round(r@data@values, digits = 2)),labels = seq(1,10,1),#pal=pal, 
-      #                      labFormat = myLabelFormat(reverse_order = T),layerId="colorLegend") # labFormat = myLabelFormat(reverse_order = T),
-      if (input$minimap == 'Display')
-        m <- m %>% addMiniMap()
-      m
+       m
     })
   })
   

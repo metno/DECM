@@ -613,7 +613,22 @@ function(input, output,session) {
   spi.reactive <- reactive({
     invisible(spi(input$spi.freq,substr(input$spi.group,1,2),input$spi.stat,substr(input$spi.period,1,9)))
   })
+  spei <- function(freq=1,group='ED',stat='nEvents',period='1981-2010') {
+    
+    spi.file <- paste('data/rda_files/spei_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
+    load(spi.file)
+    #browser()
+    spi <- array(NA,dim=c(length(droughtStatistics), dim(droughtStatistics[[1]][[stat]])))
+    for (i in 1:length(droughtStatistics))
+      spi[i,,] <- droughtStatistics[[i]][[stat]]
+    attr(spi,'longitude') <- attr(droughtStatistics[[1]][[1]],'dimnames')[[1]]
+    attr(spi,'latitude') <- attr(droughtStatistics[[1]][[1]],'dimnames')[[2]]
+    invisible(spi)
+  }
   
+  spei.reactive <- reactive({
+    invisible(spei(input$spi.freq,substr(input$spi.group,1,2),input$spi.stat,substr(input$spi.period,1,9)))
+  })
   
   observe(priority = 0, { # 
     
@@ -5301,6 +5316,57 @@ function(input, output,session) {
                              layerId="colorLegend")  # labFormat = myLabelFormat(reverse_order = F)
        m
     })
+    
+    output$map.spei <- renderLeaflet({
+      zmap <- spei.reactive()
+      cat('Observe','SPI-Index',paste('SPI-',input$it,sep=''),'GROUP', input$group,'PERIOD',input$period)
+      cat(sep = '\n')
+      x <- as.numeric(attr(zmap,'longitude'))
+      y <- as.numeric(attr(zmap,'latitude'))
+      #z <- apply(zmap,c(2,3),mean,na.rm=TRUE)
+      z <- zmap[grep(input$spi.sim,rcm.names),,]
+      #z[is.na(z)] <- -999
+      ##
+      #Create raster object
+      dat1 <- list(x=x,y = y, z = z)
+      dim(dat1$z) <- c(length(dat1$x),length(dat1$y))
+      r <- raster(dat1)
+      print(print(object.size(r),units = 'Mb'))
+
+      rev <- FALSE
+      col <- 'warm'
+      rng <- round(range(r@data@values,na.rm=TRUE),digits = 1)
+      breaks <- c(0,max(rng))
+      #breaks <- seq(-5,5,0.5)
+      leg.title <- "SPI [-]"
+
+      pal <- colorBin(colscal(col = col,rev=rev),breaks, bins = 10, pretty = TRUE,na.color = NA)
+
+      ## custom label format function
+      myLabelFormat = function(..., reverse_order = FALSE){
+        if(reverse_order){
+          function(type = "numeric", cuts){
+            cuts <- sort(cuts, decreasing = T)
+          }
+        } else{
+          labelFormat(...)
+        }
+      }
+      m <- leaflet() %>%
+        addProviderTiles(providers$Esri.WorldStreetMap,
+                         #addProviderTiles(providers$Stamen.TonerLite,
+                         options = providerTileOptions(noWrap = TRUE)) %>%
+        setView(lat=55,lng = 8, zoom = 4) %>%
+        addRasterImage(x = r,colors = pal, opacity = 0.6)
+      m <- m %>% addLegend("bottomleft", values=round(r@data@values, digits = 2),
+                           title=leg.title, colors = rev(colscal(col= col, rev = rev, n=length(pretty(breaks,n = 10)))),
+                           labels = rev(pretty(breaks,n = 10)),#pal=pal,
+                           layerId="colorLegend")  # labFormat = myLabelFormat(reverse_order = F)
+      m
+    })
+    output$spei.settings <- renderText({
+      paste(input$spi.sim,' | ',input$spi.freq,' | ',input$spi.group,' | ',input$spi.period,' | ',input$spi.stat)
+    }) 
   })
   
   observeEvent(input$gcm.groupBy,{

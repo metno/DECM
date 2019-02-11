@@ -1,8 +1,6 @@
-## Rasmus Benestad, Met Norway, 2016-11-02
-## R-shiny app that presents empirical-statistical downscaled results. The results include the CMIP5 ensemble simulations
-## for RCP4.5, RCP2.6, and RCP 8.5 for a number of stations and for the four different seasons. PCAs and EOFs have been used
-## to minimise the needed data volume, and this app expand information embedded in the PCAs/EOFs to corresponding information
-## in the form of station series or gridded maps.
+## Abdelkader Mezgahni, Rasmus Benestad, Met Norway, 2016-11-02
+## R-shiny app for DECM project. The results include the CMIP5 ensemble simulations and EURO-CORDEX simulations 
+## for RCP4.5 and RCP 8.5 emission scenarios over predefined global and regional domains.  
 
 library(shiny)
 library(esd)
@@ -97,22 +95,6 @@ load("../../back-end/data/statistics.cmip.pr.2071-2100.rda")
 #stats$pr$nf <- store
 #load("/home/sis/DECM/back-end/data/statistics.cmip.pr.2071-2100.rda")
 stats$pr$ff <- store
-
-#srex <- regions("srex")
-## helpers.R
-## Help functions for the shiny app "dpdt"
-
-## Function to get instute name from gcmnames
-getModel <- function(i) strsplit(x,split =' ')[[i]][2]
-x <- gsub('_',' ', gcmnames.45)
-models.45 <- apply(as.matrix(1:length(gcmnames.45)),1, getModel)
-
-x <- gsub('_',' ', gcmnames.26)
-models.26 <- apply(as.matrix(1:length(gcmnames.26)),1, getModel)
-
-x <- gsub('_',' ', gcmnames.85)
-models.85 <- apply(as.matrix(1:length(gcmnames.85)),1, getModel)
-
 
 ### For the seasonal cycle menu Item
 

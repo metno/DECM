@@ -102,18 +102,6 @@ stats$pr$ff <- store
 ## helpers.R
 ## Help functions for the shiny app "dpdt"
 
-## Function to get instute name from gcmnames
-getModel <- function(i) strsplit(x,split =' ')[[i]][2]
-x <- gsub('_',' ', gcmnames.45)
-models.45 <- apply(as.matrix(1:length(gcmnames.45)),1, getModel)
-
-x <- gsub('_',' ', gcmnames.26)
-models.26 <- apply(as.matrix(1:length(gcmnames.26)),1, getModel)
-
-x <- gsub('_',' ', gcmnames.85)
-models.85 <- apply(as.matrix(1:length(gcmnames.85)),1, getModel)
-
-
 ### For the seasonal cycle menu Item
 
 ## Load statistics calculated with script 'calculate_statistics.R'

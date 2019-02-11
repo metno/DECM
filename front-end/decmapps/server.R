@@ -61,6 +61,12 @@ function(input, output,session) {
     return(filterSim(input$project,input$exp,input$gcm,input$run,input$rcm,input$var,input$dates,input$url))
   })
   
+  observe
+  showNotification(
+  tags$div(tags$p(tags$h1("Please wait ... loading ..."))),
+  action = NULL, duration = 10, closeButton = FALSE,id = NULL, type = c("warning"),session = getDefaultReactiveDomain())
+  )
+
   observe({
     output$browser <- DT::renderDataTable({
       #
@@ -589,7 +595,7 @@ function(input, output,session) {
     
     invisible(m)
   }
-  
+
   ## Sectoral communication example 
   spi <- function(freq=1,group='ED',stat='nEvents',period='1981-2010') {
     
@@ -1112,7 +1118,7 @@ function(input, output,session) {
               p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', showlegend = TRUE,
                                          line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
             
-            p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+            p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
             
             if (input$gcm.legend.sc == 'Hide')
               p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -1147,14 +1153,14 @@ function(input, output,session) {
       # line = list(color = 'rgb(135,206,250'),
       
       if (input$gcm.outputValues == 'Bias')  
-        ylab <- "Bias in simulated regional temperature [deg. C]"
+        ylab <- "Bias in temperature [deg. C]"
       else if (input$gcm.outputValues == 'Anomaly')
-        ylab <- "Simulated regional temperature anomalies [deg. C]"
+        ylab <- "Temperature anomalies [deg. C]"
       else if (input$gcm.outputValues == 'Change')
-        ylab <- "Absolute change in simulted regional temperature with regards to present [deg. C]"
+        ylab <- "Change in temperature [deg. C]"
       else 
         ylab <- "Simulated regional temperature [deg. C]"
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$gcm.region),
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -1171,7 +1177,17 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region | ", input$gcm.region),
+                                           showarrow=F,
+                                           font=list(size=16,weight='bold')
+                                           )
+				)
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       else
@@ -1323,7 +1339,7 @@ function(input, output,session) {
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', showlegend = TRUE,
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
         
         if (input$gcm.legend.sc == 'Hide')
           p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -1357,9 +1373,9 @@ function(input, output,session) {
       # marker = list(color = 'rgb(135,206,250'),
       # line = list(color = 'rgb(135,206,250'),
       
-      ylab <- "Bias in simulated regional temperature [deg. C]"
+      ylab <- "Bias in temperature [deg. C]"
       
-      p.sc <- p.sc %>% layout(title = paste("Region:",input$gcm.region.pu),
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -1376,7 +1392,17 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region | ", input$gcm.region.pu),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       else
@@ -1511,7 +1537,7 @@ function(input, output,session) {
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', showlegend = TRUE,
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5, y = -0.2))
         
         if (input$gcm.legend.sc == 'Hide')
           p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -1545,10 +1571,10 @@ function(input, output,session) {
       # marker = list(color = 'rgb(135,206,250'),
       # line = list(color = 'rgb(135,206,250'),
       
-      ylab <- "Simulated regional temperature [deg. C]"
+      ylab <- "Temperature [deg. C]"
       
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$gcm.sc.region.pu),
-                              paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
+      p.sc <- p.sc %>% layout(title = FALSE,
+      	      	       	      paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
                                            showgrid = TRUE,
@@ -1564,8 +1590,21 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
-      if (input$gcm.legend.sc == 'Hide')
+                                           zeroline = FALSE), 
+			      annotations = list(
+					   yref="paper",
+					   xref="paper",
+					   y=1.07,
+					   x=0,
+					   text=paste(input$gcm.sc.region.pu, input$gcm.sc.period.pu,
+                                                      input$gcm.sc.chart.type.pu,
+                                                      input$gcm.sc.stat.pu,sep=' | '),
+					   showarrow=F,
+					   font=list(size=14,color="grey"))
+		              )
+			      
+
+    if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       else
         p.sc <- p.sc %>% layout(showlegend = TRUE)
@@ -1698,7 +1737,7 @@ function(input, output,session) {
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', showlegend = TRUE,
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x = 0.5, y = -0.2))
         
         if (input$gcm.legend.sc == 'Hide')
           p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -1732,9 +1771,9 @@ function(input, output,session) {
       # marker = list(color = 'rgb(135,206,250'),
       # line = list(color = 'rgb(135,206,250'),
       
-      ylab <- "Changes in simulated regional temperature [deg. C]"
+      ylab <- "Changes in temperature [deg. C]"
       
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$gcm.cc.region),
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -1751,7 +1790,17 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region |", input$gcm.cc.region),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       else
@@ -1886,7 +1935,7 @@ function(input, output,session) {
             p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                        line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
           
-          p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+          p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
           
           if (input$gcm.legend.sc == 'Hide') 
             p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -1918,15 +1967,15 @@ function(input, output,session) {
         }
       
       if (input$gcm.outputValues == 'Bias')  
-        ylab <- "Bias in simulated regional precipitation [%]"
+        ylab <- "Bias in precipitation [%]"
       else if (input$gcm.outputValues == 'Anomaly') 
-        ylab <- "Simulated regional precipitation anomalies [mm]"
+        ylab <- "Precipitation anomalies [mm]"
       else if (input$gcm.outputValues == 'Change')
-        ylab <- "Relative change in simulted regional precipitation with regards to present [%]"
+        ylab <- "Change in precipitation [%]"
       else 
         ylab <- "Simulated regional precipitation [mm]"
       # Format layout 
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$gcm.region),
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -1943,7 +1992,17 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region |", input$gcm.region),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -2036,7 +2095,7 @@ function(input, output,session) {
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
         
         if (input$gcm.legend.sc == 'Hide') 
           p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -2068,10 +2127,10 @@ function(input, output,session) {
       }
       
       
-      ylab <- "Bias in simulated regional precipitation [%]"
+      ylab <- "Bias in precipitation [%]"
       
       # Format layout 
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$gcm.region.pu),
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -2088,7 +2147,17 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region |", input$gcm.region.pu),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -2174,7 +2243,7 @@ function(input, output,session) {
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
         
         if (input$gcm.legend.sc == 'Hide') 
           p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -2206,10 +2275,10 @@ function(input, output,session) {
       }
       
       
-      ylab <- "Seasonal Cycle of area averaged simulated monthly precipitation sums [mm/month]"
+      ylab <- "Precipitation [mm/month]"
       
       # Format layout 
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$gcm.sc.region.pu),
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -2226,7 +2295,17 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region | ", input$gcm.sc.region.pu),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -2311,7 +2390,7 @@ function(input, output,session) {
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
         
         if (input$gcm.legend.sc == 'Hide') 
           p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -2343,10 +2422,10 @@ function(input, output,session) {
       }
       
       
-      ylab <- "Future changes in area averaged simulated monthly precipitation sums [mm/month]"
+      ylab <- "Future changes in simulated precipitation [mm/month]"
       
       # Format layout 
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$gcm.cc.region),
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -2363,7 +2442,17 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region |", input$gcm.cc.region),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -2665,7 +2754,7 @@ function(input, output,session) {
           } 
       
       if ((input$gcm.chart.type == 'Ensemble of All Simulations') | (input$gcm.chart.type == "Both - Ensemble & Individual Simulations"))
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+       p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
       #}
       
       if (input$gcm.legend.sc == 'Display') {
@@ -2686,42 +2775,52 @@ function(input, output,session) {
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       }
       if (input$gcm.outputValues == 'Bias') {
-        ylab <- 'Bias (absolute) in annual means of regional temperature values [deg. C]'
-        xlab <- 'Bias (relative) in annual means of regional precitation values [%]'
+        ylab <- 'Bias in temperature [deg. C]'
+        xlab <- 'Bias in precitation [%]'
       } else if (input$gcm.outputValues == 'Bias') {
-        ylab <- 'RMSE (absolute) in annual means of regional temperature values [deg. C]'
-        xlab <- 'RMSE (relative) in annual means of regional precitation values [%]'
+        ylab <- 'RMSE in temperature [deg. C]'
+        xlab <- 'RMSE in precitation [%]'
       } else if (input$gcm.outputValues == 'Anomaly') {
-        ylab <- 'Anomaly (absolute) in annual means of regional temperature values [deg. C]'
-        xlab <- 'Anomaly (relative) in annual means of regional precitation values [%]'
+        ylab <- 'Temperature anomalies [deg. C]'
+        xlab <- 'Precitation anomalies [%]'
       } else if (input$gcm.outputValues == 'Change') {
-        ylab <- 'Change (absolute) in annual means of regional temperature values [deg. C]'
-        xlab <- 'Change (relative) in annual means of regional precitation values [%]'
+        ylab <- 'Change in temperature [deg. C]'
+        xlab <- 'Change in precitation [%]'
       } else  {
-        ylab <- 'Annual means of regional temperature values [deg. C]'
-        xlab <- 'Annual means of regional precitation values [mm/month]'
+        ylab <- 'Temperature [deg. C]'
+        xlab <- 'Precitation [mm/month]'
       }
       
       
       
-      p.sc <- p.sc %>% layout(title = paste('Region: ',input$gcm.region),
-        paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
-        xaxis = list(title = ylab,
-                     gridcolor = 'rgb(255,255,255)',
-                     showgrid = TRUE,
-                     showline = FALSE,
-                     showticklabels = TRUE,
-                     tickcolor = 'rgb(127,127,127)',
-                     ticks = 'outside',
-                     zeroline = TRUE),
-        yaxis = list(title = xlab,
-                     gridcolor = 'rgb(255,255,255)',
-                     showgrid = TRUE,
-                     showline = FALSE,
-                     showticklabels = TRUE,
-                     tickcolor = 'rgb(127,127,127)',
-                     ticks = 'outside',
-                     zeroline = TRUE))
+      p.sc <- p.sc %>% layout(title = FALSE,
+      paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
+      xaxis = list(title = ylab,
+      gridcolor = 'rgb(255,255,255)',
+      showgrid = TRUE,
+      showline = FALSE,
+      showticklabels = TRUE,
+      tickcolor = 'rgb(127,127,127)',
+      ticks = 'outside',
+      zeroline = TRUE),
+      yaxis = list(title = xlab,
+      gridcolor = 'rgb(255,255,255)',
+      showgrid = TRUE,
+      showline = FALSE,
+      showticklabels = TRUE,
+      tickcolor = 'rgb(127,127,127)',
+      ticks = 'outside',
+      zeroline = TRUE),
+      annotations = list(
+      yref="paper",
+      xref="paper",
+      y=1.07,
+      x=0,
+      text=paste("Region |", input$gcm.region),
+      showarrow=F,
+      font=list(size=14,weight='bold')
+      )
+      )
       
       if (input$gcm.legend.sc == 'Hide') {
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -2829,7 +2928,7 @@ function(input, output,session) {
       
       
       if ((input$gcm.cc.chart.type == 'Ensemble of All Simulations') | (input$gcm.cc.chart.type == "Both - Ensemble & Individual Simulations"))
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
       #}
       
       if (input$gcm.legend.sc == 'Display') {
@@ -2849,12 +2948,12 @@ function(input, output,session) {
                                    name = 'REF', hoverinfo = 'text+x+y',text='ERAINT',showlegend = FALSE,
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       }
-      ylab <- 'Change (absolute) in annual means of regional temperature values [deg. C]'
-      xlab <- 'Change (relative) in annual means of regional precitation values [%]'
+      ylab <- 'Change in temperature [deg. C]'
+      xlab <- 'Change in precitation [%]'
       
       
       
-      p.sc <- p.sc %>% layout(title = paste('Region: ', input$gcm.cc.region),
+      p.sc <- p.sc %>% layout(title = FALSE,
         paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
         xaxis = list(title = ylab,
                      gridcolor = 'rgb(255,255,255)',
@@ -2871,7 +2970,17 @@ function(input, output,session) {
                      showticklabels = TRUE,
                      tickcolor = 'rgb(127,127,127)',
                      ticks = 'outside',
-                     zeroline = TRUE))
+                     zeroline = TRUE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region | ", input$gcm.cc.region),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       
       if (input$gcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -2881,8 +2990,8 @@ function(input, output,session) {
       # gcm.dtdp
       p.sc$elementId <- NULL
       p.sc
-      })
-    
+    })
+ 
     output$gcm.scatter.data <- DT::renderDataTable({
       
       gcm.meta.pr <- gcm.meta.pr.reactive()
@@ -3178,7 +3287,7 @@ function(input, output,session) {
               p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                          line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
             
-            p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+            p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
             
           } else if (grepl('box',tolower(input$rcm.chart.type))) {
             p.sc <- plot_ly(df, type = 'box')
@@ -3210,13 +3319,13 @@ function(input, output,session) {
       # line = list(color = 'rgb(135,206,250'),
       
       if (input$rcm.outputValues == 'Bias')  
-        ylab <- "Bias in simulated regional temperature [deg. C]"
+        ylab <- "Bias in temperature [deg. C]"
       else if (input$rcm.outputValues == 'Anomaly')
-        ylab <- "Simulated regional temperature anomalies [deg. C]"
+        ylab <- "Temperature anomalies [deg. C]"
       else if (input$rcm.outputValues == 'Change')
-        ylab <- "Absolute change in simulted regional temperature with regards to present [deg. C]"
+        ylab <- "Change in temperature [deg. C]"
       else 
-        ylab <- "Simulated regional temperature [deg. C]"
+        ylab <- "Temperature [deg. C]"
       p.sc <- p.sc %>% layout(title = paste("Region: ", input$rcm.region),
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
@@ -3234,7 +3343,17 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region | ", input$rcm.region),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       if (input$rcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
       else
@@ -3371,7 +3490,7 @@ function(input, output,session) {
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS',mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
         
       } else if (grepl('box',tolower(input$rcm.chart.type.pu))) {
         p.sc <- plot_ly(df, type = 'box')
@@ -3403,8 +3522,8 @@ function(input, output,session) {
       # line = list(color = 'rgb(135,206,250'),
       
       
-      ylab <- "Bias in simulated regional temperature [deg. C]"
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$rcm.region.pu),
+      ylab <- "Bias in temperature [deg. C]"
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -3421,7 +3540,17 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region | ", input$rcm.region.pu),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       if (input$rcm.chart.type.pu != 'Individual Simulations')
         p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
       p.sc$elementId <- NULL
@@ -3553,7 +3682,7 @@ function(input, output,session) {
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
         
       } else if (grepl('box',tolower(input$rcm.sc.chart.type.pu))) {
         p.sc <- plot_ly(df, type = 'box')
@@ -3585,8 +3714,8 @@ function(input, output,session) {
       # line = list(color = 'rgb(135,206,250'),
       
       
-      ylab <- "Seasonal Cycle of area averaged simulated temperature [deg. C]"
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$rcm.sc.region.pu),
+      ylab <- "Temperature [deg. C]"
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -3603,7 +3732,17 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region: ", input$rcm.sc.region.pu),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
 
       p.sc$elementId <- NULL
       p.sc
@@ -3766,10 +3905,10 @@ function(input, output,session) {
       # line = list(color = 'rgb(135,206,250'),
       
       
-      ylab <- "Seasonal Cycle of area averaged simulated temperature [deg. C]"
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$rcm.cc.region),
+      ylab <- "Temperature [deg. C]"
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
-                              xaxis = list(title = "Months",
+                              xaxis = list(title = "",
                                            gridcolor = 'rgb(255,255,255)',
                                            showgrid = TRUE,
                                            showline = FALSE,
@@ -3784,7 +3923,17 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region | ", input$rcm.cc.region),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       if (input$rcm.sc.chart.type.pu != 'Individual Simulations')
         
       p.sc$elementId <- NULL
@@ -3919,7 +4068,7 @@ function(input, output,session) {
           if (!is.null(df$ref))
             p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                        line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
-          p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))          
+          p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))          
         } else if (grepl('box',tolower(input$rcm.chart.type))) {
           p.sc <- plot_ly(df, type = 'box')
           
@@ -3947,15 +4096,15 @@ function(input, output,session) {
         }
       
       if (input$rcm.outputValues == 'Bias')  
-        ylab <- "Bias in simulated regional precipitation [%]"
+        ylab <- "Bias in precipitation [%]"
       else if (input$rcm.outputValues == 'Anomaly') 
-        ylab <- "Simulated regional precipitation anomalies [mm]"
+        ylab <- "Precipitation anomalies [mm]"
       else if (input$rcm.outputValues == 'Change')
-        ylab <- "Relative change in simulted regional precipitation with regards to present [%]"
+        ylab <- "Change in precipitation [%]"
       else 
-        ylab <- "Simulated regional precipitation [mm]"
+        ylab <- "Precipitation [mm/month]"
       # Format layout 
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$rcm.region.pu),
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -3972,7 +4121,17 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region | ", input$rcm.region.pu),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       
       if (input$rcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -4062,7 +4221,7 @@ function(input, output,session) {
           add_trace(x = ~month, y = ~avg, type = 'scatter', mode = 'lines',
                     line = list(color='rgb(35, 132, 170)'),
                     name = 'Average') 
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
         if (!is.null(df$ref))
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
@@ -4094,9 +4253,9 @@ function(input, output,session) {
       }
       
       
-      ylab <- "Bias in simulated regional precipitation [%]"
+      ylab <- "Bias in precipitation [%]"
       # Format layout 
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$rcm.region.pu),
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -4113,10 +4272,20 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region | ", input$rcm.region.pu),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       
       if (grepl('ensemble',tolower(input$rcm.chart.type.pu)))
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
       
       p.sc$elementId <- NULL
       p.sc
@@ -4205,7 +4374,7 @@ function(input, output,session) {
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'EOBS', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
         
       } else if (grepl('box',tolower(input$rcm.sc.chart.type.pu))) {
         p.sc <- plot_ly(df, type = 'box')
@@ -4233,9 +4402,9 @@ function(input, output,session) {
         } 
       }
       
-      ylab <- "Seasonal Cycle of area averaged simulated monthly precipitation sums [mm/month]"
+      ylab <- "Precipitation [mm/month]"
       # Format layout 
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$rcm.sc.region.pu),
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
                               xaxis = list(title = "Months",
                                            gridcolor = 'rgb(255,255,255)',
@@ -4252,10 +4421,20 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region | ", input$rcm.sc.region.pu),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       
       if (input$rcm.sc.chart.type.pu != 'Individual Simulations')
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
       
       p.sc$elementId <- NULL
       p.sc
@@ -4366,11 +4545,11 @@ function(input, output,session) {
         } 
       }
       
-      ylab <- "Seasonal Cycle of area averaged simulated monthly precipitation sums [mm/month]"
+      ylab <- "Precipitation [mm/month]"
       # Format layout 
-      p.sc <- p.sc %>% layout(title = paste("Region: ", input$rcm.cc.region),
+      p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
-                              xaxis = list(title = "Months",
+                              xaxis = list(title = "",
                                            gridcolor = 'rgb(255,255,255)',
                                            showgrid = TRUE,
                                            showline = FALSE,
@@ -4385,7 +4564,17 @@ function(input, output,session) {
                                            showticklabels = TRUE,
                                            tickcolor = 'rgb(127,127,127)',
                                            ticks = 'outside',
-                                           zeroline = FALSE))
+                                           zeroline = FALSE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region | ", input$rcm.cc.region),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       
       if (input$rcm.legend.sc == 'Hide')
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -4708,7 +4897,7 @@ function(input, output,session) {
       
       
       if ((input$rcm.chart.type == 'Ensemble of All Simulations') | (input$rcm.chart.type == "Both - Ensemble & Individual Simulations"))
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
+       p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
       #}
       
       if (input$rcm.legend.sc == 'Display') {
@@ -4729,23 +4918,23 @@ function(input, output,session) {
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       }
       if (input$rcm.outputValues == 'Bias') {
-        ylab <- 'Bias (absolute) in annual means of regional temperature values [deg. C]'
-        xlab <- 'Bias (relative) in annual means of regional precitation values [%]'
+        ylab <- 'Bias in temperature [deg. C]'
+        xlab <- 'Bias in precitation [%]'
       } else if (input$rcm.outputValues == 'Bias') {
-        ylab <- 'RMSE (absolute) in annual means of regional temperature values [deg. C]'
-        xlab <- 'RMSE (relative) in annual means of regional precitation values [%]'
+        ylab <- 'RMSE in temperature [deg. C]'
+        xlab <- 'RMSE in precitation [%]'
       } else if (input$rcm.outputValues == 'Anomaly') {
-        ylab <- 'Anomaly (absolute) in annual means of regional temperature values [deg. C]'
-        xlab <- 'Anomaly (relative) in annual means of regional precitation values [%]'
+        ylab <- 'Temperature anomalies [deg. C]'
+        xlab <- 'Precitation anomalies [%]'
       } else if (input$rcm.outputValues == 'Change') {
-        ylab <- 'Change (absolute) in annual means of regional temperature values [deg. C]'
-        xlab <- 'Change (relative) in annual means of regional precitation values [%]'
+        ylab <- 'Change in temperature [deg. C]'
+        xlab <- 'Change in precitation [%]'
       } else  {
-        ylab <- 'Annual means of regional temperature values [deg. C]'
-        xlab <- 'Annual means of regional precitation values [mm/month]'
+        ylab <- 'Precitation [mm/month]'
+	xlab <- 'Temperature [deg. C]'
       }
       
-      p.sc <- p.sc %>% layout(title = paste('Region : ',input$rcm.region),
+      p.sc <- p.sc %>% layout(title = FALSE,
         paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
         xaxis = list(title = ylab,
                      gridcolor = 'rgb(255,255,255)',
@@ -4762,7 +4951,17 @@ function(input, output,session) {
                      showticklabels = TRUE,
                      tickcolor = 'rgb(127,127,127)',
                      ticks = 'outside',
-                     zeroline = TRUE))
+                     zeroline = TRUE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region | ", input$rcm.region),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       
       if (input$rcm.legend.sc == 'Hide') {
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -4869,9 +5068,9 @@ function(input, output,session) {
       
       
       
-      if ((input$rcm.cc.chart.type == 'Ensemble of All Simulations') | (input$rcm.cc.chart.type == "Both - Ensemble & Individual Simulations")) {
-        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5))
-      }
+      if ((input$rcm.cc.chart.type == 'Ensemble of All Simulations') | (input$rcm.cc.chart.type == "Both - Ensemble & Individual Simulations"))
+        p.sc <- p.sc %>% layout(legend = list(orientation = "h",xanchor = "center",x =0.5,y=-0.2))
+      #}
       
       if (input$rcm.legend.sc == 'Display') {
         p.sc <- p.sc %>% add_trace(x = ~mean(df$dtas[-length(df$dpr)]),y = ~ mean(df$dpr[-length(df$dpr)]),type = 'scatter',mode = 'markers',
@@ -4890,10 +5089,10 @@ function(input, output,session) {
                                    name = 'REF', hoverinfo = 'text+x+y',text='ERAINT',showlegend = FALSE,
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       }
-      ylab <- 'Change (absolute) in annual means of regional temperature values [deg. C]'
-      xlab <- 'Change (relative) in annual means of regional precitation values [%]'
+      ylab <- 'Change in temperature [deg. C]'
+      xlab <- 'Change in precipitation [%]'
       
-      p.sc <- p.sc %>% layout(title = paste('Region:', input$rcm.cc.region),
+      p.sc <- p.sc %>% layout(title = FALSE,
         paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
         xaxis = list(title = ylab,
                      gridcolor = 'rgb(255,255,255)',
@@ -4910,7 +5109,17 @@ function(input, output,session) {
                      showticklabels = TRUE,
                      tickcolor = 'rgb(127,127,127)',
                      ticks = 'outside',
-                     zeroline = TRUE))
+                     zeroline = TRUE),
+                              annotations = list(
+                                           yref="paper",
+                                           xref="paper",
+                                           y=1.07,
+                                           x=0,
+                                           text=paste("Region | ", input$rcm.cc.region),
+                                           showarrow=F,
+                                           font=list(size=14,weight='bold')
+                                           )
+				)
       
       if (input$rcm.legend.sc == 'Hide') {
         p.sc <- p.sc %>% layout(showlegend = FALSE)
@@ -5455,7 +5664,6 @@ function(input, output,session) {
                         choices = c('Mean','Standard Deviation','Spatial Correlation')) 
     
   })
-  
 }
 
 

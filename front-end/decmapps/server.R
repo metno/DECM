@@ -64,7 +64,7 @@ function(input, output,session) {
   observe(
     showNotification(
       tags$div(tags$p(tags$h1("Please wait ... loading ..."))),
-      action = NULL, duration = 10, closeButton = FALSE,id = NULL, type = c("warning"),session = getDefaultReactiveDomain())
+      action = NULL, duration = 5, closeButton = FALSE,id = NULL, type = c("warning"),session = getDefaultReactiveDomain())
   )
   
   observe({
@@ -599,7 +599,7 @@ function(input, output,session) {
   ## Sectoral communication example 
   spi <- function(freq=1,group='ED',stat='nEvents',period='1981-2010') {
     
-    spi.file <- paste('~/Downloads/rda_files/spi_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
+    spi.file <- paste('data/spei_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
     load(spi.file)
     #browser()
     spi <- array(NA,dim=c(length(droughtStatistics), dim(droughtStatistics[[1]][[stat]])))
@@ -615,7 +615,7 @@ function(input, output,session) {
   })
   spei <- function(freq=1,group='ED',stat='nEvents',period='1981-2010') {
     
-    spi.file <- paste('~/Downloads/rda_files/spei_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
+    spi.file <- paste('data/rda_files/spei_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
     load(spi.file)
     #browser()
     spi <- array(NA,dim=c(length(droughtStatistics), dim(droughtStatistics[[1]][[stat]])))

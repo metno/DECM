@@ -50,14 +50,14 @@ shinyServer(function(input, output, session) {
                              "near future (2021-2050)"='nf')})
 
   ## Weighted rank calculations
-  tasRanksRcp45 <- reactive({ranking.all(stats=stats.both$rcp45,varid="tas",Regions=Regionlist())})
-  prRanksRcp45 <- reactive({ranking.all(stats=stats.both$rcp45,varid="pr",Regions=Regionlist())})
-  tasRanksRcp85 <- reactive({ranking.all(stats=stats.both$rcp85,varid="tas",Regions=Regionlist())})
-  prRanksRcp85 <- reactive({ranking.all(stats=stats.both$rcp85,varid="pr",Regions=Regionlist())})
-  tasRanks <- reactive({as.numeric(input$wrcp45)*tasRanksRcp45()+as.numeric(input$wrcp85)*tasRanksRcp85()})
-  prRanks <- reactive({as.numeric(input$wrcp45)*prRanksRcp45()+as.numeric(input$wrcp85)*prRanksRcp85()})
-  #tasRanks <- reactive({ranking.all(stats=stats(),varid="tas",Regions=Regionlist())})
-  #prRanks <- reactive({ranking.all(stats=stats(),varid="pr",Regions=Regionlist())})
+  #tasRanksRcp45 <- reactive({ranking.all(stats=stats.both$rcp45,varid="tas",Regions=Regionlist())})
+  #prRanksRcp45 <- reactive({ranking.all(stats=stats.both$rcp45,varid="pr",Regions=Regionlist())})
+  #tasRanksRcp85 <- reactive({ranking.all(stats=stats.both$rcp85,varid="tas",Regions=Regionlist())})
+  #prRanksRcp85 <- reactive({ranking.all(stats=stats.both$rcp85,varid="pr",Regions=Regionlist())})
+  #tasRanks <- reactive({as.numeric(input$wrcp45)*tasRanksRcp45()+as.numeric(input$wrcp85)*tasRanksRcp85()})
+  #prRanks <- reactive({as.numeric(input$wrcp45)*prRanksRcp45()+as.numeric(input$wrcp85)*prRanksRcp85()})
+  tasRanks <- reactive({ranking.all(stats=stats(),varid="tas",Regions=Regionlist())})
+  prRanks <- reactive({ranking.all(stats=stats(),varid="pr",Regions=Regionlist())})
 
   seas_varweightedranks <- reactive({
     as.numeric(input$wmdt)*tasRanks()+as.numeric(input$wmdp)*prRanks()})
@@ -373,7 +373,7 @@ shinyServer(function(input, output, session) {
   })
 
   # When changing RCP, change list of GCMs. NO NEED TO DO THIS!
-  # Only simulations available for both RCP4.5 and RCP9.5 are included.
+  # Only simulations available for both RCP4.5 and RCP8.5 are included.
   #observeEvent(input$rcp, {
   #  i <- seq(input$ngcm)
   #  updateCheckboxGroupInput(session, inputId = "gcms", choices = gcmnames, 

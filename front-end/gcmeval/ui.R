@@ -160,32 +160,32 @@ dashboardPage(
                   selected = 1
                 ))
               ),
-              column(
-                12,
-                helpText("How important are the different emission scenarios?"),
-                flowLayout(
-                  selectInput(
-                    "wrcp45",
-                    label = "RCP 4.5",
-                    choices = c(
-                      "Not important (0)" = 0,
-                      "Important (1)" = 1,
-                      "Very important (2)" = 2
-                    ),
-                    selected = 1
-                  ),
-                  selectInput(
-                    "wrcp85",
-                    label = "RCP 8.5",
-                    choices = c(
-                      "Not important (0)" = 0,
-                      "Important (1)" = 1,
-                      "Very important (2)" = 2
-                    ),
-                    selected = 1
-                  )
-                )
-              ),
+              #column(
+              #  12,
+              #  helpText("How important are the different emission scenarios?"),
+              #  flowLayout(
+              #    selectInput(
+              #      "wrcp45",
+              #      label = "RCP 4.5",
+              #      choices = c(
+              #        "Not important (0)" = 0,
+              #        "Important (1)" = 1,
+              #        "Very important (2)" = 2
+              #      ),
+              #      selected = 1
+              #    ),
+              #    selectInput(
+              #      "wrcp85",
+              #      label = "RCP 8.5",
+              #      choices = c(
+              #        "Not important (0)" = 0,
+              #        "Important (1)" = 1,
+              #        "Very important (2)" = 2
+              #      ),
+              #      selected = 1
+              #    )
+              #  )
+              #),
               column(
                 12,
                 helpText("How important is the performance of the single variables?"),

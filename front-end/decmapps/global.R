@@ -67,57 +67,37 @@ varscore <- function(x) {
   return(c(score,lon(x),lat(x)))
 }
 
-# Scatter plot data ...
-stats <- NULL
-## KMP 2019-01-30: Absolute paths are sensitive to the operating system
-## It is better to use relative paths or to install the back-end package and
-## load the data like from there (e.g. data('statistics.cmip.era.tas.1981-2010'))
-load("../../back-end/data/statistics.cmip.era.tas.1981-2010.rda")
-stats$tas$present <- store
-load("../../back-end/data/statistics.cmip.tas.2021-2050.rda")
-stats$tas$nf <- store
-load("../../back-end/data/statistics.cmip.tas.2071-2100.rda")
-stats$tas$ff <- store
-load("../../back-end/data/statistics.cmip.era.pr.1981-2010.rda")
-stats$pr$present <- store
-load("../../back-end/data/statistics.cmip.pr.2021-2050.rda")
-stats$pr$nf <- store
-load("../../back-end/data/statistics.cmip.pr.2071-2100.rda")
-#load("/home/sis/DECM/back-end/data/statistics.cmip.era.tas.1981-2010.rda")
-#stats$tas$present <- store
-#load("/home/sis/DECM/back-end/data/statistics.cmip.tas.2021-2050.rda")
-#stats$tas$nf <- store
-#load("/home/sis/DECM/back-end/data/statistics.cmip.tas.2071-2100.rda")
-#stats$tas$ff <- store
-#load("/home/sis/DECM/back-end/data/statistics.cmip.era.pr.1981-2010.rda")
-#stats$pr$present <- store
-#load("/home/sis/DECM/back-end/data/statistics.cmip.pr.2021-2050.rda")
-#stats$pr$nf <- store
-#load("/home/sis/DECM/back-end/data/statistics.cmip.pr.2071-2100.rda")
-stats$pr$ff <- store
-
-### For the seasonal cycle menu Item
-
+# CMIP data ...
+## GCMs RCP85
 ## Load statistics calculated with script 'calculate_statistics.R'
-stats <- NULL
-data(package="DECM", "statistics.cmip.era.tas.1981-2010",
-     envir=environment())
-stats$tas$present <- store
-data(package="DECM", "statistics.cmip.tas.2021-2050",
-     envir=environment())
-stats$tas$nf <- store
-data(package="DECM", "statistics.cmip.tas.2071-2100",
-     envir=environment())
-stats$tas$ff <- store
-data(package="DECM", "statistics.cmip.era.pr.1981-2010",
-     envir=environment())
-stats$pr$present <- store
-data(package="DECM", "statistics.cmip.pr.2021-2050",
-     envir=environment())
-stats$pr$nf <- store
-data(package="DECM", "statistics.cmip.pr.2071-2100",
-     envir=environment())
-stats$pr$ff <- store
+
+gcms <- NULL
+load("../../back-end/data/statistics.cmip.era.tas.1981-2010.rda")
+gcms$rcp45$tas$present <- store
+load("../../back-end/data/statistics.cmip.tas.2021-2050.rda")
+gcms$rcp45$tas$nf <- store
+load("../../back-end/data/statistics.cmip.tas.2071-2100.rda")
+gcms$rcp45$tas$ff <- store
+load("../../back-end/data/statistics.cmip.era.pr.1981-2010.rda")
+gcms$rcp45$pr$present <- store
+load("../../back-end/data/statistics.cmip.pr.2021-2050.rda")
+gcms$rcp45$pr$nf <- store
+load("../../back-end/data/statistics.cmip.pr.2071-2100.rda")
+gcms$rcp45$pr$ff <- store
+
+## GCMs RCP85
+load("../../back-end/data/statistics.cmip.era.tas.1981-2010.rcp85.rda")
+gcms$rcp85$tas$present <- store
+load("../../back-end/data/statistics.cmip.tas.2021-2050.rcp85.rda")
+gcms$rcp85$tas$nf <- store
+load("../../back-end/data/statistics.cmip.tas.2071-2100.rcp85.rda")
+gcms$rcp85$tas$ff <- store
+load("../../back-end/data/statistics.cmip.era.pr.1981-2010.rcp85.rda")
+gcms$rcp85$pr$present <- store
+load("../../back-end/data/statistics.cmip.pr.2021-2050.rcp85.rda")
+gcms$rcp85$pr$nf <- store
+load("../../back-end/data/statistics.cmip.pr.2071-2100.rcp85.rda")
+gcms$rcp85$pr$ff <- store
 
 ## Help functions for the shiny app "seasoncycle"
 
@@ -235,44 +215,51 @@ merge.meta.ipcc <- function(meta = meta, ipcc = IPCC.AR5.Table.9.A.1) {
 }
 
 ## Load metadata for GCMs
-load('data/metaextract_v2.rda')
-data(package = 'esd','IPCC.AR5.Table.9.A.1')
+## Load meta data for RCMs
+#data(package='DECM', 'metaextract', envir=environment())
 
+data(package = 'esd','IPCC.AR5.Table.9.A.1')
 IPCC.AR5.Table.9.A.1$Horizontal.Resolution <- cmipgcmresolution()
 
-meta <- as.data.frame(meta)
-META <- meta[,c('source','experiment','institute_id','model_id','parent_experiment_rip','realization','longname','variable','units','timeunit',
-                'resolution','longitude','latitude',"experiment_id",'dim1','index','calendar','creation_date',
-                'tracking_id','physics_version','forcing','reference','contact','comment','table_id','file')]
+gcm.meta <- function(variable='tas',experiment='RCP4.5') {
+  load(paste('../../back-end/data/metaextract_',variable,'_',tolower(experiment),'.rda',sep=''))
+  meta <- as.data.frame(meta)
+  META <- meta[,c('source','experiment','institute_id','model_id','parent_experiment_rip','realization','longname','variable','units','timeunit',
+                  'resolution','longitude','latitude',"experiment_id",'dim1','index','calendar','creation_date',
+                  'tracking_id','physics_version','forcing','reference','contact','comment','table_id','file')]
+  
+  gcm.meta <- subset(META, subset = (source == 'CMIP5') & (variable == variable) & (experiment == experiment))
+  gcm.meta <- merge.meta.ipcc(meta = gcm.meta,ipcc = IPCC.AR5.Table.9.A.1)
+}
+gcm.tas <- gcm.pr <- gcm.all <- NULL
+gcm.tas$rcp45 <- gcm.meta('tas','RCP45')
+gcm.tas$rcp85 <- gcm.meta('tas','RCP85')
+gcm.pr$rcp45 <- gcm.meta('pr','RCP45')
+gcm.pr$rcp85 <- gcm.meta('pr','RCP85')
 
-gcm.meta.tas <- subset(META, subset = (source == 'CMIP5') & (variable == 'tas') & (experiment == 'RCP4.5'))
-gcm.meta.tas <- merge.meta.ipcc(meta = gcm.meta.tas,ipcc = IPCC.AR5.Table.9.A.1)
-
-load('data/metaextract_pr.rda')
-meta <- as.data.frame(meta)
-META <- meta[,c('source','experiment','institute_id','model_id','parent_experiment_rip','realization','longname','variable','units','timeunit',
-                'resolution','longitude','latitude',"experiment_id",'dim1','index','calendar','creation_date',
-                'tracking_id','physics_version','forcing','reference','contact','comment','table_id','file')]
-
-gcm.meta.pr <- subset(META, subset = (source == 'CMIP5') & (variable == 'pr') & (experiment == 'RCP4.5'))
-gcm.meta.pr <- merge.meta.ipcc(gcm.meta.pr,IPCC.AR5.Table.9.A.1)
-
-# Common meta data for all variables
-modelrip.tas <- paste(gcm.meta.tas$institute_id,gcm.meta.tas$model_id,gcm.meta.tas$parent_experiment_rip,gcm.meta.tas$realization)
-modelrip.pr <- paste(gcm.meta.pr$institute_id,gcm.meta.pr$model_id,gcm.meta.pr$parent_experiment_rip,gcm.meta.pr$realization)
-id <- intersect(modelrip.pr,modelrip.tas)
-
-id.tas <- which(is.element(modelrip.tas[!duplicated(modelrip.tas)],id))
-# Some of the attributes are duplicated for precipitation 
-id.pr <- which(is.element(modelrip.pr[!duplicated(modelrip.pr)],id)) 
+load("../../back-end/data/statistics.cordex.tas.2071-2100.rcp45.rda")
+rcms$rcp45$tas$ff <- store
+gcm.com.var <- function(gcm.tas=gcm.tas,gcm.pr=gcm.pr) {
+  
+  # Common meta data for all variables
+  modelrip.tas <- paste(gcm.tas$institute_id,gcm.tas$model_id,gcm.tas$parent_experiment_rip,gcm.tas$realization)
+  modelrip.pr <- paste(gcm.pr$institute_id,gcm.pr$model_id,gcm.pr$parent_experiment_rip,gcm.pr$realization)
+  id.com <- intersect(modelrip.pr,modelrip.tas)
+  id <- NULL
+  id$tas <- which(is.element(modelrip.tas[!duplicated(modelrip.tas)],id.com))
+  # Some of the attributes are duplicated for precipitation 
+  id$pr <- which(is.element(modelrip.pr[!duplicated(modelrip.pr)],id.com)) 
+  invisible(id)
+} 
+com.gcm.var <- NULL
+com.gcm.var$rcp45 <- gcm.com.var(gcm.tas=gcm.tas$rcp45,gcm.pr=gcm.pr$rcp45)
+com.gcm.var$rcp85 <- gcm.com.var(gcm.tas=gcm.tas$rcp85,gcm.pr=gcm.pr$rcp85)
 
 # Extract common simulations between variables
-gcm.meta.all <- subset(gcm.meta.tas, subset = is.element(modelrip.tas[!duplicated(modelrip.tas)],id))
-gcm.meta.all <- merge.meta.ipcc(gcm.meta.all,IPCC.AR5.Table.9.A.1)
-gcm.meta.all <- gcm.meta.all[,-c(7,8,9,10)]
+gcm.all$rcp45 <- gcm.tas$rcp45[com.gcm.var$rcp45$tas,-c(7,8,9,10)]
+gcm.all$rcp85 <- gcm.tas$rcp85[com.gcm.var$rcp85$tas,-c(7,8,9,10)]
 
 # ---- RCMs -------
-## Load meta data for RCMs
 data(package='DECM', 'metaextract', envir=environment())
 meta <- as.data.frame(meta)
 META <- meta[,c('project_id','experiment','gcm','gcm_rip','rcm',
@@ -280,31 +267,57 @@ META <- meta[,c('project_id','experiment','gcm','gcm_rip','rcm',
                 'resolution','lon','lon_unit','lat','lat_unit', 
                 'frequency','creation_date','url')]
 
-rcm.meta.tas <- subset(META, subset = (project_id == 'CORDEX') & (var == 'tas') & (experiment=="RCP4.5"))
-rcm.meta.pr <- subset(META, subset = (project_id == 'CORDEX') & (var == 'pr') & (experiment=="RCP4.5"))
+rcm.tas <- rcm.pr <- rcm.all <- NULL
+rcm.tas$rcp45 <- subset(META, subset = (project_id == 'CORDEX') & (var == 'tas') & (experiment=="RCP4.5"))
+rcm.pr$rcp45 <- subset(META, subset = (project_id == 'CORDEX') & (var == 'pr') & (experiment=="RCP4.5"))
 #rcm.meta.all <- rcm.meta.pr[,-c(6:9,16)]
-i.var <- which(grepl("longname|var|unit|frequency",colnames(rcm.meta.pr)) & 
-               !grepl("lon_unit|lat_unit",colnames(rcm.meta.pr)))
-rcm.meta.all <- rcm.meta.pr[,-i.var]
+i.var <- which(grepl("longname|var|unit|frequency",colnames(rcm.pr$rcp45)) & 
+               !grepl("lon_unit|lat_unit",colnames(rcm.pr$rcp45)))
+rcm.all$rcp45 <- rcm.pr$rcp45[,-i.var]
+
+rcm.tas$rcp85 <- subset(META, subset = (project_id == 'CORDEX') & (var == 'tas') & (experiment=="RCP8.5"))
+rcm.pr$rcp85 <- subset(META, subset = (project_id == 'CORDEX') & (var == 'pr') & (experiment=="RCP8.5"))
+#rcm.meta.all <- rcm.meta.pr[,-c(6:9,16)]
+i.var <- which(grepl("longname|var|unit|frequency",colnames(rcm.pr$rcp85)) & 
+                 !grepl("lon_unit|lat_unit",colnames(rcm.pr$rcp85)))
+rcm.all$rcp85 <- rcm.pr$rcp85[,-i.var]
 
 # RCM statistics ...
+# CORDEX RCP45
 rcms <- NULL
-load("../../back-end/data/statistics.cordex.eobs.tas.1981-2010.rda")
+load("../../back-end/data/statistics.cordex.eobs.tas.1981-2010.rcp45.rda")
 store$eobs.tas$corr <- store$eobs.tas$mean
 store$eobs.tas$corr <- rep(1,13)
-rcms$tas$present <- store
-load("../../back-end/data/statistics.cordex.tas.2021-2050.rda")
-rcms$tas$nf <- store
-load("../../back-end/data/statistics.cordex.tas.2071-2100.rda")
-rcms$tas$ff <- store
-load("../../back-end/data/statistics.cordex.eobs.pr.1981-2010.rda")
+rcms$rcp45$tas$present <- store
+load("../../back-end/data/statistics.cordex.tas.2021-2050.rcp45.rda")
+rcms$rcp45$tas$nf <- store
+load("../../back-end/data/statistics.cordex.tas.2071-2100.rcp45.rda")
+rcms$rcp45$tas$ff <- store
+load("../../back-end/data/statistics.cordex.eobs.pr.1981-2010.rcp45.rda")
 store$eobs.pr$corr <- rep(1,13)
-rcms$pr$present <- store
-load("../../back-end/data/statistics.cordex.pr.2021-2050.rda")
-rcms$pr$nf <- store
-load("../../back-end/data/statistics.cordex.pr.2071-2100.rda")
+rcms$rcp45$pr$present <- store
+load("../../back-end/data/statistics.cordex.pr.2021-2050.rcp45.rda")
+rcms$rcp45$pr$nf <- store
+load("../../back-end/data/statistics.cordex.pr.2071-2100.rcp45.rda")
+rcms$rcp45$pr$ff <- store
 
-rcms$pr$ff <- store
+## CORDEX RCP85
+load("../../back-end/data/statistics.cordex.eobs.tas.1981-2010.rcp85.rda")
+store$eobs.tas$corr <- store$eobs.tas$mean
+store$eobs.tas$corr <- rep(1,13)
+rcms$rcp85$tas$present <- store
+load("../../back-end/data/statistics.cordex.tas.2021-2050.rcp85.rda")
+rcms$rcp85$tas$nf <- store
+load("../../back-end/data/statistics.cordex.tas.2071-2100.rcp85.rda")
+rcms$rcp85$tas$ff <- store
+load("../../back-end/data/statistics.cordex.eobs.pr.1981-2010.rcp85.rda")
+store$eobs.pr$corr <- rep(1,13)
+rcms$rcp85$pr$present <- store
+load("../../back-end/data/statistics.cordex.pr.2021-2050.rcp85.rda")
+rcms$rcp85$pr$nf <- store
+load("../../back-end/data/statistics.cordex.pr.2071-2100.rcp85.rda")
+rcms$rcp85$pr$ff <- store
+
 
 regions.all <- list('Europe',
                     'National Regions' = c(
@@ -350,9 +363,15 @@ afg <- readOGR(dsn = '../../back-end/inst/extdata/TM_WORLD_BORDERS-0.3/',
                stringsAsFactors = FALSE)
 
 ## Standardized Precipitation Index
-rcm.name <- function(i) {
-  rcmi <- rcm.meta.pr[i,c('gcm','gcm_rip','rcm')]
+rcm.name <- function(i,rcp) {
+  rcmi <- rcm.pr[[rcp]][i,c('gcm','gcm_rip','rcm')]
   rcmi[is.na(rcmi)] <- ''
   return(paste(as.character(as.matrix(rcmi)),collapse = '_'))
 }
-rcm.names <- sapply(1:16,rcm.name)
+rcm.names <- NULL
+rcm.names$rcp45 <- sapply(1:dim(rcm.pr[['rcp45']])[1],rcm.name,'rcp45')
+rcm.names$rcp85 <- sapply(1:dim(rcm.pr[['rcp85']])[1],rcm.name,'rcp85')
+
+rcm.tas$rcp85 <- subset(rcm.tas$rcp85,subset =  is.element(rcm.names$rcp85,rcm.names$rcp45))
+rcm.pr$rcp85 <- subset(rcm.pr$rcp85,subset =  is.element(rcm.names$rcp85,rcm.names$rcp45))
+rcm.all$rcp85 <-  subset(rcm.all$rcp85,subset =  is.element(rcm.names$rcp85,rcm.names$rcp45))

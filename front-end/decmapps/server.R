@@ -20,8 +20,6 @@ function(input, output,session) {
     return(msgs)
   })
   
-  data(Oslo)
-  
   # Model explorer
   data(package='DECM', "metaextract")
   M <- data.frame(list(Project=meta$project_id,
@@ -64,7 +62,7 @@ function(input, output,session) {
   observe(
     showNotification(
       tags$div(tags$p(tags$h1("Please wait ... loading ..."))),
-      action = NULL, duration = 5, closeButton = FALSE,id = NULL, type = c("warning"),session = getDefaultReactiveDomain())
+      action = NULL, duration = 3, closeButton = FALSE,id = NULL, type = c("warning"),session = getDefaultReactiveDomain())
   )
   
   observe({
@@ -128,8 +126,16 @@ function(input, output,session) {
   #   return(isolate(Y))  
   # })
   # 
-  gcm.sc.vals <- function(param,region,period,stat) {
-    ## 
+  
+  gcm.sc.vals <- function(param,region,period,stat,rcp,gcmvar,rowsGcm) {
+    
+    rcp <- switch(tolower(as.character(rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+    if (rcp=='rcp45')
+      stats <- gcms$rcp45
+    else if (rcp=='rcp85')
+      stats <- gcms$rcp85
     if (param == 'tas')
       gcms <- names(stats$tas$ff)
     else if (param == 'pr')
@@ -176,21 +182,19 @@ function(input, output,session) {
     
     gcm.vals <- as.data.frame(lapply(1:length(x),function(i) {if (length(x[[i]]) > 0) x[[i]] else x[[1]]})) ## AM Need to fix this later on     
     colnames(gcm.vals) <- paste('gcm.',1:length(gcm.vals),sep='')
-    
+   
     # common models to all climate variables
-    if (input$gcm.var != 'Individual') {
-      if (param=="pr") 
-        gcm.vals <- base::subset(gcm.vals,select = id.pr)
-      else if (param=="tas")
-        gcm.vals <- base::subset(gcm.vals,select = id.tas)
+    if (gcmvar=='Synchronised') {
+      #if (param=="pr")
+        gcm.vals <- base::subset(gcm.vals,select = com.gcm.var[[rcp]][[param]])
+      #else if (param=="tas")
+      #  gcm.vals <- base::subset(gcm.vals,select = com.gcm.var[[rcp]][["tas"]])
     }
-    
-    if (input$gcm.sim.sc == 'Selected Simulations') {
-      if (!is.null(input$rowsGcm))
-        gcm.vals <- gcm.vals[,input$rowsGcm]
-      else
-        showNotification('Please select a model from the meta data table!')
-    }
+  
+    if (!is.null(rowsGcm))
+      gcm.vals <- gcm.vals[,rowsGcm]
+    # else
+    #   showNotification('Please select a model from the meta data table!')
     
     if (!is.null(ref))
       df <- data.frame(gcm.vals,ref,stringsAsFactors = FALSE)
@@ -199,72 +203,96 @@ function(input, output,session) {
   }
   
   gcm.sc.tas.reactive <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.region, period = input$gcm.period,stat = input$gcm.stat))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.region, period = input$gcm.period,
+                       stat = input$gcm.stat,rcp = input$gcm.rcp,gcmvar=input$gcm.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.reactive.pu <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.region.pu, period = input$gcm.period.pu,stat = input$gcm.stat.pu))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.region.pu, period = input$gcm.period.pu,
+                       stat = input$gcm.stat.pu,rcp=input$gcm.rcp.pu, gcmvar=input$gcm.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.reactive.sc.pu <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.sc.region.pu, period = input$gcm.sc.period.pu,stat = input$gcm.sc.stat.pu))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.sc.region.pu, period = input$gcm.sc.period.pu,
+                       stat = input$gcm.sc.stat.pu,rcp=input$gcm.sc.rcp.pu, gcmvar=input$gcm.sc.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.reactive.cc.pu <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.cc.region, period = input$gcm.cc.period,stat = input$gcm.cc.stat))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.cc.region, period = input$gcm.cc.period,
+                       stat = input$gcm.cc.stat,rcp=input$gcm.cc.rcp, gcmvar=input$gcm.cc.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.present <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.region, period = 'Present (1981-2010)',stat = input$gcm.stat))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.region, period = 'Present (1981-2010)',
+                       stat = input$gcm.stat,rcp=input$gcm.rcp, gcmvar=input$gcm.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.present.pu <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.region.pu, period = 'Present (1981-2010)',stat = input$gcm.stat.pu))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.region.pu, period = 'Present (1981-2010)',
+                       stat = input$gcm.stat.pu,rcp = input$gcm.rcp.pu, gcmvar=input$gcm.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.present.sc.pu <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.sc.region.pu, period = 'Present (1981-2010)',stat = input$gcm.sc.stat.pu))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.sc.region.pu, period = 'Present (1981-2010)',
+                       stat = input$gcm.sc.stat.pu,rcp = input$gcm.sc.rcp.pu, gcmvar=input$gcm.sc.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.present.cc.pu <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.cc.region, period = 'Present (1981-2010)',stat = input$gcm.cc.stat))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.cc.region, period = 'Present (1981-2010)',
+                       stat = input$gcm.cc.stat,rcp = input$gcm.cc.rcp, gcmvar=input$gcm.cc.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.reactive <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.region,  period = input$gcm.period,stat = input$gcm.stat))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.region,  period = input$gcm.period,
+                       stat = input$gcm.stat,rcp = input$gcm.rcp, gcmvar=input$gcm.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.reactive.pu <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.region.pu,  period = input$gcm.period.pu,stat = input$gcm.stat.pu))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.region.pu,  period = input$gcm.period.pu,
+                       stat = input$gcm.stat.pu,rcp = input$gcm.rcp.pu, gcmvar=input$gcm.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.reactive.sc.pu <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.sc.region.pu,  period = input$gcm.sc.period.pu,stat = input$gcm.sc.stat.pu))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.sc.region.pu,  period = input$gcm.sc.period.pu,
+                       stat = input$gcm.sc.stat.pu,rcp = input$gcm.sc.rcp.pu, gcmvar=input$gcm.sc.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.reactive.cc.pu <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.cc.region,  period = input$gcm.cc.period,stat = input$gcm.cc.stat))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.cc.region,  period = input$gcm.cc.period,
+                       stat = input$gcm.cc.stat,rcp = input$gcm.cc.rcp, gcmvar=input$gcm.cc.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.present <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.region,  period = 'Present (1981-2010)',stat = input$gcm.stat))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.region,  period = 'Present (1981-2010)',
+                       stat = input$gcm.stat,rcp = input$gcm.rcp, gcmvar=input$gcm.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.present.pu <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.region.pu,  period = 'Present (1981-2010)',stat = input$gcm.stat.pu))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.region.pu,  period = 'Present (1981-2010)',
+                       stat = input$gcm.stat.pu,rcp = input$gcm.rcp.pu, gcmvar=input$gcm.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.present.sc.pu <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.sc.region.pu,  period = 'Present (1981-2010)',stat = input$gcm.sc.stat.pu))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.sc.region.pu,  period = 'Present (1981-2010)',
+                       stat = input$gcm.sc.stat.pu,rcp = input$gcm.sc.rcp.pu, gcmvar=input$gcm.sc.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.present.cc.pu <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.cc.region,  period = 'Present (1981-2010)',stat = input$gcm.cc.stat))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.cc.region,  period = 'Present (1981-2010)',
+                       stat = input$gcm.cc.stat,rcp = input$gcm.cc.rcp, gcmvar=input$gcm.cc.var, rowsGcm = input$rowGcm))
   })
   
   ## RCMs 
-  rcm.sc.vals <- function(param,region,period,stat) {
-    stats <- rcms
+  rcm.sc.vals <- function(param,region,period,stat,rcp) {
+    rcp <- switch(tolower(as.character(rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+
+    if (rcp == 'rcp45')
+      stats <- rcms$rcp45
+    else if (rcp=='rcp85')
+      stats <- rcms$rcp85
+
     if (param == 'tas')
       rcms <- names(stats$tas$ff)
     else if (param == 'pr')
@@ -345,67 +373,67 @@ function(input, output,session) {
   }
   
   rcm.sc.tas.reactive <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.region, period = input$rcm.period,stat = input$rcm.stat))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.region, period = input$rcm.period,stat = input$rcm.stat,rcp = input$rcm.rcp))
   })
   
   rcm.sc.tas.reactive.sc.pu <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.sc.region.pu, period = input$rcm.sc.period.pu,stat = input$rcm.sc.stat.pu))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.sc.region.pu, period = input$rcm.sc.period.pu,stat = input$rcm.sc.stat.pu,rcp = input$rcm.sc.rcp.pu))
   })
   
   rcm.sc.tas.reactive.cc.pu <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.cc.region, period = input$rcm.cc.period,stat = input$rcm.cc.stat))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.cc.region, period = input$rcm.cc.period,stat = input$rcm.cc.stat,rcp = input$rcm.cc.rcp))
   })
   
   rcm.sc.tas.reactive.pu <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.region.pu, period = input$rcm.period.pu,stat = input$rcm.stat.pu))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.region.pu, period = input$rcm.period.pu,stat = input$rcm.stat.pu,rcp = input$rcm.rcp.pu))
   })
   
   rcm.sc.pr.reactive <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.region,  period = input$rcm.period,stat = input$rcm.stat))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.region, period = input$rcm.period,stat = input$rcm.stat,rcp = input$rcm.rcp))
   })
   
   rcm.sc.pr.reactive.pu <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.region.pu,  period = input$rcm.period.pu,stat = input$rcm.stat.pu))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.region.pu, period = input$rcm.period.pu,stat = input$rcm.stat.pu, rcp = input$rcm.rcp.pu))
   })
   
   rcm.sc.pr.reactive.sc.pu <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.sc.region.pu,  period = input$rcm.sc.period.pu,stat = input$rcm.sc.stat.pu))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.sc.region.pu, period = input$rcm.sc.period.pu,stat = input$rcm.sc.stat.pu,rcp = input$rcm.sc.rcp.pu))
   })
   
   rcm.sc.pr.reactive.cc.pu <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.cc.region,  period = input$rcm.cc.period,stat = input$rcm.cc.stat))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.cc.region, period = input$rcm.cc.period,stat = input$rcm.cc.stat,rcp = input$rcm.cc.rcp))
   })
   
   rcm.sc.tas.present <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.region, period = 'Present (1981-2010)',stat = input$rcm.stat,rcp = input$rcm.rcp.pu))
   })
   
   rcm.sc.tas.present.sc.pu <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.sc.region.pu,  period = 'Present (1981-2010)',stat = input$rcm.sc.stat.pu))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.sc.region.pu, period = 'Present (1981-2010)',stat = input$rcm.sc.stat.pu,rcp = input$rcm.sc.rcp.pu))
   })
   
   rcm.sc.tas.present.cc.pu <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.cc.region,  period = 'Present (1981-2010)',stat = input$rcm.cc.stat))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.cc.region, period = 'Present (1981-2010)',stat = input$rcm.cc.stat,rcp = input$rcm.cc.rcp))
   })
   
   rcm.sc.tas.present.pu <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat.pu))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.region, period = 'Present (1981-2010)',stat = input$rcm.stat.pu,rcp = input$rcm.rcp.pu))
   })
   
   rcm.sc.pr.present <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.region, period = 'Present (1981-2010)',stat = input$rcm.stat,rcp = input$rcm.rcp))
   })
   
   rcm.sc.pr.present.pu <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat.pu))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat.pu,rcp = input$rcm.rcp.pu))
   })
   
   rcm.sc.pr.present.sc.pu <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.sc.region.pu,  period = 'Present (1981-2010)',stat = input$rcm.sc.stat.pu))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.sc.region.pu,  period = 'Present (1981-2010)',stat = input$rcm.sc.stat.pu,rcp = input$rcm.sc.rcp.pu))
   })
   
   rcm.sc.pr.present.cc.pu <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.cc.region,  period = 'Present (1981-2010)',stat = input$rcm.cc.stat))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.cc.region,  period = 'Present (1981-2010)',stat = input$rcm.cc.stat,rcp = input$rcm.cc.rcp))
   })
   
   # observe(priority = -1, {
@@ -419,107 +447,153 @@ function(input, output,session) {
   # })
   # 
   
-  sta.meta <- reactive({
-    data(package= 'esd', station.meta)
-    if (input$param7 == 'Temperature')
-      param <- 't2m'
-    else
-      param = 'precip'
-    sta.meta <- select.station(param= param, src = 'ECAD')
-  })
-  
   gcm.meta.tas.reactive <- reactive({
-    if (input$gcm.var == 'Individual'){
-      return(gcm.meta.tas)
+  
+    rcp <- switch(tolower(as.character(input$gcm.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+    
+    if (input$gcm.var == 'Individual') {
+      return(gcm.tas[[rcp]])
     } else 
-      return(gcm.meta.all)
+      return(gcm.all[[rcp]])
   })
   
   gcm.meta.tas.reactive.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$gcm.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     if (input$gcm.var.pu == 'Individual'){
-      return(gcm.meta.tas)
+      return(gcm.tas[[rcp]])
     } else 
-      return(gcm.meta.all)
+      return(gcm.all[[rcp]])
   })
   
   gcm.meta.tas.reactive.sc.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$gcm.sc.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     if (input$gcm.sc.var.pu == 'Individual'){
-      return(gcm.meta.tas)
+      return(gcm.tas[[rcp]])
     } else 
-      return(gcm.meta.all)
+      return(gcm.all[[rcp]])
   })
   
   gcm.meta.tas.reactive.cc.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$gcm.cc.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     if (input$gcm.cc.var == 'Individual'){
-      return(gcm.meta.tas)
+      return(gcm.tas[[rcp]])
     } else 
-      return(gcm.meta.all)
+      return(gcm.all[[rcp]])
   })
   
   gcm.meta.pr.reactive <- reactive({
+    rcp <- switch(tolower(as.character(input$gcm.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     if (input$gcm.var == 'Individual'){
-      return(gcm.meta.pr)
+      return(gcm.pr[[rcp]])
     } else 
-      return(gcm.meta.all)
+      return(gcm.all[[rcp]])
   })
   
   gcm.meta.pr.reactive.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$gcm.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     if (input$gcm.var.pu == 'Individual'){
-      return(gcm.meta.pr)
+      return(gcm.pr[[rcp]])
     } else 
-      return(gcm.meta.all)
+      return(gcm.all[[rcp]])
   })
   
   rcm.meta.tas.reactive <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+    
     if (input$rcm.var == 'Individual'){
-      return(rcm.meta.tas)
+      return(rcm.tas[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
   })
   
   rcm.meta.tas.reactive.sc.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.sc.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     if (input$rcm.sc.var.pu == 'Individual'){
-      return(rcm.meta.tas)
+      return(rcm.tas[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
   })
   
   rcm.meta.tas.reactive.cc.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.cc.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+    
     if (input$rcm.cc.var == 'Individual'){
-      return(rcm.meta.tas)
+      return(rcm.tas[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
   })
   
   rcm.meta.tas.reactive.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+    
     if (input$rcm.var.pu == 'Individual'){
-      return(rcm.meta.tas)
+      return(rcm.tas[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
   })
   
   rcm.meta.pr.reactive <- reactive({
-    
+    rcp <- switch(tolower(as.character(input$rcm.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+
     if (input$rcm.var == 'Individual'){
-      return(rcm.meta.pr)
+      return(rcm.pr[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
   })
   
   rcm.meta.pr.reactive.sc.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.sc.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     
     if (input$rcm.sc.var.pu == 'Individual'){
-      return(rcm.meta.pr)
+      return(rcm.pr[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
+  })
+  
+  rcm.meta.pr.reactive.cc.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.cc.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+    
+    if (input$rcm.cc.var == 'Individual'){
+      return(rcm.pr[[rcp]])
+    } else 
+      return(rcm.all[[rcp]])
   })
   
   rcm.meta.pr.reactive.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     
     if (input$rcm.var.pu == 'Individual'){
-      return(rcm.meta.pr)
+      return(rcm.pr[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
   })
   
   txttab <- reactive({
@@ -599,9 +673,9 @@ function(input, output,session) {
   ## Sectoral communication example 
   spi <- function(freq=1,group='ED',stat='nEvents',period='1981-2010') {
     
-    spi.file <- paste('data/spei_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
+    spi.file <- paste('data/spi_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
     load(spi.file)
-    #browser()
+    #
     spi <- array(NA,dim=c(length(droughtStatistics), dim(droughtStatistics[[1]][[stat]])))
     for (i in 1:length(droughtStatistics))
       spi[i,,] <- droughtStatistics[[i]][[stat]]
@@ -615,9 +689,9 @@ function(input, output,session) {
   })
   spei <- function(freq=1,group='ED',stat='nEvents',period='1981-2010') {
     
-    spi.file <- paste('data/rda_files/spei_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
+    spi.file <- paste('data/spei_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
     load(spi.file)
-    #browser()
+    #
     spi <- array(NA,dim=c(length(droughtStatistics), dim(droughtStatistics[[1]][[stat]])))
     for (i in 1:length(droughtStatistics))
       spi[i,,] <- droughtStatistics[[i]][[stat]]
@@ -636,10 +710,11 @@ function(input, output,session) {
     ## Metadata table
     ## data(package= 'DECM', metaextract)
     
-    #
+    
     ## library(dplyr)
     
     output$gcm.meta.tas <- DT::renderDataTable({
+      
       gcm.meta.tas <- gcm.meta.tas.reactive()
       ## Metadata table
       #data(package= 'DECM', metaextract)
@@ -716,8 +791,8 @@ function(input, output,session) {
     
     output$gcm.meta.all <- DT::renderDataTable({
       ## Metadata table
-      DF.pr <- data.frame(N = cbind(1:dim(gcm.meta.all)[1],gcm.meta.all))
-      colnames(DF.pr) <- c('N',colnames(gcm.meta.all))
+      DF.pr <- data.frame(N = cbind(1:dim(gcm.all)[1],gcm.all))
+      colnames(DF.pr) <- c('N',colnames(gcm.all))
       DT::datatable(DF.pr,
                     selection = list(mode = 'multiple',target = 'row'),
                     callback = JS("table.on('click.dt', function() {
@@ -748,7 +823,7 @@ function(input, output,session) {
     ## RCMs tablets 
     
     output$rcm.meta.tas <- DT::renderDataTable({
-      #data(package= 'DECM', metaextract)
+      rcm.meta.tas <- rcm.meta.tas.reactive()
       DF.tas <- data.frame(N = cbind(1:dim(rcm.meta.tas)[1],rcm.meta.tas))
       colnames(DF.tas) <- c('N',colnames(rcm.meta.tas))
       DT::datatable(DF.tas,
@@ -784,8 +859,7 @@ function(input, output,session) {
     })
     
     output$rcm.meta.pr <- DT::renderDataTable({
-      ## Metadata table
-      
+      rcm.meta.pr <- rcm.meta.pr.reactive()
       DF.pr <- data.frame(N = cbind(1:dim(rcm.meta.pr)[1],rcm.meta.pr))
       colnames(DF.pr) <- c('N',colnames(rcm.meta.pr))
       DT::datatable(DF.pr,
@@ -819,9 +893,7 @@ function(input, output,session) {
     })
     
     output$rcm.meta.all <- DT::renderDataTable({
-      ## Metadata table
-      
-      #data(package= 'DECM', metaextract)
+      rcm.meta.all <- rcm.meta.tas.reactive()
       DF.com <- data.frame(N = cbind(1:dim(rcm.meta.all)[1],rcm.meta.all))
       colnames(DF.com) <- c('N',colnames(rcm.meta.all))
       DT::datatable(DF.com,
@@ -1198,7 +1270,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.region, input$gcm.period,
+                                text=paste(input$gcm.region, input$gcm.period,input$rcp,
                                            input$gcm.chart.type,
                                            input$gcm.stat,sep=' | '),
                                 showarrow=F,
@@ -1415,7 +1487,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.region.pu, input$gcm.period.pu,
+                                text=paste(input$gcm.region.pu, input$gcm.period.pu,input$gcm.rcp.pu,
                                            input$gcm.chart.type.pu,
                                            input$gcm.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -1615,7 +1687,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.sc.region.pu, input$gcm.sc.period.pu,
+                                text=paste(input$gcm.sc.region.pu, input$gcm.sc.period.pu,input$gcm.sc.rcp.pu,
                                            input$gcm.sc.chart.type.pu,
                                            input$gcm.sc.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -1815,7 +1887,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.cc.region, input$gcm.cc.period,
+                                text=paste(input$gcm.cc.region, input$gcm.cc.period,input$gcm.cc.rcp,
                                                 input$gcm.cc.chart.type,
                                                 input$gcm.cc.stat,sep=' | '),
                                 showarrow=F,
@@ -2019,7 +2091,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.region, input$gcm.period,
+                                text=paste(input$gcm.region, input$gcm.period,input$gcm.rcp,
                                                 input$gcm.chart.type,
                                                 input$gcm.stat,sep=' | '),
                                 showarrow=F,
@@ -2106,7 +2178,7 @@ function(input, output,session) {
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-      } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
+      } else if (grepl('ensemble', tolower(input$gcm.chart.type.pu))) { # Make an enveloppe instead of lines
         p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
                         line = list(color = 'transparent'),name = 'High',showlegend = TRUE) %>%
           add_trace(y = ~low, type = 'scatter', mode = 'lines',showlegend = TRUE,
@@ -2123,7 +2195,7 @@ function(input, output,session) {
         if (input$gcm.legend.sc == 'Hide') 
           p.sc <- p.sc %>% layout(showlegend = FALSE)
         
-      } else if (grepl('box',tolower(input$gcm.chart.type))) {
+      } else if (grepl('box',tolower(input$gcm.chart.type.pu))) {
         p.sc <- plot_ly(df, type = 'box')
         
         month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
@@ -2176,7 +2248,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.region.pu, input$gcm.period.pu,
+                                text=paste(input$gcm.region.pu, input$gcm.period.pu, input$gcm.rcp.pu,
                                                 input$gcm.chart.type.pu,
                                                 input$gcm.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -2326,7 +2398,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.sc.region.pu, input$gcm.sc.period.pu,
+                                text=paste(input$gcm.sc.region.pu, input$gcm.sc.period.pu, input$gcm.sc.rcp.pu,
                                            input$gcm.sc.chart.type.pu,
                                            input$gcm.sc.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -2342,9 +2414,8 @@ function(input, output,session) {
     })
     
     output$gcm.cc.pr.pu <- renderPlotly({
-      
+
       gcm.meta.pr <- gcm.meta.pr.reactive.pu()
-      
       df <- ((gcm.sc.pr.reactive.cc.pu() - gcm.sc.pr.present.cc.pu())/ gcm.sc.pr.present.cc.pu()) * 100
       
       df.env <- NULL
@@ -2475,7 +2546,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.cc.region, input$gcm.cc.period,
+                                text=paste(input$gcm.cc.region, input$gcm.cc.period, input$gcm.cc.rcp,
                                            input$gcm.cc.chart.type,
                                            input$gcm.cc.stat,sep=' | '),
                                 showarrow=F,
@@ -2845,7 +2916,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.region, input$gcm.period,
+                                text=paste(input$gcm.region, input$gcm.period, input$gcm.rcp,
                                            input$gcm.chart.type,
                                            input$gcm.stat,sep=' | '),
                                 showarrow=F,
@@ -2865,11 +2936,10 @@ function(input, output,session) {
     })
     
     output$gcm.cc.scatter.pu <- renderPlotly({
-      #
       gcm.meta.pr <- gcm.meta.pr.reactive.pu()
       dpr <- gcm.sc.pr.reactive.cc.pu()
       gcms <- names(dpr)
-      dpr <- ((dpr - gcm.sc.pr.present())/ gcm.sc.pr.present()) * 100
+      dpr <- ((dpr - gcm.sc.pr.present.cc.pu())/ gcm.sc.pr.present.cc.pu()) * 100
       
       gcm.meta.tas <- gcm.meta.tas.reactive.cc.pu()
       dtas <- gcm.sc.tas.reactive.cc.pu() - gcm.sc.tas.present.cc.pu()
@@ -3007,7 +3077,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.cc.region, input$gcm.cc.period,
+                                text=paste(input$gcm.cc.region, input$gcm.cc.period, input$gcm.cc.rcp,
                                            input$gcm.cc.chart.type,
                                            input$gcm.cc.stat,sep=' | '),
                                 showarrow=F,
@@ -3382,7 +3452,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.region, input$rcm.period,
+                                text=paste(input$rcm.region, input$rcm.period, input$rcm.rcp,
                                            input$rcm.chart.type,
                                            input$rcm.stat,sep=' | '),
                                 showarrow=F,
@@ -3401,6 +3471,7 @@ function(input, output,session) {
     output$hydro.sc.tas <- rcm.sc.tas
     
     output$rcm.sc.bias.tas.pu <- renderPlotly({
+      
       rcm.meta.tas <- rcm.meta.tas.reactive.pu()
       df <- rcm.sc.tas.reactive.pu()
       df <- df - df[,dim(df)[2]]      
@@ -3581,7 +3652,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.region.pu, input$rcm.period.pu,
+                                text=paste(input$rcm.region.pu, input$rcm.period.pu, input$rcm.rcp.pu,
                                            input$rcm.chart.type.pu,
                                            input$rcm.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -3775,7 +3846,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.sc.region.pu, input$rcm.sc.period.pu,
+                                text=paste(input$rcm.sc.region.pu, input$rcm.sc.period.pu, input$rcm.sc.rcp.pu,
                                            input$gcm.sc.chart.type.pu,
                                            input$gcm.sc.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -3788,7 +3859,7 @@ function(input, output,session) {
     })
     
     output$rcm.cc.tas.pu <- renderPlotly({
-      
+      rcm.meta.tas <- rcm.meta.tas.reactive.cc.pu()
       df <- rcm.sc.tas.reactive.cc.pu() - rcm.sc.tas.present.cc.pu()
       
       #df <- df[,-36] # AM Quick fix but has to be removed ... once meta is updated.
@@ -3968,7 +4039,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.cc.region, input$rcm.cc.period,
+                                text=paste(input$rcm.cc.region, input$rcm.cc.period, input$rcm.cc.rcp,
                                            input$rcm.cc.chart.type,
                                            input$rcm.cc.stat,sep=' | '),
                                 showarrow=F,
@@ -4168,7 +4239,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.region.pu, input$rcm.period.pu,
+                                text=paste(input$rcm.region.pu, input$rcm.period.pu, input$rcm.rcp.pu,
                                            input$rcm.chart.type.pu,
                                            input$rcm.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -4321,7 +4392,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.region.pu, input$rcm.period.pu,
+                                text=paste(input$gcm.region.pu, input$rcm.period.pu, input$rcm.rcp.pu,
                                            input$gcm.chart.type.pu,
                                            input$gcm.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -4472,7 +4543,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.sc.region.pu, input$rcm.sc.period.pu,
+                                text=paste(input$rcm.sc.region.pu, input$rcm.sc.period.pu, input$rcm.sc.rcp.pu,
                                            input$rcm.sc.chart.type.pu,
                                            input$rcm.sc.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -4488,7 +4559,7 @@ function(input, output,session) {
     })
     
     output$rcm.cc.pr.pu <- renderPlotly({
-      rcm.meta.pr <- rcm.meta.pr.reactive.sc.pu()
+      rcm.meta.pr <- rcm.meta.pr.reactive.cc.pu()
       
       df <- (rcm.sc.pr.reactive.cc.pu() - rcm.sc.pr.present.cc.pu()) / rcm.sc.pr.present.cc.pu() * 100
       
@@ -4592,7 +4663,7 @@ function(input, output,session) {
         } 
       }
       
-      ylab <- "Precipitation [mm/month]"
+      ylab <- "Precipitation [%]"
       # Format layout 
       p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
@@ -4617,7 +4688,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.cc.region, input$rcm.cc.period,
+                                text=paste(input$rcm.cc.region, input$rcm.cc.period, input$rcm.cc.rcp,
                                            input$rcm.cc.chart.type,
                                            input$rcm.cc.stat,sep=' | '),
                                 showarrow=F,
@@ -4711,7 +4782,6 @@ function(input, output,session) {
     })
     
     output$rcm.sc.pr.data <- DT::renderDataTable({
-      
       rcm.meta.pr <- rcm.meta.pr.reactive()
       df <- rcm.sc.pr.reactive()
       
@@ -5006,7 +5076,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.region, input$rcm.period,
+                                text=paste(input$rcm.region, input$rcm.period, input$rcm.rcp,
                                            input$rcm.chart.type,
                                            input$rcm.stat,sep=' | '),
                                 showarrow=F,
@@ -5166,7 +5236,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.cc.region, input$rcm.cc.period,
+                                text=paste(input$rcm.cc.region, input$rcm.cc.period, input$rcm.cc.rcp,
                                            input$rcm.cc.chart.type,
                                            input$rcm.cc.stat,sep=' | '),
                                 showarrow=F,
@@ -5314,7 +5384,7 @@ function(input, output,session) {
       x <- as.numeric(attr(zmap,'longitude'))
       y <- as.numeric(attr(zmap,'latitude'))
       #z <- apply(zmap,c(2,3),mean,na.rm=TRUE)
-      z <- zmap[grep(input$spi.sim,rcm.names),,]
+      z <- zmap[grep(input$spi.sim,rcm.names[["rcp45"]]),,]
       #z[is.na(z)] <- -999
       ## 
       #Create raster object
@@ -5362,7 +5432,7 @@ function(input, output,session) {
       x <- as.numeric(attr(zmap,'longitude'))
       y <- as.numeric(attr(zmap,'latitude'))
       #z <- apply(zmap,c(2,3),mean,na.rm=TRUE)
-      z <- zmap[grep(input$spi.sim,rcm.names),,]
+      z <- zmap[grep(input$spi.sim,rcm.names[["rcp45"]]),,]
       #z[is.na(z)] <- -999
       ##
       #Create raster object
@@ -5405,6 +5475,13 @@ function(input, output,session) {
     output$spei.settings <- renderText({
       paste(input$spi.sim,' | ',input$spi.freq,' | ',input$spi.group,' | ',input$spi.period,' | ',input$spi.stat)
     }) 
+    output$spei.settings <- DT::renderDataTable({
+      DT::datatable(filter = 'none',
+          rbind(c(input$spi.sim,input$spi.freq,input$spi.group,input$spi.period,input$spi.stat)),
+          colnames = c("Simulation","Frequency","Category","Period","Statistic") ,options = list(dom = 't'), 
+          caption='Your selected settings',style="bootstrap") # %>% DT::formatStyle(columns = c(1:5),color ='white',backgroundColor = 'royalblue')
+    }) 
+    
   })
   
   observeEvent(input$gcm.groupBy,{

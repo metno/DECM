@@ -608,7 +608,7 @@ function(input, output,session) {
   })
   
   txttab <- reactive({
-    txt <- paste('Monthly estimates of regional temperature assuming the',input$gcm.rcp,' emission scenarios for the',tolower(input$gcm.period),'over the ',input$gcm.region,'region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the reference data set (Observation).', sep= ' ')
+    txt <- paste('Monthly estimates of regional temperature assuming the',input$gcm.rcp,' emission scenario for the',tolower(input$gcm.period),'over the ',input$gcm.region,'region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the reference data set (Observation).', sep= ' ')
     return(txt)
   })
   
@@ -2586,14 +2586,14 @@ function(input, output,session) {
       else if (input$gcm.outputValues == 'Change') {
         df <- gcm.sc.tas.reactive() - gcm.sc.tas.present()
       }
-      caption <- paste('Monthly estimates of regional temperature assuming',input$gcm.rcp,'emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+      caption <- paste('Monthly estimates of regional temperature assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                        The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                        The last row in the table shows the estimated values from the reference data set (Observation).',
                        sep= ' ')
       
       if (input$gcm.outputValues == 'Bias') {
         df <- df - df[,dim(df)[2]] 
-        caption <- paste('Bias [Deg. C] in monthly estimates of regional temperature assuming',input$gcm.rcp,'emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Bias [Deg. C] in monthly estimates of regional temperature assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The bias is computed as the deviation from the reference data set (Observation).',
                          sep= ' ')
@@ -2641,7 +2641,7 @@ function(input, output,session) {
       
       if (input$gcm.outputValues == 'Absolute')
         
-        caption <- paste('Monthly estimates of regional preciptiation assuming',input$gcm.rcp,'emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Monthly estimates of regional preciptiation assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The last row in the table shows the estimated values from the reference data set (Observation).',
                          sep= ' ')
@@ -2653,13 +2653,13 @@ function(input, output,session) {
                          sep= ' ')
       } else if (input$gcm.outputValues == 'Bias') {
         df <- (df - df[,dim(df)[2]])/df[,dim(df)[2]] * 100 
-        caption <- paste('Bias [in %] in monthly estimates of regional preciptiation assuming',input$gcm.rcp,'emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Bias [in %] in monthly estimates of regional preciptiation assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The bias is computed as the deviation from the reference data set (Observation).',
                          sep= ' ')
       }  else if (input$gcm.outputValues == 'Change') {
         df <- ((gcm.sc.pr.reactive() - gcm.sc.pr.present())/ gcm.sc.pr.present()) * 100
-        caption <- paste('Change [in %] in monthly estimates of regional preciptiation assuming',input$gcm.rcp,'emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Change [in %] in monthly estimates of regional preciptiation assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The changes are computed as the deviation from the historical simulations for the present (1981-2010).',
                          sep= ' ')
@@ -3175,18 +3175,18 @@ function(input, output,session) {
                        sep= ' ')
       
       if (input$gcm.outputValues == 'Bias') {
-        caption <- paste('Annual means of Biases in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming',input$gcm.rcp,'emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Annual means of Biases in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The bias is computed as the deviation from the reference data set (last row).',
                          sep= ' ')
       } else if (input$gcm.outputValues == 'RMSE'){
-        caption <- paste('Annual means of RMSE in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming',input$gcm.rcp,'emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Annual means of RMSE in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The RMSE is computed as the square root mean of deviations from the reference data set (last row).',
                          sep= ' ')
         
       } else if (input$gcm.outputValues == 'Change'){
-        caption <- paste('Annual means of Changes in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming',input$gcm.rcp,'emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Annual means of Changes in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column, respectively. 
                          The RMSE is computed as the square root mean of deviations from the reference data set (last row).',
                          sep= ' ')
@@ -4729,23 +4729,23 @@ function(input, output,session) {
         rcm.meta.tas <- rcm.meta.tas[input$rowsRcm,]
       }
       
-      caption <- paste('Simulated regional temperature [deg. C] assuming',input$rcm.rcp,'emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+      caption <- paste('Simulated regional temperature [deg. C] assuming',input$rcm.rcp,'emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                        The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
                        The last row in the table shows the estimated values from the reference data set (Observation).',sep= ' ')
       
       if (input$rcm.outputValues == 'Bias') {
         df <- df - df[,dim(df)[2]]      
-        caption <- paste('Bias in simulated regional temperature [deg. C] assuming',input$rcm.rcp,' emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Bias in simulated regional temperature [deg. C] assuming',input$rcm.rcp,' emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
                          The last row in the table shows the estimated values from the reference data set (Observation).',sep= ' ')
       } else if (input$rcm.outputValues == 'Anomaly') {
         df <- df - mean(df[,dim(df)[2]],na.rm=TRUE)  
-        caption <- paste('Simulated regional temperature anomalies [deg. C] assuming',input$rcm.rcp,'emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Simulated regional temperature anomalies [deg. C] assuming',input$rcm.rcp,'emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
                          The last row in the table shows the estimated values from the reference data set (Observation).',sep= ' ')
       } else if (input$rcm.outputValues == 'Change') {
         df <- rcm.sc.tas.reactive() - rcm.sc.tas.present()
-        caption <- paste('Absolute changes in regional temperature [deg. C] assuming',input$rcm.rcp,'emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Absolute changes in regional temperature [deg. C] assuming',input$rcm.rcp,'emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
                          Changes are computed with regards to the reference period 1981-2010.',sep= ' ')
       }
@@ -4797,7 +4797,7 @@ function(input, output,session) {
         rcm.meta.pr <- rcm.meta.pr[input$rowsRcm,]
       }
       
-      caption <- paste('Simulated regional precipitation [mm/month] assuming',input$rcm.rcp,'emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+      caption <- paste('Simulated regional precipitation [mm/month] assuming',input$rcm.rcp,'emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                        The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
                        The last row in the table shows the estimated values from the reference data set (Observation).',sep= ' ')
       
@@ -5311,24 +5311,24 @@ function(input, output,session) {
       df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),dpr = as.numeric(round(colMeans(dpr),digits = 2)),
                        rcm.name = rcmall, inst.name = rcm.inst,stringsAsFactors = FALSE)
       
-      caption <- paste('Annual means of monthly estimates of both regional temperature (deg. C) and precipitation (mm/month) assuming ',input$rcm.rcp,' emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+      caption <- paste('Annual means of monthly estimates of both regional temperature (deg. C) and precipitation (mm/month) assuming ',input$rcm.rcp,' emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                        The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                        The last row in the table shows the estimated values from the reference data set (last row).',
                        sep= ' ')
       
       if (input$rcm.outputValues == 'Bias') {
-        caption <- paste('Annual means of Biases in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming ',input$rcm.rcp,' emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Annual means of Biases in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming ',input$rcm.rcp,' emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The bias is computed as the deviation from the reference data set (last row).',
                          sep= ' ')
       } else if (input$rcm.outputValues == 'RMSE'){
-        caption <- paste('Annual means of RMSE in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming ',input$rcm.rcp,' emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Annual means of RMSE in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming ',input$rcm.rcp,' emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The RMSE is computed as the square root mean of deviations from the reference data set (last row).',
                          sep= ' ')
         
       } else if (input$rcm.outputValues == 'Change'){
-        caption <- paste('Annual means of Changes in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming  ',input$rcm.rcp,' emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Annual means of Changes in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming  ',input$rcm.rcp,' emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column, respectively. 
                          The RMSE is computed as the square root mean of deviations from the reference data set (last row).',
                          sep= ' ')
@@ -5730,7 +5730,7 @@ function(input, output,session) {
     output$figMoreTips.rcm.cc.scatter <- figMoreTips
     output$figRemember.rcm.cc.scatter <- figRemember
     
-    txtTable <- tags$h5('Monthly estimates of regional temperature assuming an emission scenarios for the present (1981-2010) averaged over the selected region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the reference data set (Observation)')
+    txtTable <- tags$h5('Monthly estimates of regional temperature assuming an emission scenario for the present (1981-2010) averaged over the selected region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the reference data set (Observation)')
     
     output$tabcaption = renderInfoBox({
       infoBox('How to read the table!',txtTable, icon = shiny::icon("table"),color = 'orange')

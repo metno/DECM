@@ -231,15 +231,14 @@ gcm.meta <- function(variable='tas',experiment='RCP4.5') {
   gcm.meta <- subset(META, subset = (source == 'CMIP5') & (variable == variable) & (experiment == experiment))
   gcm.meta <- merge.meta.ipcc(meta = gcm.meta,ipcc = IPCC.AR5.Table.9.A.1)
 }
+
 gcm.tas <- gcm.pr <- gcm.all <- NULL
 gcm.tas$rcp45 <- gcm.meta('tas','RCP45')
 gcm.tas$rcp85 <- gcm.meta('tas','RCP85')
 gcm.pr$rcp45 <- gcm.meta('pr','RCP45')
 gcm.pr$rcp85 <- gcm.meta('pr','RCP85')
 
-load("../../back-end/data/statistics.cordex.tas.2071-2100.rcp45.rda")
-rcms$rcp45$tas$ff <- store
-gcm.com.var <- function(gcm.tas=gcm.tas,gcm.pr=gcm.pr) {
+gcm.com.var <- function(gcm.tas,gcm.pr) {
   
   # Common meta data for all variables
   modelrip.tas <- paste(gcm.tas$institute_id,gcm.tas$model_id,gcm.tas$parent_experiment_rip,gcm.tas$realization)

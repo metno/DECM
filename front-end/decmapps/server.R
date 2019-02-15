@@ -608,7 +608,7 @@ function(input, output,session) {
   })
   
   txttab <- reactive({
-    txt <- paste('Monthly estimates of regional temperature assuming an intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the reference data set (Observation).', sep= ' ')
+    txt <- paste('Monthly estimates of regional temperature assuming the',input$gcm.rcp,' emission scenarios for the',tolower(input$gcm.period),'over the ',input$gcm.region,'region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the reference data set (Observation).', sep= ' ')
     return(txt)
   })
   

@@ -239,8 +239,7 @@ gcm.pr$rcp85 <- gcm.meta('pr','RCP85')
 
 load("../../back-end/data/statistics.cordex.tas.2071-2100.rcp45.rda")
 rcms$rcp45$tas$ff <- store
-gcm.com.var <- function(gcm.tas=gcm.tas,gcm.pr=gcm.pr) {
-  
+gcm.com.var <- function(gcm.tas,gcm.pr) {
   # Common meta data for all variables
   modelrip.tas <- paste(gcm.tas$institute_id,gcm.tas$model_id,gcm.tas$parent_experiment_rip,gcm.tas$realization)
   modelrip.pr <- paste(gcm.pr$institute_id,gcm.pr$model_id,gcm.pr$parent_experiment_rip,gcm.pr$realization)

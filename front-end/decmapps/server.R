@@ -3145,8 +3145,7 @@ function(input, output,session) {
       else if (input$gcm.outputValues == 'RMSE') {
         dtas <- sqrt((dtas-dtas[,dim(dtas)[2]])^2)
       } else if (input$gcm.outputValues == 'Anomaly') {
-        DF <- t(dtas)
-        dtas <- as.data.frame(t(DF - rowMeans(DF)))
+        dtas <- dtas - mean(dtas[,dim(dtas)[2]],na.rm=TRUE)
       } else if (input$gcm.outputValues == 'Change') {
         dtas <- dtas - gcm.sc.tas.present()
       }
@@ -4234,7 +4233,7 @@ function(input, output,session) {
       if (input$rcm.outputValues == 'Bias')  
         ylab <- "Bias in precipitation [%]"
       else if (input$rcm.outputValues == 'Anomaly') 
-        ylab <- "Precipitation anomalies [mm]"
+        ylab <- "Precipitation anomalies [%]"
       else if (input$rcm.outputValues == 'Change')
         ylab <- "Change in precipitation [%]"
       else 
@@ -4819,20 +4818,18 @@ function(input, output,session) {
       
       if (input$rcm.outputValues == 'Bias') {
         df <- ((df - df[,dim(df)[2]])/df[,dim(df)[2]]) * 100
-        caption <- paste('Bias in simulated regional precipitation [%] assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Bias in simulated regional precipitation [%] assuming',input$rcm.rcp,'  
+                         emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
                          The last row in the table shows the estimated values from the reference data set (Observation).',sep= ' ')
       } else if (input$rcm.outputValues == 'Anomaly') {
         df <- ((df - mean(df[,dim(df)[2]],na.rm=TRUE))/mean(df[,dim(df)[2]],na.rm=TRUE)) * 100
-        caption <- paste('Simulated regional precipitation anomalies [%] assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Simulated regional precipitation anomalies [%] assuming an',input$rcm.rcp,'emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
                          The last row in the table shows the estimated values from the reference data set (Observation).',sep= ' ')
       } else if (input$rcm.outputValues == 'Change') {
         df <- ((rcm.sc.pr.reactive() - rcm.sc.pr.present())/ rcm.sc.pr.present()) * 100
-        caption <- paste('Relative changes in regional precipitation [%] assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Relative changes in regional precipitation [%] assuming',input$rcm.rcp,'emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
                          Changes are computed with regards to the reference period 1981-2010',sep= ' ')
       }
@@ -5329,28 +5326,24 @@ function(input, output,session) {
       df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),dpr = as.numeric(round(colMeans(dpr),digits = 2)),
                        rcm.name = rcmall, inst.name = rcm.inst,stringsAsFactors = FALSE)
       
-      caption <- paste('Annual means of monthly estimates of both regional temperature (deg. C) and precipitation (mm/month) assuming an 
-                       intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+      caption <- paste('Annual means of monthly estimates of both regional temperature (deg. C) and precipitation (mm/month) assuming ',input$rcm.rcp,' emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                        The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                        The last row in the table shows the estimated values from the reference data set (last row).',
                        sep= ' ')
       
       if (input$rcm.outputValues == 'Bias') {
-        caption <- paste('Annual means of Biases in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Annual means of Biases in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming ',input$rcm.rcp,' emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The bias is computed as the deviation from the reference data set (last row).',
                          sep= ' ')
       } else if (input$rcm.outputValues == 'RMSE'){
-        caption <- paste('Annual means of RMSE in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Annual means of RMSE in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming ',input$rcm.rcp,' emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The RMSE is computed as the square root mean of deviations from the reference data set (last row).',
                          sep= ' ')
         
       } else if (input$rcm.outputValues == 'Change'){
-        caption <- paste('Annual means of Changes in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Annual means of Changes in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming  ',input$rcm.rcp,' emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column, respectively. 
                          The RMSE is computed as the square root mean of deviations from the reference data set (last row).',
                          sep= ' ')
@@ -5550,22 +5543,22 @@ function(input, output,session) {
     
     # GCM info text output
     output$figcaption.gcm.sc.tas = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming  ',input$gcm.rcp,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
     output$figcaption.gcm.tas.pu = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the bias in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the bias in historical and projected surface air temperature assuming ',input$gcm.rcp,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
     output$figcaption.gcm.tas.cc = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the changes in simulated historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the changes in simulated historical and projected surface air temperature assuming  ',input$gcm.rcp,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
     output$figcaption.gcm.sc.tas.pu = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming ',input$gcm.rcp,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
@@ -5603,20 +5596,20 @@ function(input, output,session) {
     
     # RCM info text output
     output$figcaption.rcm.sc.tas = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming ',input$rcm.sc.rcp.pu,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
     output$figcaption.rcm.tas.cc = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the future changes seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the future changes seasonal cycle in historical and projected surface air temperature assuming ',input$rcm.cc.rcp,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     output$figcaption.rcm.tas.pu = renderInfoBox({
-      txt <- tags$h5('Interactive charts  evaluating the bias in seasonal cycle of historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts  evaluating the bias in seasonal cycle of historical and projected surface air temperature assuming ',input$rcm.rcp.pu,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     output$figcaption.rcm.sc.tas.pu = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming  ',input$rcm.sc.rcp.pu,'  emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
@@ -5631,7 +5624,7 @@ function(input, output,session) {
     })
     
     output$figcaption.rcm.pr.pu = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the bias in seasonal cycle of historical and projected monthly precipitation totals assuming the intermediate (RCP4.5) emission scenario. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the bias in seasonal cycle of historical and projected monthly precipitation totals assuming ',input$rcm.rcp,' emission scenario. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
@@ -5752,7 +5745,7 @@ function(input, output,session) {
     output$figMoreTips.rcm.cc.scatter <- figMoreTips
     output$figRemember.rcm.cc.scatter <- figRemember
     
-    txtTable <- tags$h5('Monthly estimates of regional temperature assuming an intermediate emission scenarios for the present (1981-2010) averaged over Global region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the reference data set (Observation)')
+    txtTable <- tags$h5('Monthly estimates of regional temperature assuming an emission scenarios for the present (1981-2010) averaged over the selected region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the reference data set (Observation)')
     
     output$tabcaption = renderInfoBox({
       infoBox('How to read the table!',txtTable, icon = shiny::icon("table"),color = 'orange')

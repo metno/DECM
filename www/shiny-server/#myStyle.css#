@@ -1,0 +1,456 @@
+/* myStyle.css */
+
+html {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+body {
+    font-family:Karla; font-size:18px;
+    background-color: #ffffff;
+    color: #114;
+    line-height: 1.25;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    line-height: 28px;
+}
+p {
+    text-align: left;
+    line-height: 28px;
+}
+a {
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+#titleBar {
+    font-family:Karla; font-size:14px;
+    height: 50px;
+    background-color: #871010;
+    overflow: hidden;
+    border-bottom: 1px solid #ffffff;
+    -moz-box-shadow:    0px 0px 10px 3px #BBC;
+    -webkit-box-shadow: 0px 0px 10px 3px #BBC;
+    box-shadow:         0px 0px 10px 3px #BBC;
+}
+#titleBar #container {
+    margin-top: 8px;
+}
+#titleBar h1 {
+    font-family:Karla;
+    margin: 0 auto .5em auto;
+    padding: 0;
+    color: #DDD;
+    text-align: center;
+}
+#intro {
+    font-family:Karla;
+    background-color: #DDD;
+    margin: 1em 1em 0 1em;
+    padding: .75em;
+    text-align: center;
+    border: 1px solid #CCC;
+    font-size: 18px;
+    margin-top:0px;
+}
+#intro p {
+    margin: .3em 0 .3em 0;
+    text-align: center;
+}
+#outer-content {
+    max-width: 910px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#content {
+    margin: 1em auto 1em auto;
+    float: left;
+}
+#main{
+    margin-right: 350px;
+    float: left;
+    line-height: 24px;
+}
+
+#shiny{
+    float: left;
+    width: 305px;
+    margin-left: -330px;
+    padding-left: 20px;
+    border-left: 1px solid #AAA;
+}
+#shiny iframe {
+    margin-top: 30px;
+}
+.caption{
+    font-size: 13px;
+}
+
+code {
+    background-color: #E5E5E5;
+    border: 1px solid #AAA;
+    -webkit-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    padding: 0 .5em 0 .5em;
+}
+
+/* Add a black background color to the top navigation */
+.topnav {
+    background-color: #871010;
+    overflow: hidden;
+    height: 90px;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  display: flex;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  font-size: 20px;
+  position: relative;
+  transform: translate(-50%, -50%);
+  margin-top: 0px;
+}
+
+.topnav ul {
+    position:relative;
+    left:28%;
+    float:center;
+    list-style:none; 
+    padding:0;
+    display: flex;
+    max-width: 50%;
+    text-align: center;
+}   
+
+.topnav ul li {
+    list-style-type:none;
+    padding:0px;
+    width:100%;                                   /*this is the line that helped me get rid of the white space at the start of my nav */ 
+}
+.topnav ul li a {
+    text-decoration:none;
+    }
+
+.topnav-centered a {
+  float: left;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Add an active class to highlight the current page */
+.active {
+  font-weight: bold;
+  color: white;
+}
+
+/* Hide the link that should open and close the topnav on small screens */
+.topnav .icon {
+  display: none;
+}
+
+/* Dropdown container - needed to position the dropdown content */
+.dropdown {
+  float: left;
+  overflow: hidden;
+}
+
+/* Style the dropdown button to fit inside the topnav */
+.dropdown .dropbtn {
+  font-size: 17px;
+  border: none;
+  outline: none;
+  color: white;
+  padding: 14px 16px;
+  background-color: inherit;
+  font-family: inherit;
+  margin: 0;
+}
+
+/* Style the dropdown content (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Style the links inside the dropdown */
+.dropdown-content a {
+  float: none;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+/* Add a dark background on topnav links and the dropdown button on hover */
+.topnav a:hover, .dropdown:hover .dropbtn {
+  background-color: #555;
+  color: white;
+}
+
+/* Add a grey background to dropdown links on hover */
+.dropdown-content a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Show the dropdown menu when the user moves the mouse over the dropdown button */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* When the screen is less than 600 pixels wide, hide all links, except for the first one ("Home"). Show the link that contains should open and close the topnav (.icon) */
+@media screen and (max-width: 600px) {
+  .topnav a:not(:first-child), .dropdown .dropbtn {
+    display: none;
+  }
+  .topnav a.icon {
+    float: right;
+    display: block;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .topnav ul {@media screen and (max-width: 600px) {
+  .topnav a:not(:first-child), .dropdown .dropbtn {
+    display: none;
+  }
+  .topnav a.icon {
+    float: right;
+    display: block;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .topnav.responsive {position: relative;}
+  .topnav.responsive .icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  .topnav.responsive a {
+    float: none;
+    display: block;
+    text-align: left;
+  }
+  .topnav.responsive .dropdown {float: none;}
+  .topnav.responsive .dropdown-content {position: relative;}
+  .topnav.responsive .dropdown .dropbtn {
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+}
+  .topnav.responsive {position: relative;}
+  .topnav.responsive .icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  .topnav.responsive a {
+    float: none;
+    display: block;
+    text-align: left;
+  }
+  .topnav.responsive .dropdown {float: none;}
+  .topnav.responsive .dropdown-content {position: relative;}
+  .topnav.responsive .dropdown .dropbtn {
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+}
+/* Center the loader */
+#loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    width: 150px;
+    height: 150px;
+    margin: -75px 0 0 -75px;
+    border: 16px solid #871010;
+    border-radius: 50%;
+    border-top: 16px solid #ffffff;
+    width: 120px;
+    height: 120px;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+}
+
+/* Add animation to "page content" */
+.animate-bottom {
+    position: relative;
+    -webkit-animation-name: animatebottom;
+    -webkit-animation-duration: 1s;
+    animation-name: animatebottom;
+    animation-duration: 1s
+}
+
+@-webkit-keyframes animatebottom {
+    from { bottom:-100px; opacity:0 }
+    to { bottom:0px; opacity:1 }
+}
+
+@keyframes animatebottom {
+    from{ bottom:-100px; opacity:0 }
+    to{ bottom:0; opacity:1 }
+}
+@keyframes animatebottom {
+    from{ bottom:-100px; opacity:0 }
+    to{ bottom:0; opacity:1 }
+}
+
+#myDiv {
+    display: none;
+    text-align: center;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+/* The side navigation menu */
+.sidenav {
+    height: 100%; /* 100% Full-height */
+    width: 0; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    left: 0;
+    background-color: #111; /* Black*/
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 60px; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+}
+
+/* The navigation menu links */
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+/* Position and style the close button (top right corner) */
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+#main {
+    transition: margin-left .5s;
+    padding: 20px;
+}
+
+/* For desktop: */
+.col-1 {width: 100%;}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 640px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+    /* For mobile phones: */
+    [class*="col-"] {
+	width: 100%;
+    }
+}
+
+/* Set the width of the side navigation to 250px */
+function openNav() {
+    document.getElementById("mySidenav").style.width = "250px";
+}
+
+/* Set the width of the side navigation to 0 */
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+}
+
+.sidebar {
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    background-color: #871010;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+}
+
+.sidebar a {
+    display: block;
+    color: white;
+    padding: 16px;
+    text-decoration: none;
+}
+
+.sidebar a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.sidebar a:hover:not(.active) {
+    background-color: #DDD;
+    color: white;
+}
+
+div.content {
+    margin-left: 200px;
+    padding: 1px 16px;
+    height: 1000px;
+}
+
+@media screen and (max-width: 700px) {
+    .sidebar {
+	width: 100%;
+	height: auto;
+	position: relative;
+    }
+    .sidebar a {float: left;}
+    div.content {margin-left: 0;}
+    b {font-size:22px;}
+}
+
+@media screen and (max-width: 400px) {
+    .sidebar a {
+	text-align: center;
+	float: none;
+    }
+    @media only screen
+    and (min-device-width: 320px)
+    and (max-device-width: 480px)
+    and (-webkit-min-device-pixel-ratio: 2)
+    and (orientation: portrait) {
+	b {font-size:22px;}
+    }

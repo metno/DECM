@@ -1,0 +1,5 @@
+Sitemap: http://example.com/sitemap.xml
+Sitemap: http://example.com/news-sitemap.xml
+User-agent: *
+Disallow: /wp-admin/
+Allow: /wp-admin/admin-ajax.php

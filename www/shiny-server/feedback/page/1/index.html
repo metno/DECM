@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en-US"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=10"><title>Feedbacks on the prototype – Prototype</title><script type="text/javascript">
+  WebFontConfig = {"google":{"families":["Ubuntu:500:latin,latin-ext","Ubuntu:r,i,b,bi:latin,latin-ext"]}};
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = 'http://example.com/wp-content/mu-plugins/wpcomsh/vendor/automattic/custom-fonts/js/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+	})();
+</script><style id="jetpack-custom-fonts-css"></style><link rel="dns-prefetch" href="//s0.wp.com"><link rel="dns-prefetch" href="//s.w.org"><link rel="stylesheet" id="usrStyle-css" href="../../wp-content/plugins/universal-star-rating/css/style.css" type="text/css" media="all"><link rel="stylesheet" id="wp-block-library-css" href="https://c0.wp.com/c/5.0.3/wp-includes/css/dist/block-library/style.min.css" type="text/css" media="all"><link rel="stylesheet" id="jetpack-email-subscribe-css" href="https://c0.wp.com/p/jetpack/6.9/modules/shortcodes/css/jetpack-email-subscribe.css" type="text/css" media="all"><link rel="stylesheet" id="wpcom-text-widget-styles-css" href="../../wp-content/mu-plugins/wpcomsh/vendor/automattic/text-media-widget-styles/css/widget-text.css" type="text/css" media="all"><link rel="stylesheet" id="thumbs_rating_styles-css" href="../../wp-content/plugins/thumbs-rating/css/style.css" type="text/css" media="all"><link rel="stylesheet" id="megamenu-css" href="../../wp-content/uploads/maxmegamenu/style.css" type="text/css" media="all"><link rel="stylesheet" id="dashicons-css" href="https://c0.wp.com/c/5.0.3/wp-includes/css/dashicons.min.css" type="text/css" media="all"><link rel="stylesheet" id="vantage-style-css" href="../../wp-content/themes/vantage/style.css" type="text/css" media="all"><link rel="stylesheet" id="font-awesome-css" href="../../wp-content/themes/vantage/fontawesome/css/font-awesome.css" type="text/css" media="all"><link rel="stylesheet" id="recent-posts-widget-with-thumbnails-public-style-css" href="../../wp-content/plugins/recent-posts-widget-with-thumbnails/public.css" type="text/css" media="all"><link rel="stylesheet" id="meks-author-widget-css" href="../../wp-content/plugins/meks-smart-author-widget/css/style.css" type="text/css" media="all"><link rel="stylesheet" id="dry_awp_theme_style-css" href="../../wp-content/plugins/advanced-wp-columns/assets/css/awp-columns.css" type="text/css" media="all"><style id="dry_awp_theme_style-inline-css" type="text/css">
+@media screen and (max-width: 1024px) {	.csColumn {		clear: both !important;		float: none !important;		text-align: center !important;		margin-left:  10% !important;		margin-right: 10% !important;		width: 80% !important;	}	.csColumnGap {		display: none !important;	}}
+</style><link rel="stylesheet" id="glossary-hint-css" href="../../wp-content/plugins/glossary-by-codeat/public/assets/css/tooltip-line.css" type="text/css" media="all"><link rel="stylesheet" id="social-logos-css" href="https://c0.wp.com/p/jetpack/6.9/_inc/social-logos/social-logos.min.css" type="text/css" media="all"><link rel="stylesheet" id="jetpack_css-css" href="https://c0.wp.com/p/jetpack/6.9/css/jetpack.css" type="text/css" media="all"><script type="text/javascript" src="https://c0.wp.com/c/5.0.3/wp-includes/js/jquery/jquery.js"></script><script type="text/javascript" src="https://c0.wp.com/c/5.0.3/wp-includes/js/jquery/jquery-migrate.min.js"></script><script type="text/javascript">
+/* <![CDATA[ */
+var thumbs_rating_ajax = {"ajax_url":"https:\/\/PLACEHOLDER.wpsho\/wp-admin\/admin-ajax.php","nonce":"f7de2898c0"};
+/* ]]> */
+</script><script type="text/javascript" src="../../wp-content/plugins/thumbs-rating/js/general.js"></script><link rel="dns-prefetch" href="//widgets.wp.com"><link rel="dns-prefetch" href="//s0.wp.com"><link rel="dns-prefetch" href="//0.gravatar.com"><link rel="dns-prefetch" href="//1.gravatar.com"><link rel="dns-prefetch" href="//2.gravatar.com"><link rel="dns-prefetch" href="//jetpack.wordpress.com"><link rel="dns-prefetch" href="//s1.wp.com"><link rel="dns-prefetch" href="//s2.wp.com"><link rel="dns-prefetch" href="//public-api.wordpress.com"><link rel="dns-prefetch" href="//i0.wp.com"><link rel="dns-prefetch" href="//i1.wp.com"><link rel="dns-prefetch" href="//i2.wp.com"><link rel="dns-prefetch" href="//c0.wp.com"><style type="text/css">img#wpstats{display:none}</style><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="We have now received some feedback and suggestions on this prototype. Here are some of them in italics together with our thoughts written in bold. Missing important features, most notably *being able to choose RCP scenario in the settings stage* right now if one plots individual models the figure gets WAY too crowded, because there…"><link rel="amphtml" href="../../2018/08/08/feedbacks-on-the-prototype/amp/index.html"><meta property="og:type" content="article"><meta property="og:title" content="Feedbacks on the prototype"><meta property="og:url" content="../../2018/08/08/feedbacks-on-the-prototype/index.html"><meta property="og:description" content="We have now received some feedback and suggestions on this prototype. Here are some of them in italics together with our thoughts written in bold. Missing important features, most notably *being ab…"><meta property="article:published_time" content="2018-08-08T10:49:50+00:00"><meta property="article:modified_time" content="2018-08-27T11:38:30+00:00"><meta property="og:site_name" content="Prototype"><meta property="og:image" content="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=512%2C512&ssl=1"><meta property="og:image:width" content="512"><meta property="og:image:height" content="512"><meta property="og:locale" content="en_US"><meta name="twitter:text:title" content="Feedbacks on the prototype"><meta name="twitter:image" content="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=240%2C240&ssl=1"><meta name="twitter:card" content="summary"><style type="text/css" media="screen">
+		#footer-widgets .widget { width: 100%; }
+		#masthead-widgets .widget { width: 100%; }
+	</style><style type="text/css" id="customizer-css">body,button,input,select,textarea { font-family: "Verdana", Verdana, Geneva, sans-serif; font-weight: 400 } #masthead h1 { font-family: "Verdana", Verdana, Geneva, sans-serif; font-weight: 400 } h1,h2,h3,h4,h5,h6 { font-family: "Verdana", Verdana, Geneva, sans-serif; font-weight: 400 } #masthead .hgroup h1, #masthead.masthead-logo-in-menu .logo > h1 { font-size: px } .entry-content { font-size: 14px } #masthead .hgroup { padding-top: 10px; padding-bottom: 10px } .entry-content a, .entry-content a:visited, article.post .author-box .box-content .author-posts a:hover, #secondary a, #secondary a:visited, #masthead .hgroup a, #masthead .hgroup a:visited, .comment-form .logged-in-as a, .comment-form .logged-in-as a:visited { color: #6d0624 } .entry-content a:hover, .entry-content a:focus, .entry-content a:active, #secondary a:hover, #masthead .hgroup a:hover, #masthead .hgroup a:focus, #masthead .hgroup a:active, .comment-form .logged-in-as a:hover, .comment-form .logged-in-as a:focus, .comment-form .logged-in-as a:active { color: #941333 } .main-navigation { background-color: #941333 } .main-navigation a { color: #ffffff } .main-navigation ul ul { background-color: #6d0d24 } .main-navigation ul ul a { color: #ffffff } .main-navigation ul li:hover > a, #search-icon #search-icon-icon:hover { background-color: #ac163b } .main-navigation ul ul li:hover > a { background-color: #ac163b } .main-navigation ul li a { padding-top: 10px; padding-bottom: 10px } .main-navigation ul li { font-size: 16px } #header-sidebar .widget_nav_menu ul.menu > li > ul.sub-menu { border-top-color: #6d0300 } a.button, button, html input[type="button"], input[type="reset"], input[type="submit"], .post-navigation a, #image-navigation a, article.post .more-link, article.page .more-link, .paging-navigation a, .woocommerce #page-wrapper .button, .woocommerce a.button, .woocommerce .checkout-button, .woocommerce input.button, #infinite-handle span button { text-shadow: none } a.button, button, html input[type="button"], input[type="reset"], input[type="submit"], .post-navigation a, #image-navigation a, article.post .more-link, article.page .more-link, .paging-navigation a, .woocommerce #page-wrapper .button, .woocommerce a.button, .woocommerce .checkout-button, .woocommerce input.button, .woocommerce #respond input#submit.alt, .woocommerce a.button.alt, .woocommerce button.button.alt, .woocommerce input.button.alt, #infinite-handle span { -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none } #masthead { background-color: #d6d6d6; background-image: url("http://example.com/wp-content/uploads/2018/03/proto_logo_2.png"); background-position: center; background-repeat: no-repeat } .entry-content img { -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.175); -moz-box-shadow: 0 1px 2px rgba(0,0,0,0.175); box-shadow: 0 1px 2px rgba(0,0,0,0.175) } #colophon { background-image: url("http://example.com/wp-content/uploads/2018/03/footer_logo_2.png"); background-position: center; background-repeat: no-repeat } </style><link rel="icon" href="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=32%2C32&ssl=1" sizes="32x32"><link rel="icon" href="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=192%2C192&ssl=1" sizes="192x192"><link rel="apple-touch-icon-precomposed" href="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=180%2C180&ssl=1"><meta name="msapplication-TileImage" content="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=270%2C270&ssl=1"><script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r;
+      i[r] = i[r] || function () {
+          (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date();
+      a = s.createElement(o),
+          m = s.getElementsByTagName(o)[0];
+      a.async = 1;
+      a.src = g;
+      m.parentNode.insertBefore(a, m)
+  })
+  (window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+  ga('create', 'UA-105333318-2', 'auto', {
+      'siteSpeedSampleRate': '1'   });
+    ga('set', 'anonymizeIp', true);
+    ga('send', 'pageview');
+  </script><style type="text/css" id="wp-custom-css">
+				p, ul, ol {font-size:18px;margin-bottom:10px !important;line-height: 1.5;}			</style><style type="text/css">/** Mega Menu CSS: fs **/</style></head><body class="post-template-default single single-post postid-2033 single-format-standard wp-custom-logo mega-menu-primary group-blog responsive layout-full no-js has-sidebar page-layout-default">
+
+
+<div id="page-wrapper">
+
+	
+	
+		<header id="masthead" class="site-header" role="banner"><div class="hgroup full-container ">
+
+		
+			<a href="../../index.html" title="Prototype" rel="home" class="logo"><img src="https://i1.wp.com/climatedatasite.net/wp-content/uploads/2018/02/ribbon.png?fit=51%2C174&ssl=1" class="logo-no-height-constrain" width="51" height="174" alt="Prototype Logo"></a>
+			
+				<div class="support-text">
+									</div>
+
+			
+		
+	</div>
+
+	
+<nav role="navigation" class="site-navigation primary use-sticky-menu mobile-navigation"><div class="full-container">
+				
+					<div id="mega-menu-wrap-primary" class="mega-menu-wrap"><div class="mega-menu-toggle" tabindex="0"><div class="mega-toggle-blocks-left"></div><div class="mega-toggle-blocks-center"></div><div class="mega-toggle-blocks-right"><div class="mega-toggle-block mega-menu-toggle-block mega-toggle-block-1" id="mega-toggle-block-1"><span class="mega-toggle-label"><span class="mega-toggle-label-closed">MENU</span><span class="mega-toggle-label-open">MENU</span></span></div></div></div><ul id="mega-menu-primary" class="mega-menu max-mega-menu mega-menu-horizontal mega-no-js" data-event="hover_intent" data-effect="fade_up" data-effect-speed="200" data-effect-mobile="disabled" data-effect-speed-mobile="200" data-mobile-force-width="false" data-second-click="close" data-document-click="collapse" data-vertical-behaviour="standard" data-breakpoint="600" data-unbind="true"><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-menu-item-home mega-align-bottom-left mega-menu-flyout mega-menu-item-1790" id="mega-menu-item-1790"><a class="mega-menu-link" href="../../index.html" tabindex="0">Home</a></li><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-align-bottom-left mega-menu-flyout mega-menu-item-1787" id="mega-menu-item-1787"><a class="mega-menu-link" href="../../demo-videos/index.html" tabindex="0">Demo videos</a></li><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-align-bottom-left mega-menu-flyout mega-menu-item-1788" id="mega-menu-item-1788"><a class="mega-menu-link" href="../../esdlab/index.html" tabindex="0">ESD lab</a></li><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-align-bottom-left mega-menu-flyout mega-menu-item-1789" id="mega-menu-item-1789"><a class="mega-menu-link" href="../../about/index.html" tabindex="0">About</a></li><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-current_page_parent mega-align-bottom-left mega-menu-flyout mega-menu-item-1826" id="mega-menu-item-1826"><a class="mega-menu-link" href="../../blog/index.html" tabindex="0">Blog</a></li></ul></div>			</div>
+</nav></header><div id="main" class="site-main">
+		<div class="full-container">
+			
+<div id="primary" class="content-area">
+	<div id="content" class="site-content" role="main">
+
+	
+		
+<article id="post-2033" class="post post-2033 type-post status-publish format-standard hentry category-uncategorized"><div class="entry-main">
+
+		
+					<header class="entry-header"><h1 class="entry-title">Feedbacks on the prototype</h1>
+				
+				
+			</header><div class="entry-content">
+			<p>We have now received some feedback and suggestions on this prototype. Here are some of them <em>in italics</em> together with our <strong>thoughts written in bold</strong>.</p>
+<ul><li><em>Missing important features, most notably *being able to choose <a href="../../glossary/rcp4-5/index.html">RCP</a> scenario in the <a href="../../glossary/settings-outputs/index.html">settings</a> stage* right now if one plots individual <a href="../../glossary/climate-models/index.html">models</a> the figure gets WAY too crowded, because there are too many <a href="../../glossary/climate-models/index.html">models</a> and scenarios. The only way to look at a specific scenario is by grouping and deselecting the undesired scenarios, which is a bit cumbersome and more difficult. <b>We could have added RCPs, but have not got this far yet. Also purpose of this prototype is to convey information about <a href="../../glossary/climate-models/index.html">models</a> and their quality (based on one example), and not to provide scenarios for the future. The purpose is to give a “crowded” first impression, but there are ways to “uncrowd” the figure, for instance by clicking on the legends or the <a href="../../glossary/metadata/index.html">metadata</a> table to select or deselect/hide individual or groups of <a href="../../glossary/climate-models/index.html">models</a>.  </b></em></li>
+<li><em>Too many <a href="../../glossary/climate-models/index.html">models</a> from the same institution –> introduces bias in the <a href="../../glossary/ensemble/index.html">ensemble</a> mean (NASA GISS gets 5 “votes” per scenario –> undemocratic <a href="../../glossary/ensemble/index.html">ensemble</a>) <b>These are different realisations and their differences reveal information about natural variability. Again, it is possible to hide some of the runs. One should not compare averages of <a href="../../glossary/ensemble/index.html">ensemble</a> members for one given model if the <a href="../../glossary/ensemble/index.html">ensemble</a> has different size to that of other <a href="../../glossary/ensemble/index.html">ensembles</a> or if compared with single model runs.  </b></em></li>
+<li><em>It would be useful to quickly see the most important <a href="../../glossary/metadata/index.html">metadata</a> when hovering over a <a href="../../glossary/simulation/index.html">simulation</a> in the legend, e.g. the resolution. <b>It’s in there and has already been implemented for the data users who have more options. You need to group the <a href="../../glossary/climate-models/index.html">models</a> by e.g. “Horizontal.resolution” and the information will then show up in the hoover.</b></em></li>
+<li><em>Is it possible to remove the window-within-a-window style of the page? Can the whole “page” be just the actual application frame? <strong>Yes, we are working on this, and the recent changes will soon be updated  on our server. </strong></em></li>
+<li><em>Will there be any other parameters besides temperature and precipitation? <strong>We could have added more variables, but since this is a prototype, we have limited the variables to the most commonly used ones for users of <a href="../../glossary/climate-models/index.html">climate</a> information. We may include wind in the future. </strong></em></li>
+<li><em>When you open the item 1 (i.e., the area selection), the zoom in/out buttons are overlapping with the text. Thanks! <strong>We will look into this.</strong></em></li>
+</ul><p>Rasmus (August 8, 2018)</p>
+<div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon-text sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul><li class="share-twitter"><a rel="nofollow noopener noreferrer" data-shared="sharing-twitter-2033" class="share-twitter sd-button share-icon" href="../../2018/08/08/feedbacks-on-the-prototype/index.html" target="_blank" title="Click to share on Twitter"><span>Twitter</span></a></li><li class="share-facebook"><a rel="nofollow noopener noreferrer" data-shared="sharing-facebook-2033" class="share-facebook sd-button share-icon" href="../../2018/08/08/feedbacks-on-the-prototype/index.html" target="_blank" title="Click to share on Facebook"><span>Facebook</span></a></li><li class="share-google-plus-1"><a rel="nofollow noopener noreferrer" data-shared="sharing-google-2033" class="share-google-plus-1 sd-button share-icon" href="../../2018/08/08/feedbacks-on-the-prototype/index.html" target="_blank" title="Click to share on Google+"><span>Google</span></a></li><li class="share-end"></ul></div></div></div><div class="sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded" id="like-post-wrapper-129599453-2033-5c5196c375ec8" data-src="https://widgets.wp.com/likes/#blog_id=129599453&post_id=2033&origin=climatedatasite.net&obj_id=129599453-2033-5c5196c375ec8" data-name="like-post-frame-129599453-2033-5c5196c375ec8"><h3 class="sd-title">Like this:</h3><div class="likes-widget-placeholder post-likes-widget-placeholder" style="height: 55px;"><span class="button"><span>Like</span></span> <span class="loading">Loading...</span></div><span class="sd-text-color"></span><a class="sd-link-color"></a></div>					</div>
+
+		
+		
+		
+	</div>
+
+</article><div id="comments" class="comments-area">
+
+	
+	
+	
+	
+		<div id="respond" class="comment-respond">
+							<h3 id="reply-title" class="comment-reply-title">Leave a Reply					<small><a rel="nofollow" id="cancel-comment-reply-link" href="/2018/08/08/feedbacks-on-the-prototype/#respond" style="display:none;">Cancel reply</a></small>
+				</h3>
+						<form id="commentform" class="comment-form">
+				<iframe title="Comment Form" src="https://jetpack.wordpress.com/jetpack-comment/?blogid=129599453&postid=2033&comment_registration=0&require_name_email=1&stc_enabled=1&stb_enabled=1&show_avatars=1&avatar_default=identicon&greeting=Leave+a+Reply&greeting_reply=Leave+a+Reply+to+%25s&color_scheme=light&lang=en_US&jetpack_version=6.9&show_cookie_consent=10&has_cookie_consent=0&sig=ee74c49bfed29c3d045635d22de6471ec257d9f6#parent=https%3A%2F%2Fclimatedatasite.net%2F2018%2F08%2F08%2Ffeedbacks-on-the-prototype%2F" style="width:100%; height: 430px; border:0;" name="jetpack_remote_comment" class="jetpack_remote_comment" id="jetpack_remote_comment" sandbox="allow-same-origin allow-top-navigation allow-scripts allow-forms allow-popups"></iframe>
+									
+					<script>
+						document.addEventListener('DOMContentLoaded', function () {
+							var commentForms = document.getElementsByClassName('jetpack_remote_comment');
+							for (var i = 0; i < commentForms.length; i++) {
+								commentForms[i].allowTransparency = false;
+								commentForms[i].scrolling = 'no';
+							}
+						});
+					</script></form>
+		</div>
+
+		
+		<input type="hidden" name="comment_parent" id="comment_parent" value=""><p class="akismet_comment_form_privacy_notice">This site uses Akismet to reduce spam. <a href="https://akismet.com/privacy/" target="_blank" rel="nofollow noopener">Learn how your comment data is processed</a>.</p>
+</div>
+		
+	
+	</div>
+</div>
+
+
+<div id="secondary" class="widget-area" role="complementary">
+		<aside id="jetpack_display_posts_widget-2" class="widget widget_jetpack_display_posts_widget"><h3 class="widget-title">Recent Posts: Prototype</h3><div class="jetpack-display-remote-posts"><h4><a href="../../2018/11/15/looking-beyond-our-prototype/index.html">Looking beyond our prototype </a></h4>
+<h4><a href="../../2018/10/26/new-look/index.html">Recent updates and new look !</a></h4>
+<h4><a href="../../2018/10/09/we-have-exceeded-1500-users/index.html">We have exceeded 1500 users !</a></h4>
+<h4><a href="../../2018/10/09/results-for-rcp8-5-gcms-will-be-added-soon/index.html">Results for RCP8.5/GCMs will be added soon</a></h4>
+<h4><a href="../../2018/09/27/presentation-of-data-evaluation-for-climate-models-decm-at-the-copernicus-climate-change-services-2nd-general-assembly/index.html">Presentation of  Data evaluation for climate models (DECM) at the Copernicus Climate Change Services 2nd general assembly </a></h4>
+<h4><a href="../../2018/08/27/congratulations-more-than-a-thousand-users-since-the-prototype-has-been-lunched/index.html">Congratulations ! More than a thousand users since the prototype has been launched in the beginning of 2018</a></h4>
+<h4><a href="../../2018/08/08/feedbacks-on-the-prototype/index.html">Feedbacks on the prototype</a></h4>
+<h4><a href="../../2018/06/26/three-oral-presentations-of-the-decm-prototype-at-ems-2018-in-budapest/index.html">Three oral presentations of the DECM prototype at EMS 2018 in Budapest</a></h4>
+<h4><a href="../../2018/06/12/european-regions-now-included/index.html">European regions now included !</a></h4>
+<h4><a href="../../2018/06/07/added-ip-anonymization-for-google-analytics/index.html">Added IP anonymization for google analytics</a></h4>
+</div></aside><aside id="calendar-3" class="widget widget_calendar"><h3 class="widget-title">News calendar</h3><div id="calendar_wrap" class="calendar_wrap"><table id="wp-calendar"><caption>August 2018</caption>
+	<thead><tr><th scope="col" title="Monday">M</th>
+		<th scope="col" title="Tuesday">T</th>
+		<th scope="col" title="Wednesday">W</th>
+		<th scope="col" title="Thursday">T</th>
+		<th scope="col" title="Friday">F</th>
+		<th scope="col" title="Saturday">S</th>
+		<th scope="col" title="Sunday">S</th>
+	</tr></thead><tfoot><tr><td colspan="3" id="prev"><a href="../../2018/06/index.html">« Jun</a></td>
+		<td class="pad"> </td>
+		<td colspan="3" id="next"><a href="../../2018/09/index.html">Sep »</a></td>
+	</tr></tfoot><tbody><tr><td colspan="2" class="pad"> </td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
+	</tr><tr><td>6</td><td>7</td><td><a href="../../2018/08/08/index.html" aria-label="Posts published on August 8, 2018">8</a></td><td>9</td><td>10</td><td>11</td><td>12</td>
+	</tr><tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td>
+	</tr><tr><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td>
+	</tr><tr><td><a href="../../2018/08/27/index.html" aria-label="Posts published on August 27, 2018">27</a></td><td>28</td><td>29</td><td>30</td><td>31</td>
+		<td class="pad" colspan="2"> </td>
+	</tr></tbody></table></div></aside></div>
+
+					</div>
+	</div>
+
+	
+	
+	<footer id="colophon" class="site-footer vertical-footer" role="contentinfo"><div id="footer-widgets" class="full-container">
+					</div>
+	
+			<div id="site-info">
+			<br><br><br><br><br><br><br><br><p> This service is a part of Copernicus Climate Change Service (C3S)<br> All data and tools are available according to the Framework Agreement for Copernicus services<br></p>		</div>
+	
+	<div id="theme-attribution">A <a href="https://siteorigin.com">SiteOrigin</a> Theme</div>
+</footer></div>
+
+
+
+
+	<script>
+		jQuery(document).ready(function() {
+
+			// Get all thumbs containers
+			jQuery( ".thumbs-rating-container" ).each(function( index ) {
+
+			 	// Get data attribute
+			 	 var content_id = jQuery(this).data('content-id');
+
+			 	 var itemName = "thumbsrating"+content_id;
+
+			 	      // Check if this content has localstorage
+			 	 	if (localStorage.getItem(itemName)){
+
+						// Check if it's Up or Down vote
+						if ( localStorage.getItem("thumbsrating" + content_id + "-1") ){
+							jQuery(this).find('.thumbs-rating-up').addClass('thumbs-rating-voted');
+						}
+						if ( localStorage.getItem("thumbsrating" + content_id + "-0") ){
+							jQuery(this).find('.thumbs-rating-down').addClass('thumbs-rating-voted');
+						}
+					}
+			});
+		});
+	</script><a href="#" id="scroll-to-top" class="" title="Back To Top"><span class="vantage-icon-arrow-up"></span></a>
+	<script type="text/javascript">
+		window.WPCOM_sharing_counts = {"https:\/\/PLACEHOLDER.wpsho\/2018\/08\/08\/feedbacks-on-the-prototype\/":2033};
+	</script><script type="text/javascript" src="https://c0.wp.com/p/jetpack/6.9/_inc/build/photon/photon.min.js"></script><script type="text/javascript" src="https://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201905"></script><script type="text/javascript" src="../../wp-content/themes/vantage/js/jquery.flexslider.min.js"></script><script type="text/javascript" src="../../wp-content/themes/vantage/js/jquery.touchSwipe.min.js"></script><script type="text/javascript" src="../../wp-content/themes/vantage/js/jquery.theme-main.min.js"></script><script type="text/javascript" src="https://c0.wp.com/c/5.0.3/wp-includes/js/hoverIntent.min.js"></script><script type="text/javascript">
+/* <![CDATA[ */
+var megamenu = {"timeout":"300","interval":"100"};
+/* ]]> */
+</script><script type="text/javascript" src="../../wp-content/plugins/megamenu/js/maxmegamenu.js"></script><script type="text/javascript" src="https://c0.wp.com/p/jetpack/6.9/_inc/build/postmessage.min.js"></script><script type="text/javascript" src="https://c0.wp.com/p/jetpack/6.9/_inc/build/jquery.jetpack-resize.min.js"></script><script type="text/javascript" src="https://c0.wp.com/p/jetpack/6.9/_inc/build/likes/queuehandler.min.js"></script><script async="async" type="text/javascript" src="../../wp-content/plugins/akismet/_inc/form.js"></script><script type="text/javascript">
+/* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1","is_stats_active":"1"};
+/* ]]> */
+</script><script type="text/javascript" src="https://c0.wp.com/p/jetpack/6.9/_inc/build/sharedaddy/sharing.min.js"></script><script type="text/javascript">
+var windowOpen;
+			jQuery( document.body ).on( 'click', 'a.share-twitter', function() {
+				// If there's another sharing window open, close it.
+				if ( 'undefined' !== typeof windowOpen ) {
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery( this ).attr( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+				return false;
+			});
+var windowOpen;
+			jQuery( document.body ).on( 'click', 'a.share-facebook', function() {
+				// If there's another sharing window open, close it.
+				if ( 'undefined' !== typeof windowOpen ) {
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery( this ).attr( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+				return false;
+			});
+var windowOpen;
+			jQuery( document.body ).on( 'click', 'a.share-google-plus-1', function() {
+				// If there's another sharing window open, close it.
+				if ( 'undefined' !== typeof windowOpen ) {
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery( this ).attr( 'href' ), 'wpcomgoogle-plus-1', 'menubar=1,resizable=1,width=480,height=550' );
+				return false;
+			});
+</script><iframe src="https://widgets.wp.com/likes/master.html?ver=201905#ver=201905" scrolling="no" id="likes-master" name="likes-master" style="display:none;"></iframe>
+	<div id="likes-other-gravatars"><div class="likes-text"><span>%d</span> bloggers like this:</div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
+	
+		
+		<script type="text/javascript">
+			(function () {
+				var comm_par_el = document.getElementById( 'comment_parent' ),
+					comm_par = ( comm_par_el && comm_par_el.value ) ? comm_par_el.value : '',
+					frame = document.getElementById( 'jetpack_remote_comment' ),
+					tellFrameNewParent;
+
+				tellFrameNewParent = function () {
+					if ( comm_par ) {
+						frame.src = "https://jetpack.wordpress.com/jetpack-comment/?blogid=129599453&postid=2033&comment_registration=0&require_name_email=1&stc_enabled=1&stb_enabled=1&show_avatars=1&avatar_default=identicon&greeting=Leave+a+Reply&greeting_reply=Leave+a+Reply+to+%25s&color_scheme=light&lang=en_US&jetpack_version=6.9&show_cookie_consent=10&has_cookie_consent=0&sig=ee74c49bfed29c3d045635d22de6471ec257d9f6#parent=https%3A%2F%2Fclimatedatasite.net%2F2018%2F08%2F08%2Ffeedbacks-on-the-prototype%2F" + '&replytocom=' + parseInt( comm_par, 10 ).toString();
+					} else {
+						frame.src = "https://jetpack.wordpress.com/jetpack-comment/?blogid=129599453&postid=2033&comment_registration=0&require_name_email=1&stc_enabled=1&stb_enabled=1&show_avatars=1&avatar_default=identicon&greeting=Leave+a+Reply&greeting_reply=Leave+a+Reply+to+%25s&color_scheme=light&lang=en_US&jetpack_version=6.9&show_cookie_consent=10&has_cookie_consent=0&sig=ee74c49bfed29c3d045635d22de6471ec257d9f6#parent=https%3A%2F%2Fclimatedatasite.net%2F2018%2F08%2F08%2Ffeedbacks-on-the-prototype%2F";
+					}
+				};
+
+				
+				if ( 'undefined' !== typeof addComment ) {
+					addComment._Jetpack_moveForm = addComment.moveForm;
+
+					addComment.moveForm = function ( commId, parentId, respondId, postId ) {
+						var returnValue = addComment._Jetpack_moveForm( commId, parentId, respondId, postId ),
+							cancelClick, cancel;
+
+						if ( false === returnValue ) {
+							cancel = document.getElementById( 'cancel-comment-reply-link' );
+							cancelClick = cancel.onclick;
+							cancel.onclick = function () {
+								var cancelReturn = cancelClick.call( this );
+								if ( false !== cancelReturn ) {
+									return cancelReturn;
+								}
+
+								if ( ! comm_par ) {
+									return cancelReturn;
+								}
+
+								comm_par = 0;
+
+								tellFrameNewParent();
+
+								return cancelReturn;
+							};
+						}
+
+						if ( comm_par == parentId ) {
+							return returnValue;
+						}
+
+						comm_par = parentId;
+
+						tellFrameNewParent();
+
+						return returnValue;
+					};
+				}
+
+				
+				// Do the post message bit after the dom has loaded.
+				document.addEventListener( 'DOMContentLoaded', function () {
+					var iframe_url = "https:\/\/jetpack.wordpress.com";
+					if ( window.postMessage ) {
+						if ( document.addEventListener ) {
+							window.addEventListener( 'message', function ( event ) {
+								var origin = event.origin.replace( /^http:\/\//i, 'https://' );
+								if ( iframe_url.replace( /^http:\/\//i, 'https://' ) !== origin ) {
+									return;
+								}
+								jQuery( frame ).height( event.data );
+							});
+						} else if ( document.attachEvent ) {
+							window.attachEvent( 'message', function ( event ) {
+								var origin = event.origin.replace( /^http:\/\//i, 'https://' );
+								if ( iframe_url.replace( /^http:\/\//i, 'https://' ) !== origin ) {
+									return;
+								}
+								jQuery( frame ).height( event.data );
+							});
+						}
+					}
+				})
+
+			})();
+		</script><script type="text/javascript" src="https://stats.wp.com/e-201905.js" async="async" defer></script><script type="text/javascript">
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:6.9',blog:'129599453',post:'2033',tz:'0',srv:'climatedatasite.net'} ]);
+	_stq.push([ 'clickTrackerInit', '129599453', '2033' ]);
+</script></body></html>

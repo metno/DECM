@@ -239,7 +239,6 @@ gcm.pr$rcp45 <- gcm.meta('pr','RCP45')
 gcm.pr$rcp85 <- gcm.meta('pr','RCP85')
 
 gcm.com.var <- function(gcm.tas,gcm.pr) {
-  
   # Common meta data for all variables
   modelrip.tas <- paste(gcm.tas$institute_id,gcm.tas$model_id,gcm.tas$parent_experiment_rip,gcm.tas$realization)
   modelrip.pr <- paste(gcm.pr$institute_id,gcm.pr$model_id,gcm.pr$parent_experiment_rip,gcm.pr$realization)

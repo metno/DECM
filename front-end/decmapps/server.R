@@ -1270,7 +1270,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.region, input$gcm.period,input$rcp,
+                                text=paste(input$gcm.region, input$gcm.period,input$gcm.rcp,
                                            input$gcm.chart.type,
                                            input$gcm.stat,sep=' | '),
                                 showarrow=F,

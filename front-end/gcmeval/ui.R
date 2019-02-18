@@ -22,18 +22,18 @@ dashboardPage(
     extendShinyjs(text = jsresetclick, functions = c("resetClick")),
     extendShinyjs(text = jsrefocus, functions = "refocus"),
     fluidRow(
-      column(
-        12,
-        box(
-          collapsible = FALSE,
-          collapsed = FALSE,
-          width = '100%',
-          a(
-            href = 'https://climate.copernicus.eu/data-evaluation-climate-models',
-          tags$img(src = "banner_c3s.png", width = "100%")
-          )
-        )
-      ),
+      #column(
+      #  12,
+      #  box(
+      #    collapsible = FALSE,
+      #    collapsed = FALSE,
+      #    width = '100%',
+      #    a(
+      #      href = 'https://climate.copernicus.eu/data-evaluation-climate-models',
+      #    tags$img(src = "banner_c3s.png", width = "100%")
+      #    )
+      #  )
+      #),
       column(
         12,
         box(label="info",
@@ -43,15 +43,13 @@ dashboardPage(
             collapsed = FALSE,
             width="100%",
             htmlOutput("IntroText"),
-            #actionLink("link_to_selection", "Go to ensemble selection"),
-            #br(),
             htmlOutput("DisclaimerText")
         )
       ),
       column(
         3,
         box(label="select",
-          title = "Ensemble selection",
+          #title = "Ensemble selection",
           width = '100%',
           status = "primary",
           collapsible=FALSE,#TRUE,
@@ -99,7 +97,7 @@ dashboardPage(
         12,
         box(
           label="skill",
-          title = h3('Model skill evaluation'),
+          title = HTML("<font size=+1.5 color='black'><b>Model skill evaluation</b></font>"),
           width = '100%' ,
           status = 'primary',
           collapsible = TRUE,
@@ -113,7 +111,7 @@ dashboardPage(
           column(
             12,
             box(
-              title = "Settings",
+              title = HTML("<font size=+0.5 color='black'>Settings</font>"),
               width = "100%",
               status = "primary",
               collapsible = TRUE,
@@ -160,32 +158,6 @@ dashboardPage(
                   selected = 1
                 ))
               ),
-              #column(
-              #  12,
-              #  helpText("How important are the different emission scenarios?"),
-              #  flowLayout(
-              #    selectInput(
-              #      "wrcp45",
-              #      label = "RCP 4.5",
-              #      choices = c(
-              #        "Not important (0)" = 0,
-              #        "Important (1)" = 1,
-              #        "Very important (2)" = 2
-              #      ),
-              #      selected = 1
-              #    ),
-              #    selectInput(
-              #      "wrcp85",
-              #      label = "RCP 8.5",
-              #      choices = c(
-              #        "Not important (0)" = 0,
-              #        "Important (1)" = 1,
-              #        "Very important (2)" = 2
-              #      ),
-              #      selected = 1
-              #    )
-              #  )
-              #),
               column(
                 12,
                 helpText("How important is the performance of the single variables?"),
@@ -338,7 +310,7 @@ dashboardPage(
       12,
       box(
         label="spread",
-        title = "Spread of the regional mean climate change",
+        title = HTML("<font size=+1.5 color='black'><b>Spread of the regional mean climate change</b></font>"),
         status = 'primary',
         width = '100%',
         collapsible = TRUE,
@@ -350,7 +322,7 @@ dashboardPage(
                       br()
                ),
                column(12,
-                      box(title="Settings", 
+                      box(title=HTML("<font size=+0.5 color='black'>Settings</font>"), 
                           width = '100%',
                           status = 'primary',
                           collapsible = TRUE,
@@ -416,7 +388,7 @@ dashboardPage(
     column(
       12,
       box(
-        title = h3('Info'),
+        title = HTML('<font size=+1.5 color=black>Info</font>'),
         width = '100%' ,
         status = 'primary',
         collapsible = TRUE,

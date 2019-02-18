@@ -1,6 +1,8 @@
 ## Load libraries and define functions: 
 source("global.R")
 
+## Add after scatterplot: ensemble mean change in temperature and precipitation
+
 ## Define a server for the Shiny app
 shinyServer(function(input, output, session) {
 
@@ -50,12 +52,6 @@ shinyServer(function(input, output, session) {
                              "near future (2021-2050)"='nf')})
 
   ## Weighted rank calculations
-  #tasRanksRcp45 <- reactive({ranking.all(stats=stats.both$rcp45,varid="tas",Regions=Regionlist())})
-  #prRanksRcp45 <- reactive({ranking.all(stats=stats.both$rcp45,varid="pr",Regions=Regionlist())})
-  #tasRanksRcp85 <- reactive({ranking.all(stats=stats.both$rcp85,varid="tas",Regions=Regionlist())})
-  #prRanksRcp85 <- reactive({ranking.all(stats=stats.both$rcp85,varid="pr",Regions=Regionlist())})
-  #tasRanks <- reactive({as.numeric(input$wrcp45)*tasRanksRcp45()+as.numeric(input$wrcp85)*tasRanksRcp85()})
-  #prRanks <- reactive({as.numeric(input$wrcp45)*prRanksRcp45()+as.numeric(input$wrcp85)*prRanksRcp85()})
   tasRanks <- reactive({ranking.all(stats=stats(),varid="tas",Regions=Regionlist())})
   prRanks <- reactive({ranking.all(stats=stats(),varid="pr",Regions=Regionlist())})
 
@@ -326,29 +322,27 @@ shinyServer(function(input, output, session) {
     })
     
     sz <- reactive({
-      x <- rep(8, length(gcmnames))
+      x <- rep(7, length(gcmnames))
       x[im()] <- 10
       return(x)
     })
     
-    emphasize.data <- reactive({
-      data.frame(x=dtas()[im()],y=dpr()[im()])
-    })
-    
-    emphasize.marker <- reactive({
-      list(color=clr()[im()],size=sz()[im()],
-           line=list(clr.line()[im()], width=2))
-    })
-    
     p <- plot_ly(data.frame(x=dtas(),y=dpr()), x=~x, y=~y, type="scatter", mode="markers",
-            marker=list(color=clr(), size=sz(), line=list(color=clr.line(), width=2)),
-            text=paste(gcmnames,"\nWeighted rank:",weightedrank_all()), source="A") %>%
+            marker=list(color=clr(), size=sz(), line=list(color=clr.line(), width=1.2)),
+            text=paste(gcmnames,"\nWeighted rank:",weightedrank_all()), source="A",
+            name="Selected GCMs") %>%
+    add_trace(x=mean(dtas()), y=mean(dpr()), name="mean of all",
+              marker=list(symbol="star", color='yellow', size=7, 
+                          line=list(color='black', width=1))) %>%
+    add_trace(x=mean(dtas()[im()]), y=mean(dpr()[im()]), 
+              name="mean of selection",
+              marker=list(symbol='star', color='red', size=7,
+                          line=list(color='black', width=1))) %>%
     layout(p, title=paste("Present day (1981-2010) to",tolower(input$period)),
            xaxis=list(title="Temperature change (deg C)",range=c(-5,5)),
-           yaxis=list(title="Precipitation change (mm/day)",range=c(-1,1))) %>%
-    add_trace(emphasize.data(), x=~x, y=~y, marker=emphasize.marker(),
-              showlegend=FALSE)
-    
+           yaxis=list(title="Precipitation change (mm/day)",range=c(-1,1)),
+           showlegend=TRUE, 
+           legend=list(orientation="h",  xanchor="left", x = 0.1, y=-0.2, sz=1))
   })
 
   output$clickevent <- renderPrint({

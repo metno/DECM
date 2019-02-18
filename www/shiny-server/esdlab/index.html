@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en-US"><head><link href='https://fonts.googleapis.com/css?family=Karla' rel='stylesheet'><meta charset="UTF-8"> <meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=10"><title>DECM lab – Prototype</title><script type="text/javascript">
+  WebFontConfig = {"google":{"families":["Ubuntu:500:latin,latin-ext","Ubuntu:r,i,b,bi:latin,latin-ext"]}};
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = 'http://example.com/wp-content/mu-plugins/wpcomsh/vendor/automattic/custom-fonts/js/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+	})();
+</script><style id="jetpack-custom-fonts-css"></style><link rel="dns-prefetch" href="//s0.wp.com"><link rel="dns-prefetch" href="//s.w.org"><link rel="stylesheet" id="usrStyle-css" href="../wp-content/plugins/universal-star-rating/css/style.css" type="text/css" media="all"><link rel="stylesheet" id="wp-block-library-css" href="https://c0.wp.com/c/5.0.3/wp-includes/css/dist/block-library/style.min.css" type="text/css" media="all"><link rel="stylesheet" id="jetpack-email-subscribe-css" href="https://c0.wp.com/p/jetpack/6.9/modules/shortcodes/css/jetpack-email-subscribe.css" type="text/css" media="all"><link rel="stylesheet" id="wpcom-text-widget-styles-css" href="../wp-content/mu-plugins/wpcomsh/vendor/automattic/text-media-widget-styles/css/widget-text.css" type="text/css" media="all"><link rel="stylesheet" id="thumbs_rating_styles-css" href="../wp-content/plugins/thumbs-rating/css/style.css" type="text/css" media="all"><link rel="stylesheet" id="megamenu-css" href="../wp-content/uploads/maxmegamenu/style.css" type="text/css" media="all"><link rel="stylesheet" id="dashicons-css" href="https://c0.wp.com/c/5.0.3/wp-includes/css/dashicons.min.css" type="text/css" media="all"><link rel="stylesheet" id="vantage-style-css" href="../wp-content/themes/vantage/style.css" type="text/css" media="all"><link rel="stylesheet" id="font-awesome-css" href="../wp-content/themes/vantage/fontawesome/css/font-awesome.css" type="text/css" media="all"><link rel="stylesheet" id="recent-posts-widget-with-thumbnails-public-style-css" href="../wp-content/plugins/recent-posts-widget-with-thumbnails/public.css" type="text/css" media="all"><link rel="stylesheet" id="meks-author-widget-css" href="../wp-content/plugins/meks-smart-author-widget/css/style.css" type="text/css" media="all"><link rel="stylesheet" id="dry_awp_theme_style-css" href="../wp-content/plugins/advanced-wp-columns/assets/css/awp-columns.css" type="text/css" media="all"><style id="dry_awp_theme_style-inline-css" type="text/css">
+@media screen and (max-width: 1024px) {	.csColumn {		clear: both !important;		float: none !important;		text-align: center !important;		margin-left:  10% !important;		margin-right: 10% !important;		width: 80% !important;	}	.csColumnGap {		display: none !important;	}}
+</style><link rel="stylesheet" id="glossary-hint-css" href="../wp-content/plugins/glossary-by-codeat/public/assets/css/tooltip-line.css" type="text/css" media="all"><link rel="stylesheet" id="social-logos-css" href="https://c0.wp.com/p/jetpack/6.9/_inc/social-logos/social-logos.min.css" type="text/css" media="all"><link rel="stylesheet" id="jetpack_css-css" href="https://c0.wp.com/p/jetpack/6.9/css/jetpack.css" type="text/css" media="all"><script type="text/javascript" src="https://c0.wp.com/c/5.0.3/wp-includes/js/jquery/jquery.js"></script><script type="text/javascript" src="https://c0.wp.com/c/5.0.3/wp-includes/js/jquery/jquery-migrate.min.js"></script><script type="text/javascript">
+/* <![CDATA[ */
+var thumbs_rating_ajax = {"ajax_url":"https:\/\/PLACEHOLDER.wpsho\/wp-admin\/admin-ajax.php","nonce":"f7de2898c0"};
+/* ]]> */
+</script><script type="text/javascript" src="../wp-content/plugins/thumbs-rating/js/general.js"></script><link rel="dns-prefetch" href="//widgets.wp.com"><link rel="dns-prefetch" href="//s0.wp.com"><link rel="dns-prefetch" href="//0.gravatar.com"><link rel="dns-prefetch" href="//1.gravatar.com"><link rel="dns-prefetch" href="//2.gravatar.com"><link rel="dns-prefetch" href="//jetpack.wordpress.com"><link rel="dns-prefetch" href="//s1.wp.com"><link rel="dns-prefetch" href="//s2.wp.com"><link rel="dns-prefetch" href="//public-api.wordpress.com"><link rel="dns-prefetch" href="//i0.wp.com"><link rel="dns-prefetch" href="//i1.wp.com"><link rel="dns-prefetch" href="//i2.wp.com"><link rel="dns-prefetch" href="//c0.wp.com"><style type="text/css">img#wpstats{display:none}</style><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="I know what I need of climate data"><meta property="og:type" content="article"><meta property="og:title" content="DECM lab"><meta property="og:url" content="../esdlab/index.html"><meta property="og:description" content="I know what I need of climate data"><meta property="article:published_time" content="2017-05-24T08:24:18+00:00"><meta property="article:modified_time" content="2018-06-26T13:04:45+00:00"><meta property="og:site_name" content="Prototype"><meta property="og:image" content="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=512%2C512&ssl=1"><meta property="og:image:width" content="512"><meta property="og:image:height" content="512"><meta property="og:locale" content="en_US"><meta name="twitter:text:title" content="DECM lab"><meta name="twitter:image" content="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=240%2C240&ssl=1"><meta name="twitter:card" content="summary"><style type="text/css" media="screen">
+		#footer-widgets .widget { width: 100%; }
+		#masthead-widgets .widget { width: 100%; }
+	</style><style type="text/css" id="customizer-css">body,button,input,select,textarea { font-family: "Karla", Verdana, Geneva, sans-serif; font-weight: 400 } #masthead h1 { font-family: "Karla", Verdana, Geneva, sans-serif; font-weight: 400 } h1,h2,h3,h4,h5,h6 { font-family: "Karla", Verdana, Geneva, sans-serif; font-weight: 400 } #masthead .hgroup h1, #masthead.masthead-logo-in-menu .logo > h1 { font-size: px } .entry-content { font-size: 14px } #masthead .hgroup { padding-top: 10px; padding-bottom: 10px } .entry-content a, .entry-content a:visited, article.post .author-box .box-content .author-posts a:hover, #secondary a, #secondary a:visited, #masthead .hgroup a, #masthead .hgroup a:visited, .comment-form .logged-in-as a, .comment-form .logged-in-as a:visited { color: #6d0624 } .entry-content a:hover, .entry-content a:focus, .entry-content a:active, #secondary a:hover, #masthead .hgroup a:hover, #masthead .hgroup a:focus, #masthead .hgroup a:active, .comment-form .logged-in-as a:hover, .comment-form .logged-in-as a:focus, .comment-form .logged-in-as a:active { color: #941333 } .main-navigation { background-color: #941333 } .main-navigation a { color: #ffffff } .main-navigation ul ul { background-color: #6d0d24 } .main-navigation ul ul a { color: #ffffff } .main-navigation ul li:hover > a, #search-icon #search-icon-icon:hover { background-color: #ac163b } .main-navigation ul ul li:hover > a { background-color: #ac163b } .main-navigation ul li a { padding-top: 10px; padding-bottom: 10px } .main-navigation ul li { font-size: 16px } #header-sidebar .widget_nav_menu ul.menu > li > ul.sub-menu { border-top-color: #6d0300 } a.button, button, html input[type="button"], input[type="reset"], input[type="submit"], .post-navigation a, #image-navigation a, article.post .more-link, article.page .more-link, .paging-navigation a, .woocommerce #page-wrapper .button, .woocommerce a.button, .woocommerce .checkout-button, .woocommerce input.button, #infinite-handle span button { text-shadow: none } a.button, button, html input[type="button"], input[type="reset"], input[type="submit"], .post-navigation a, #image-navigation a, article.post .more-link, article.page .more-link, .paging-navigation a, .woocommerce #page-wrapper .button, .woocommerce a.button, .woocommerce .checkout-button, .woocommerce input.button, .woocommerce #respond input#submit.alt, .woocommerce a.button.alt, .woocommerce button.button.alt, .woocommerce input.button.alt, #infinite-handle span { -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none } #masthead { background-color: #d6d6d6; background-image: url("http://example.com/wp-content/uploads/2018/03/proto_logo_2.png"); background-position: center; background-repeat: no-repeat } .entry-content img { -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.175); -moz-box-shadow: 0 1px 2px rgba(0,0,0,0.175); box-shadow: 0 1px 2px rgba(0,0,0,0.175) } #colophon { background-image: url("http://example.com/wp-content/uploads/2018/03/footer_logo_2.png"); background-position: center; background-repeat: no-repeat } </style><link rel="icon" href="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=32%2C32&ssl=1" sizes="32x32"><link rel="icon" href="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=192%2C192&ssl=1" sizes="192x192"><link rel="apple-touch-icon-precomposed" href="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=180%2C180&ssl=1"><meta name="msapplication-TileImage" content="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=270%2C270&ssl=1"><script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r;
+      i[r] = i[r] || function () {
+          (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date();
+      a = s.createElement(o),
+          m = s.getElementsByTagName(o)[0];
+      a.async = 1;
+      a.src = g;
+      m.parentNode.insertBefore(a, m)
+  })
+  (window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+  ga('create', 'UA-105333318-2', 'auto', {
+      'siteSpeedSampleRate': '1'   });
+    ga('set', 'anonymizeIp', true);
+    ga('send', 'pageview');
+  </script><style type="text/css" id="wp-custom-css">
+				p, ul, ol {color:rgb(56,56,56);font-size:20px;margin-bottom:10px !important;line-height: 1.5;}			</style><style type="text/css">/** Mega Menu CSS: fs **/</style></head><body class="page-template page-template-home-panels page-template-home-panels-php page page-id-5 wp-custom-logo mega-menu-primary group-blog responsive layout-full no-js has-sidebar page-layout-full-width-sidebar not-default-page">
+
+
+<div id="page-wrapper">
+
+	
+	
+		<header id="masthead" class="site-header" role="banner"><div class="hgroup full-container ">
+
+		
+			<a href="../index.html" title="Prototype" rel="home" class="logo"><img src="https://i1.wp.com/climatedatasite.net/wp-content/uploads/2018/02/ribbon.png?fit=51%2C174&ssl=1" class="logo-no-height-constrain" width="51" height="174" alt="Prototype Logo"></a>
+			
+				<div class="support-text">
+									</div>
+
+			
+		
+	</div>
+
+	
+<nav role="navigation" class="site-navigation primary use-sticky-menu mobile-navigation"><div class="full-container">
+				
+					<div id="mega-menu-wrap-primary" class="mega-menu-wrap"><div class="mega-menu-toggle" tabindex="0"><div class="mega-toggle-blocks-left"></div><div class="mega-toggle-blocks-center"></div><div class="mega-toggle-blocks-right"><div class="mega-toggle-block mega-menu-toggle-block mega-toggle-block-1" id="mega-toggle-block-1"><span class="mega-toggle-label"><span class="mega-toggle-label-closed">MENU</span><span class="mega-toggle-label-open">MENU</span></span></div></div></div><ul id="mega-menu-primary" class="mega-menu max-mega-menu mega-menu-horizontal mega-no-js" data-event="hover_intent" data-effect="fade_up" data-effect-speed="200" data-effect-mobile="disabled" data-effect-speed-mobile="200" data-mobile-force-width="false" data-second-click="close" data-document-click="collapse" data-vertical-behaviour="standard" data-breakpoint="600" data-unbind="true"><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-menu-item-home mega-align-bottom-left mega-menu-flyout mega-menu-item-1790" id="mega-menu-item-1790"><a class="mega-menu-link" href="../index.html" tabindex="0">Home</a></li><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-align-bottom-left mega-menu-flyout mega-menu-item-1787" id="mega-menu-item-1787"><a class="mega-menu-link" href="../demo-videos/index.html" tabindex="0">Demo videos</a></li><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-current-menu-item mega-page_item mega-page-item-5 mega-current_page_item mega-align-bottom-left mega-menu-flyout mega-menu-item-1788" id="mega-menu-item-1788"><a class="mega-menu-link" href="../esdlab/index.html" tabindex="0">DECM lab</a></li><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-align-bottom-left mega-menu-flyout mega-menu-item-1789" id="mega-menu-item-1789"><a class="mega-menu-link" href="../about/index.html" tabindex="0">About</a></li><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-align-bottom-left mega-menu-flyout mega-menu-item-1826" id="mega-menu-item-1826"><a class="mega-menu-link" href="../blog/index.html" tabindex="0">Blog</a></li></ul></div>			</div>
+</nav></header><div id="main" class="site-main">
+		<div class="full-container">
+			
+<div id="primary" class="content-area">
+	<div id="content" class="site-content" role="main">
+		<div class="entry-content">
+			<h4>What is the ‘DECM Lab’?</h4>
+<p>The DECM lab is a web platform that contains tools (i.e. mainly web applications) developed and maintained by few climate researchers at the <a href="https://www.met.no/">Norwegian Meteorological Institute</a> (Norway). The main objective of this Lab is to build a prototype tool within the Data Evaluation of Climate Models C3S project. The applications provide users with web interfaces to allow them visualizing, exploring, and analyzing climate model data and outputs. These tools are built as <a href="https://shiny.rstudio.com/">Rshiny apps</a> and are running on the Climate Data Store <a href="./decmlab.html">Shiny Server</a>. The applications uses the <a href="https://github.com/metno/esd/wiki">‘ESD R package’</a> as a back-end engine to process and summarize <a href="../glossary/climate-models/index.html">climate model</a> outputs.</p>
+<p>This platform and the following web applications have been developed and maintained by :</p>
+<ul><li>Rasmus Benestad (rasmusb@met.no)</li>
+<li>Abdelkader Mezghani (abdelkaderm@met.no)</li>
+<li>Kajsa M. Parding (kajsamp@met.no)</li>
+<li>Andreas Dobler (andreasd@met.no)</li>
+<li>Helene B. Erlandsen (helenebe@met.no )</li>
+</ul><hr><h4>We offer various R Shiny web applications</h4>
+<p>Currently available apps are</p>
+<ul><li style="text-align: left;">An example of <a href="https://esdlab.met.no/nordicatlas">distillation of climate information</a> from large <a href="../glossary/ensemble/index.html">ensembles</a> for the Nordic countries.</li>
+<li style="text-align: left;">An application for <a href="https://esdlab.met.no/gcmeval">evaluation of CMIP5 climate model simulations</a> with several performance statistics, weighted rankings, <a href="../glossary/climate-models/index.html">climate</a> change ranges and visual representations of the model <a href="../glossary/ensemble/index.html">ensemble</a>.</li>
+<li style="text-align: left;">The <a href="https://esdlab.met.no/modelexplorer/">climate model explorer</a> which let’s you sort through data available from the KNMI <a href="../glossary/climate-models/index.html">climate</a> data explorer and produce simple plots and maps of <a href="../glossary/climate-models/index.html">climate</a> change.</li>
+<li style="text-align: left;">A <a href="https://esdlab.met.no/taylordiagram">Taylor diagram app</a> for evaluation of a set of RCMs comparing spatial correlations and standard deviations to a reference dataset.</li>
+<li style="text-align: left;">The <a href="https://esdlab.met.no/dpdt">dP vs dT app</a> showing the regionally averaged projected changes in precipitation and temperature for <a href="../glossary/cmip5/index.html">CMIP5</a> <a href="../glossary/climate-models/index.html">models</a>. This tool can be used for selecting a smaller but representative <a href="../glossary/ensemble/index.html">ensemble</a> of GCMs out of a large <a href="../glossary/ensemble/index.html">ensemble</a>. The chosen <a href="../glossary/climate-models/index.html">models</a> should cover the full range of projected <a href="../glossary/climate-models/index.html">climate</a> change of all the available <a href="../glossary/climate-models/index.html">models</a>, e.g., one from each quadrant of change (warm-wet, warm-dry, cold-wet, cold-dry) and one from the middle.</li>
+<li style="text-align: left;">The <a href="https://esdlab.met.no/seasoncycle">seasonal cycle app</a> showing the <a href="../glossary/seasonal-cycle/index.html">seasonal cycle</a> of precipitation and temperature for GCMs (<a href="../glossary/cmip5/index.html">CMIP5</a>) compared to a reference data set (ERAinterim). This tool can be used in <a href="../glossary/ensemble/index.html">ensemble</a> selection to exclude <a href="../glossary/climate-models/index.html">models</a> that are not representing the <a href="../glossary/seasonal-cycle/index.html">seasonal cycle</a> well in a particular <a href="../glossary/region/index.html">region</a>.</li>
+<li style="text-align: left;">Also, the <a href="https://esdlab.met.no/decmapps">main toolbox</a> which combines all the different applications into one using a categorised dashboard intended for product users, data users, and sectoral users is available there.</li>
+</ul><hr><h4>Do not forget to report any issue and send us your feedback</h4>
+<p>Feel free to provide feedback and issues with the form below.</p>
+<p><strong>Feedback on the page</strong></p>
+<div id="contact-form-5">
+<form action="http://example.com/esdlab/#contact-form-5" method="post" class="contact-form commentsblock">
+
+<div class="grunion-field-wrap grunion-field-email-wrap">
+<label for="g5-email" class="grunion-field-label email">Email<span>(required)</span></label>
+<input type="email" name="g5-email" id="g5-email" value="" class="email" required aria-required="true"></div>
+
+<div class="grunion-field-wrap grunion-field-name-wrap">
+<label for="g5-name" class="grunion-field-label name">Name</label>
+<input type="text" name="g5-name" id="g5-name" value="" class="name"></div>
+
+<div class="grunion-field-wrap grunion-field-url-wrap">
+<label for="g5-website" class="grunion-field-label url">Website</label>
+<input type="url" name="g5-website" id="g5-website" value="" class="url"></div>
+
+<div class="grunion-field-wrap grunion-field-textarea-wrap">
+<label for="contact-form-comment-g5-message" class="grunion-field-label textarea">Message</label>
+<textarea name="g5-message" id="contact-form-comment-g5-message" rows="20" class="textarea"></textarea></div>
+	<p class="contact-submit">
+		<input type="submit" value="Submit" class="pushbutton-wide"><input type="hidden" name="contact-form-id" value="5"><input type="hidden" name="action" value="grunion-contact-form"><input type="hidden" name="contact-form-hash" value="cd689d0110d57a7cac7007ad1e69d5dd5b3bc4a9"></p>
+</form>
+</div>
+<p>[Idea: expose tools to users, collect feedback, collect statistics on use]</p>
+<div class="sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded" id="like-post-wrapper-129599453-5-5c519697708d4" data-src="https://widgets.wp.com/likes/#blog_id=129599453&post_id=5&origin=climatedatasite.net&obj_id=129599453-5-5c519697708d4" data-name="like-post-frame-129599453-5-5c519697708d4"><h3 class="sd-title">Like this:</h3><div class="likes-widget-placeholder post-likes-widget-placeholder" style="height: 55px;"><span class="button"><span>Like</span></span> <span class="loading">Loading...</span></div><span class="sd-text-color"></span><a class="sd-link-color"></a></div>		</div>
+	</div>
+</div>
+
+					</div>
+	</div>
+
+	
+	
+	<footer id="colophon" class="site-footer vertical-footer" role="contentinfo"><div id="footer-widgets" class="full-container">
+					</div>
+	
+			<div id="site-info">
+			<br><br><br><br><br><br><br><br><p> This service is a part of Copernicus Climate Change Service (C3S)<br> All data and tools are available according to the Framework Agreement for Copernicus services<br></p>		</div>
+	
+	<div id="theme-attribution">A <a href="https://siteorigin.com">SiteOrigin</a> Theme</div>
+</footer></div>
+
+
+
+
+	<script>
+		jQuery(document).ready(function() {
+
+			// Get all thumbs containers
+			jQuery( ".thumbs-rating-container" ).each(function( index ) {
+
+			 	// Get data attribute
+			 	 var content_id = jQuery(this).data('content-id');
+
+			 	 var itemName = "thumbsrating"+content_id;
+
+			 	      // Check if this content has localstorage
+			 	 	if (localStorage.getItem(itemName)){
+
+						// Check if it's Up or Down vote
+						if ( localStorage.getItem("thumbsrating" + content_id + "-1") ){
+							jQuery(this).find('.thumbs-rating-up').addClass('thumbs-rating-voted');
+						}
+						if ( localStorage.getItem("thumbsrating" + content_id + "-0") ){
+							jQuery(this).find('.thumbs-rating-down').addClass('thumbs-rating-voted');
+						}
+					}
+			});
+		});
+	</script><a href="#" id="scroll-to-top" class="" title="Back To Top"><span class="vantage-icon-arrow-up"></span></a><script type="text/javascript" src="https://c0.wp.com/p/jetpack/6.9/_inc/build/photon/photon.min.js"></script><script type="text/javascript" src="https://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201905"></script><script type="text/javascript" src="../wp-content/themes/vantage/js/jquery.flexslider.min.js"></script><script type="text/javascript" src="../wp-content/themes/vantage/js/jquery.touchSwipe.min.js"></script><script type="text/javascript" src="../wp-content/themes/vantage/js/jquery.theme-main.min.js"></script><script type="text/javascript" src="https://c0.wp.com/c/5.0.3/wp-includes/js/hoverIntent.min.js"></script><script type="text/javascript">
+/* <![CDATA[ */
+var megamenu = {"timeout":"300","interval":"100"};
+/* ]]> */
+</script><script type="text/javascript" src="../wp-content/plugins/megamenu/js/maxmegamenu.js"></script><script type="text/javascript" src="https://c0.wp.com/p/jetpack/6.9/_inc/build/postmessage.min.js"></script><script type="text/javascript" src="https://c0.wp.com/p/jetpack/6.9/_inc/build/jquery.jetpack-resize.min.js"></script><script type="text/javascript" src="https://c0.wp.com/p/jetpack/6.9/_inc/build/likes/queuehandler.min.js"></script><iframe src="https://widgets.wp.com/likes/master.html?ver=201905#ver=201905" scrolling="no" id="likes-master" name="likes-master" style="display:none;"></iframe>
+	<div id="likes-other-gravatars"><div class="likes-text"><span>%d</span> bloggers like this:</div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
+	<script type="text/javascript" src="https://stats.wp.com/e-201905.js" async="async" defer></script><script type="text/javascript">
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:6.9',blog:'129599453',post:'5',tz:'0',srv:'climatedatasite.net'} ]);
+	_stq.push([ 'clickTrackerInit', '129599453', '5' ]);
+</script></body></html>

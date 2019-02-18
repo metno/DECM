@@ -250,12 +250,21 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                                    selected = "Global",width = '100%')),
                                                               column(8,helpText('You can navigate between the various predefined regions.'))
                                                        ),
-                                                       leafletOutput('gcm.region.pu',width = '100%',height = '600'),
+                                                       leafletOutput('gcm.region.pu',width = '100%',height = '500'),
                                                        title = tags$p('1. Select a region : Explore and navigate through various regions (AR5 predefined regions)'), 
                                                        collapsible = TRUE, collapsed = TRUE)
                                                  ),
                                                  fluidRow(
                                                    box(width = '100%', solidHeader = TRUE, status = 'danger',
+                                                       fluidRow(
+                                                         column(12,
+                                                                column(4,selectInput("gcm.rcp.pu", label = "Emission Scenario", 
+                                                                                     choices = c("Intermediate (RCP4.5)","High (RCP8.5)"),
+                                                                                     selected = "Intermediate (RCP4.5)",width = '100%'),
+                                                                       bsPopover(id = 'gcm.period.pu',title = 'test2',content = 'this is a test',placement = 'top')),
+                                                                column(8,br(),helpText('You can navigate between an intermediate (RCP4.5) and a high concentration (RCP8.5) pathways.'))
+                                                         )
+                                                       ),
                                                        fluidRow(
                                                          column(12,
                                                                 column(4,selectInput("gcm.period.pu", label = "Period", 
@@ -333,7 +342,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                  ),
                                                  fluidRow(
                                                    box(
-                                                     column(12,plotlyOutput("gcm.sc.bias.pr.pu",height = '600'))
+                                                     column(12,plotlyOutput("gcm.sc.bias.pr.pu",height = '500'))
                                                      ,
                                                      fluidRow(
                                                        column(12,
@@ -387,6 +396,14 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                    box(width = '100%', solidHeader = TRUE, status = 'danger',
                                                        fluidRow(
                                                          column(12,
+                                                                column(4,selectInput("rcm.rcp.pu", label = "Emission Scenario", 
+                                                                                     choices = c("Intermediate (RCP4.5)","High (RCP8.5)"),
+                                                                                     selected = "Intermediate (RCP4.5)",width = '100%')),
+                                                                column(8,br(),helpText('You can navigate between an intermediate (RCP4.5) and a high concentration (RCP8.5) pathways.'))
+                                                         )
+                                                       ),
+                                                       fluidRow(
+                                                         column(12,
                                                                 column(4,selectInput("rcm.period.pu", label = "Period", 
                                                                                      choices = c("Present (1981-2010)","Near Future (2021-2050)",
                                                                                                  "Far Future (2071-2100)"),
@@ -428,7 +445,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                    box(
                                                      
                                                      column(12,
-                                                            plotlyOutput("rcm.sc.bias.tas.pu",height = '600'))
+                                                            plotlyOutput("rcm.sc.bias.tas.pu",height = '500'))
                                                      ,
                                                      fluidRow(
                                                        column(12,
@@ -535,6 +552,14 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                  ),
                                                  fluidRow(
                                                    box(width = '100%', solidHeader = TRUE, status = 'danger',
+                                                       fluidRow(
+                                                         column(12,
+                                                                column(4,selectInput("gcm.sc.rcp.pu", label = "Emission Scenario", 
+                                                                                     choices = c("Intermediate (RCP4.5)","High (RCP8.5)"),
+                                                                                     selected = "Intermediate (RCP4.5)",width = '100%')),
+                                                                column(8,br(),helpText('You can navigate between an intermediate (RCP4.5) and a high concentration (RCP8.5) pathways.'))
+                                                         )
+                                                       ),
                                                        fluidRow(
                                                          column(12,
                                                                 column(4,selectInput("gcm.sc.period.pu", label = "Period",
@@ -659,6 +684,14 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                  ),
                                                  fluidRow(
                                                    box(width = '100%', solidHeader = TRUE, status = 'danger',
+                                                       fluidRow(
+                                                         column(12,
+                                                                column(4,selectInput("rcm.sc.rcp.pu", label = "Emission Scenario", 
+                                                                                     choices = c("Intermediate (RCP4.5)","High (RCP8.5)"),
+                                                                                     selected = "Intermediate (RCP4.5)",width = '100%')),
+                                                                column(8,br(),helpText('You can navigate between an intermediate (RCP4.5) and a high concentration (RCP8.5) pathways.'))
+                                                         )
+                                                       ),
                                                        fluidRow(
                                                          column(12,
                                                                 column(4,selectInput("rcm.sc.period.pu", label = "Period",
@@ -794,6 +827,12 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                             fluidRow(
                               box(width = '100%', solidHeader = TRUE, status = 'danger',
                                   fluidRow(
+                                           column(4,selectInput("gcm.rcp", label = "Emission Scenario", 
+                                                                choices = c("Intermediate (RCP4.5)","High (RCP8.5)"),
+                                                                selected = "Intermediate (RCP4.5)",width = '100%')),
+                                           column(8,br(),helpText('You can navigate between an intermediate (RCP4.5) and a high concentration (RCP8.5) pathways.'))
+                                  ),
+                                  fluidRow(
                                     column(4,selectInput("gcm.period", label = "Period", 
                                                          choices = c("Present (1981-2010)","Near Future (2021-2050)",
                                                                      "Far Future (2071-2100)"),
@@ -813,7 +852,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                  choices = c("Display","Hide"),
                                                                  selected = "Hide Legend",width = '100%')),
                                            column(8,br(),helpText('You can display or hide the legend in the different charts'))),                                         
-                                  fluidRow(column(4,  selectInput("gcm.groupBy", label = "Group By", choices = c('None','---',names(gcm.meta.tas)),
+                                  fluidRow(column(4,  selectInput("gcm.groupBy", label = "Group By", choices = c('None','---',names(gcm.tas$rcp45)),
                                                                   selected = 'None',width = '100%')),
                                            column(8,br(),helpText('You can group the simulations by values in the meta data table, for instance, by global climate model ID, i.e. all simulations sharing the same global climate model belong to the same group but different colors are applied for simulations within each group.'))),
                                   fluidRow(column(4,  selectInput("gcm.colorBy", label = "Color By", 
@@ -901,7 +940,6 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                           fluidPage(
                             p(),
                             fluidRow(
-                              column(12,
                                      box(width = '100%', solidHeader = TRUE, status = 'danger',
                                          #tags$figcaption('The EURO-CORDEX domain',
                                          #                tags$a(href = 'http://cordex.org/domains/cordex-region-euro-cordex/',"Read more")),
@@ -911,11 +949,16 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                selected = "Europe",width = '100%')),
                                          leafletOutput('rcm.region',width = '100%',height = 500),
                                          title = tags$p('1. Display the region (EURO-CORDEX, PRUDENCE, European countries)'), 
-                                         collapsible = TRUE, collapsed = TRUE))
+                                         collapsible = TRUE, collapsed = TRUE)
                             ),
                             fluidRow(
-                              column(12,
                                      box(width = '100%', solidHeader = TRUE, status = 'danger',
+                                         fluidRow(
+                                                  column(4,selectInput("rcm.rcp", label = "Emission Scenario", 
+                                                                       choices = c("Intermediate (RCP4.5)","High (RCP8.5)"),
+                                                                       selected = "Intermediate (RCP4.5)",width = '100%')),
+                                                  column(8,br(),helpText('You can navigate between an intermediate (RCP4.5) and a high concentration (RCP8.5) pathways.'))
+                                         ),
                                          fluidRow(
                                            column(4,selectInput("rcm.period", label = "Period", 
                                                                 choices = c("Present (1981-2010)","Near Future (2021-2050)",
@@ -943,7 +986,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                 selected = "Hide Legend",width = '100%')),
                                            column(8,br(),helpText('You can display or hide the legend in the different charts'))),                             
                                          fluidRow(
-                                           column(4,selectInput("rcm.groupBy", label = "Group By", choices = c('None','---',names(rcm.meta.tas)),
+                                           column(4,selectInput("rcm.groupBy", label = "Group By", choices = c('None','---',names(rcm.tas$rcp45)),
                                                                 selected = 'None',width = '100%')),
                                            column(8,br(),helpText('You can group the simulations by values in the meta data table, for instance, by global climate model ID, i.e. all simulations sharing the same global climate model belong to the same group but different colors are applied for simulations within each group.'))
                                          ),
@@ -969,10 +1012,9 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                 selected = 'Synchronised',width = '100%')),
                                            column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%'))),
                                          title = tags$p('2. Settings & Outputs : Modify the default settings and select the output type and values.'), 
-                                         collapsible = TRUE, collapsed = TRUE))
+                                         collapsible = TRUE, collapsed = TRUE)
                             ),
                             fluidRow(
-                              column(12,
                                      box(width = '100%', solidHeader = TRUE, status = 'danger',
                                          tabsetPanel(
                                            tabPanel("Chart",p(),
@@ -988,10 +1030,9 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                            tabPanel("Data",DT::dataTableOutput("rcm.sc.tas.data")),
                                            tabPanel('Metadata',DT::dataTableOutput("rcm.meta.tas"))),
                                          title = tags$p('3. Evaluate the seasonal cycle in simulated Mean Air Temperature'), 
-                                         collapsible = TRUE, collapsed = FALSE))
+                                         collapsible = TRUE, collapsed = FALSE)
                             ),
                             fluidRow(
-                              column(12,
                                      box(width = '100%', solidHeader = TRUE, status = 'danger',
                                          tabsetPanel(
                                            tabPanel("Chart", p(), 
@@ -1007,9 +1048,8 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                            tabPanel("Data", DT::dataTableOutput("rcm.sc.pr.data")),
                                            tabPanel('Metadata',DT::dataTableOutput("rcm.meta.pr"))),
                                          title = tags$p('4. Evaluate the seasonal cycle in Simulated Monthly Precipitation totals'), 
-                                         collapsible = TRUE, collapsed = TRUE))),
+                                         collapsible = TRUE, collapsed = TRUE)),
                             fluidRow(
-                              column(12,
                                      box(width = '100%', solidHeader = TRUE, status = 'danger',
                                          tabsetPanel(
                                            tabPanel("Chart", p(), 
@@ -1025,7 +1065,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                            tabPanel("Data", DT::dataTableOutput("rcm.scatter.data"))),
                                          #tabPanel('Metadata',DT::dataTableOutput("gcm.meta.pr"))),
                                          title = tags$p('5. Scatter Plots of Simulated Climate Variables'), 
-                                         collapsible = TRUE, collapsed = TRUE)))
+                                         collapsible = TRUE, collapsed = TRUE))
                           )
                   ),
                   tabItem(tabName = "score5", 
@@ -1056,6 +1096,12 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                 column(8,br(),helpText('You can navigate between various AR5 predefined regions.'))
                                                               ),
                                                               fluidRow(
+                                                                       column(4,selectInput("gcm.cc.rcp", label = "Emission Scenario", 
+                                                                                            choices = c("Intermediate (RCP4.5)","High (RCP8.5)"),
+                                                                                            selected = "Intermediate (RCP4.5)",width = '100%')),
+                                                                       column(8,br(),helpText('You can navigate between an intermediate (RCP4.5) and a high concentration (RCP8.5) pathways.'))
+                                                              ),
+                                                              fluidRow(
                                                                 column(4,selectInput("gcm.cc.period", label = "Period", 
                                                                                      choices = c("Near Future (2021-2050)",
                                                                                                  "Far Future (2071-2100)"),
@@ -1077,7 +1123,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                 column(8,br(),helpText('You can display values for various statistics such as the mean and the spatial standard deviation. The spatial  correlations are computed only between historical simulations and the reference data for the present (1981-2010).'))),  
                                                               fluidRow(
                                                                 column(4,selectInput("gcm.cc.var", label = "Variables", 
-                                                                                     choices = c('Individual','Synchronised'),
+                                                                                     choices = c('Synchronised'),
                                                                                      selected = 'Synchronised',width = '100%')),
                                                                 column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%')))   
                                                      ),
@@ -1121,6 +1167,12 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                 column(8,br(),helpText('You can navigate between various PRUDENCE predefined regions (! not yet implemented).'))
                                                               ),
                                                               fluidRow(
+                                                                       column(4,selectInput("rcm.cc.rcp", label = "Emission Scenario", 
+                                                                                            choices = c("Intermediate (RCP4.5)","High (RCP8.5)"),
+                                                                                            selected = "Intermediate (RCP4.5)",width = '100%')),
+                                                                       column(8,br(),helpText('You can navigate between an intermediate (RCP4.5) and a high concentration (RCP8.5) pathways.'))
+                                                              ),
+                                                              fluidRow(
                                                                 column(4,selectInput("rcm.cc.period", label = "Period", 
                                                                                      choices = c("Near Future (2021-2050)",
                                                                                                  "Far Future (2071-2100)"),
@@ -1142,7 +1194,7 @@ dashboardPage(title = 'Data Evaluation for Climate Models (DECM)',skin = 'red',
                                                                 column(8,br(),helpText('You can display values for various statistics such as the mean and the spatial standard deviation. The spatial  correlations are computed only between historical simulations and the reference data for the present (1981-2010).'))),  
                                                               fluidRow(
                                                                 column(4,selectInput("rcm.cc.var", label = "Variables", 
-                                                                                     choices = c('Individual','Synchronised'),
+                                                                                     choices = c('Synchronised'),
                                                                                      selected = 'Synchronised',width = '100%')),
                                                                 column(8,br(),helpText('You can filter the simulations and keep only identical simulations for all climate variables such as precipitation and temperature.',width = '100%')))   
                                                      ),
@@ -1266,9 +1318,9 @@ Both SPI and SPEI have been estimated using only one distribution for each (gamm
                                   collapsible = TRUE, collapsed = FALSE)),
                             fluidRow(
                               box(width = '100%', solidHeader = TRUE, status = 'danger',
-                                  'Your settings are the following:',
+                                  #'Your settings are the following:',
                                   tags$hr(),
-                                  textOutput('spei.settings'),
+                                  DT::dataTableOutput('spei.settings'),
                                   tags$hr(),
                                   leafletOutput("map.spei",height = '900'),
                                   title = tags$p('3. Evaluate the SPEI - Standardized Precipitaiton and Evaporation Index - over Europe'),

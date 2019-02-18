@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Welcome to the DECM Shiny Server!</title>
+
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #ffffff;
+}
+</style>
+
+
+  <style type="text/css">
+    body, html {
+      font-family: Helvetica, Arial, sans-serif;
+      background-color: #ffffff;
+      color: #114;
+      margin: 0;
+      padding: 0;
+    }
+    a {
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    #titleBar {
+      height: 80px;
+      background-color: #871010;
+      overflow: hidden;
+      border-bottom: 1px solid #3475b3;
+      -moz-box-shadow:    0px 0px 10px 3px #BBC;
+      -webkit-box-shadow: 0px 0px 10px 3px #BBC;
+      box-shadow:         0px 0px 10px 3px #BBC;
+    }
+    #titleBar #container {
+      margin-top: 14px;
+    }
+    #titleBar h1 {
+      margin: 0 auto .5em auto;
+      padding: .2em;
+      color: #EEE;
+      text-align: center;
+    }
+    #intro {
+      background-color: #DDD;
+      margin: 1em 1em 0 1em;
+      padding: .75em;
+      text-align: center;
+      border: 1px solid #CCC;
+      font-size: 18px;
+    }
+    #intro p {
+      margin: .3em 0 .3em 0;
+    }
+    #outer-content {
+      max-width: 910px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #content {
+      margin: 1em auto 1em auto;
+      float: left;
+    }
+    #main{
+      margin-right: 350px;
+      float: left;
+      line-height: 24px;
+    }
+
+    #shiny{
+      float: left;
+      width: 305px;
+      margin-left: -330px;
+      padding-left: 20px;
+      border-left: 1px solid #AAA;
+    }
+    #shiny iframe {
+      margin-top: 30px;
+    }
+    .caption{
+      font-size: 13px;
+    }
+    code {
+      background-color: #E5E5E5;
+      border: 1px solid #AAA;
+      -webkit-border-radius: 3px;
+      -khtml-border-radius: 3px; 
+      -moz-border-radius: 3px;
+      border-radius: 3px;
+      padding: 0 .5em 0 .5em;
+    }
+  
+      .topnav {
+      overflow: hidden;
+      background-color: #871010;
+      
+    }
+
+    .topnav a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    }
+
+    .topnav a:hover {
+    background-color: #871010;
+    color: black;
+    }
+
+    .topnav a.active {
+    background-color: #871010;
+    color: white;
+    }
+</style>
+
+
+</head>
+<div class="header">
+  <img src="banner_c3s.png" alt="logo" style="width:50%;margin-left:25%;margin-bottom=50px"/>
+</div>
+
+<body>
+  <div id="titleBar">
+    <div id="container">
+      <h1>Welcome to the Data Evaluation for Climate Models (DECM)</h1>
+    </div>
+  </div>
+  
+<!-- Navbar -->
+  <div class="topnav">
+    <a class="active" href="./index.html">Home</a>
+    <a href="#esdlab">ESD Lab</a>
+    <a href="#demo">Demos</a>
+    <a href="#about">About</a>
+  </div>
+
+<!-- Home page -->  
+  <div id="outer-content">
+    <div id="intro">
+      <p> TEST  / Beta versions of applications for visualising and exploring climate model data.</p>
+    </div>
+
+<h4>What is the 'ESD Lab'?</h4>
+<p>The ESD lab is a web platform that contains tools (i.e. mainly web applications) developed and maintained by few climate researchers at the <a href="https://www.met.no/">Norwegian Meteorological Institute</a> (Norway). The main objective of this Lab is to build a prototype tool within the Data Evaluation of Climate Models C3S project. The applications provide users with web interfaces to allow them visualizing, exploring, and analyzing climate model data and outputs. These tools are built as <a href="https://shiny.rstudio.com/">Rshiny apps</a> and are running on our own <a href="https://esdlab.met.no/">Shiny Server</a>. The applications uses the <a href="https://github.com/metno/esd/wiki">'ESD R package'</a> as a back-end engine to process and summarize climate model outputs.</p>
+<p>This platform and the following web applications have been developed and maintained by :</p>
+<ul>
+<li>Rasmus Benestad (rasmusb@met.no)</li>
+<li>Abdelkader Mezghani (abdelkaderm@met.no)</li>
+<li>Kajsa M. Parding (kajsamp@met.no)</li>
+<li>Andreas Dobler (andreasd@met.no)</li>
+<li>Helene B. Erlandsen (helenebe@met.no )</li>
+</ul>
+<hr />
+<h4>We offer various R Shiny web applications</h4>
+<p>Currently available apps are</p>
+<ul>
+<li style="list-style-type: none">
+<ul>
+<li style="text-align: left;">An example of <a href="https://esdlab.met.no/nordicatlas">distillation of climate information</a> from large ensembles for the Nordic countries.</li>
+</ul>
+</li>
+</ul>
+<p> </p>
+<ul>
+<li style="list-style-type: none">
+<ul>
+<li style="text-align: left;">An application for <a href="https://esdlab.met.no/gcmeval">evaluation of CMIP5 climate model simulations</a> with several performance statistics, weighted rankings, climate change ranges and visual representations of the model ensemble.</li>
+</ul>
+</li>
+</ul>
+<p> </p>
+<ul>
+<li style="list-style-type: none">
+<ul>
+<li style="text-align: left;">The <a href="https://esdlab.met.no/modelexplorer/">climate model explorer</a> which let's you sort through data available from the KNMI climate data explorer and produce simple plots and maps of climate change.</li>
+</ul>
+</li>
+</ul>
+<p> </p>
+<ul>
+<li style="list-style-type: none">
+<ul>
+<li style="text-align: left;">A <a href="https://esdlab.met.no/taylordiagram">Taylor diagram app</a> for evaluation of a set of RCMs comparing spatial correlations and standard deviations to a reference dataset.</li>
+</ul>
+</li>
+</ul>
+<p> </p>
+<ul>
+<li style="list-style-type: none">
+<ul>
+<li style="text-align: left;">The <a href="https://esdlab.met.no/dpdt">dP vs dT app</a> showing the regionally averaged projected changes in precipitation and temperature for CMIP5 models. This tool can be used for selecting a smaller but representative ensemble of GCMs out of a large ensemble. The chosen models should cover the full range of projected climate change of all the available models, e.g., one from each quadrant of change (warm-wet, warm-dry, cold-wet, cold-dry) and one from the middle.</li>
+</ul>
+</li>
+</ul>
+<p> </p>
+<ul>
+<li style="list-style-type: none">
+<ul>
+<li style="text-align: left;">The <a href="https://esdlab.met.no/seasoncycle">seasonal cycle app</a> showing the seasonal cycle of precipitation and temperature for GCMs (CMIP5) compared to a reference data set (ERAinterim). This tool can be used in ensemble selection to exclude models that are not representing the seasonal cycle well in a particular region.</li>
+</ul>
+</li>
+</ul>
+<p> </p>
+<ul>
+<li style="text-align: left;">Also, the <a href="https://esdlab.met.no/decmapps">main toolbox</a> which combines all the different applications into one using a categorised dashboard intended for product users, data users, and sectoral users is available there.</li>
+</ul>
+<hr />
+<h4>Do not forget to report any issue and send us your feedback</h4>
+<p>Feel free to provide feedback and issues with the form below.</p>
+<p><strong>Feedback on the page</strong></p>
+<p>[contact-form][contact-field label="Email" type="email" required="true" /][contact-field label="Name" type="name"/][contact-field label="Website" type="url" /][contact-field label="Message" type="textarea" /][/contact-form]</p>
+<p>[Idea: expose tools to users, collect feedback, collect statistics on use]</p>
+
+<!-- DECM Lab page -->
+
+
+</body>
+</html>

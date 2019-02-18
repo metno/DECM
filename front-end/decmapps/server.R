@@ -20,8 +20,6 @@ function(input, output,session) {
     return(msgs)
   })
   
-  data(Oslo)
-  
   # Model explorer
   data(package='DECM', "metaextract")
   M <- data.frame(list(Project=meta$project_id,
@@ -64,7 +62,7 @@ function(input, output,session) {
   observe(
     showNotification(
       tags$div(tags$p(tags$h1("Please wait ... loading ..."))),
-      action = NULL, duration = 5, closeButton = FALSE,id = NULL, type = c("warning"),session = getDefaultReactiveDomain())
+      action = NULL, duration = 3, closeButton = FALSE,id = NULL, type = c("warning"),session = getDefaultReactiveDomain())
   )
   
   observe({
@@ -128,8 +126,17 @@ function(input, output,session) {
   #   return(isolate(Y))  
   # })
   # 
-  gcm.sc.vals <- function(param,region,period,stat) {
-    ## 
+  
+  gcm.sc.vals <- function(param,region,period,stat,rcp,gcmvar,rowsGcm) {
+    
+    rcp <- switch(tolower(as.character(rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+    if (rcp=='rcp45')
+      stats <- gcms$rcp45
+    else if (rcp=='rcp85')
+      stats <- gcms$rcp85
+    
     if (param == 'tas')
       gcms <- names(stats$tas$ff)
     else if (param == 'pr')
@@ -176,21 +183,19 @@ function(input, output,session) {
     
     gcm.vals <- as.data.frame(lapply(1:length(x),function(i) {if (length(x[[i]]) > 0) x[[i]] else x[[1]]})) ## AM Need to fix this later on     
     colnames(gcm.vals) <- paste('gcm.',1:length(gcm.vals),sep='')
-    
-    # common models to all climate variables
-    if (input$gcm.var != 'Individual') {
-      if (param=="pr") 
-        gcm.vals <- base::subset(gcm.vals,select = id.pr)
-      else if (param=="tas")
-        gcm.vals <- base::subset(gcm.vals,select = id.tas)
+
+        # common models to all climate variables
+    if (gcmvar=='Synchronised') {
+      #if (param=="pr")
+        gcm.vals <- base::subset(gcm.vals,select = com.gcm.var[[rcp]][[param]])
+      #else if (param=="tas")
+      #  gcm.vals <- base::subset(gcm.vals,select = com.gcm.var[[rcp]][["tas"]])
     }
-    
-    if (input$gcm.sim.sc == 'Selected Simulations') {
-      if (!is.null(input$rowsGcm))
-        gcm.vals <- gcm.vals[,input$rowsGcm]
-      else
-        showNotification('Please select a model from the meta data table!')
-    }
+  
+    if (!is.null(rowsGcm))
+      gcm.vals <- gcm.vals[,rowsGcm]
+    # else
+    #   showNotification('Please select a model from the meta data table!')
     
     if (!is.null(ref))
       df <- data.frame(gcm.vals,ref,stringsAsFactors = FALSE)
@@ -199,72 +204,96 @@ function(input, output,session) {
   }
   
   gcm.sc.tas.reactive <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.region, period = input$gcm.period,stat = input$gcm.stat))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.region, period = input$gcm.period,
+                       stat = input$gcm.stat,rcp = input$gcm.rcp,gcmvar=input$gcm.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.reactive.pu <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.region.pu, period = input$gcm.period.pu,stat = input$gcm.stat.pu))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.region.pu, period = input$gcm.period.pu,
+                       stat = input$gcm.stat.pu,rcp=input$gcm.rcp.pu, gcmvar=input$gcm.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.reactive.sc.pu <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.sc.region.pu, period = input$gcm.sc.period.pu,stat = input$gcm.sc.stat.pu))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.sc.region.pu, period = input$gcm.sc.period.pu,
+                       stat = input$gcm.sc.stat.pu,rcp=input$gcm.sc.rcp.pu, gcmvar=input$gcm.sc.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.reactive.cc.pu <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.cc.region, period = input$gcm.cc.period,stat = input$gcm.cc.stat))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.cc.region, period = input$gcm.cc.period,
+                       stat = input$gcm.cc.stat,rcp=input$gcm.cc.rcp, gcmvar=input$gcm.cc.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.present <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.region, period = 'Present (1981-2010)',stat = input$gcm.stat))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.region, period = 'Present (1981-2010)',
+                       stat = input$gcm.stat,rcp=input$gcm.rcp, gcmvar=input$gcm.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.present.pu <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.region.pu, period = 'Present (1981-2010)',stat = input$gcm.stat.pu))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.region.pu, period = 'Present (1981-2010)',
+                       stat = input$gcm.stat.pu,rcp = input$gcm.rcp.pu, gcmvar=input$gcm.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.present.sc.pu <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.sc.region.pu, period = 'Present (1981-2010)',stat = input$gcm.sc.stat.pu))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.sc.region.pu, period = 'Present (1981-2010)',
+                       stat = input$gcm.sc.stat.pu,rcp = input$gcm.sc.rcp.pu, gcmvar=input$gcm.sc.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.tas.present.cc.pu <- reactive({
-    return(gcm.sc.vals(param = 'tas',region = input$gcm.cc.region, period = 'Present (1981-2010)',stat = input$gcm.cc.stat))
+    return(gcm.sc.vals(param = 'tas',region = input$gcm.cc.region, period = 'Present (1981-2010)',
+                       stat = input$gcm.cc.stat,rcp = input$gcm.cc.rcp, gcmvar=input$gcm.cc.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.reactive <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.region,  period = input$gcm.period,stat = input$gcm.stat))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.region,  period = input$gcm.period,
+                       stat = input$gcm.stat,rcp = input$gcm.rcp, gcmvar=input$gcm.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.reactive.pu <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.region.pu,  period = input$gcm.period.pu,stat = input$gcm.stat.pu))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.region.pu,  period = input$gcm.period.pu,
+                       stat = input$gcm.stat.pu,rcp = input$gcm.rcp.pu, gcmvar=input$gcm.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.reactive.sc.pu <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.sc.region.pu,  period = input$gcm.sc.period.pu,stat = input$gcm.sc.stat.pu))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.sc.region.pu,  period = input$gcm.sc.period.pu,
+                       stat = input$gcm.sc.stat.pu,rcp = input$gcm.sc.rcp.pu, gcmvar=input$gcm.sc.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.reactive.cc.pu <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.cc.region,  period = input$gcm.cc.period,stat = input$gcm.cc.stat))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.cc.region,  period = input$gcm.cc.period,
+                       stat = input$gcm.cc.stat,rcp = input$gcm.cc.rcp, gcmvar=input$gcm.cc.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.present <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.region,  period = 'Present (1981-2010)',stat = input$gcm.stat))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.region,  period = 'Present (1981-2010)',
+                       stat = input$gcm.stat,rcp = input$gcm.rcp, gcmvar=input$gcm.var, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.present.pu <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.region.pu,  period = 'Present (1981-2010)',stat = input$gcm.stat.pu))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.region.pu,  period = 'Present (1981-2010)',
+                       stat = input$gcm.stat.pu,rcp = input$gcm.rcp.pu, gcmvar=input$gcm.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.present.sc.pu <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.sc.region.pu,  period = 'Present (1981-2010)',stat = input$gcm.sc.stat.pu))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.sc.region.pu,  period = 'Present (1981-2010)',
+                       stat = input$gcm.sc.stat.pu,rcp = input$gcm.sc.rcp.pu, gcmvar=input$gcm.sc.var.pu, rowsGcm = input$rowGcm))
   })
   
   gcm.sc.pr.present.cc.pu <- reactive({
-    return(gcm.sc.vals(param = 'pr',region = input$gcm.cc.region,  period = 'Present (1981-2010)',stat = input$gcm.cc.stat))
+    return(gcm.sc.vals(param = 'pr',region = input$gcm.cc.region,  period = 'Present (1981-2010)',
+                       stat = input$gcm.cc.stat,rcp = input$gcm.cc.rcp, gcmvar=input$gcm.cc.var, rowsGcm = input$rowGcm))
   })
   
   ## RCMs 
-  rcm.sc.vals <- function(param,region,period,stat) {
-    stats <- rcms
+  rcm.sc.vals <- function(param,region,period,stat,rcp) {
+    rcp <- switch(tolower(as.character(rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+
+    if (rcp == 'rcp45')
+      stats <- rcms$rcp45
+    else if (rcp=='rcp85')
+      stats <- rcms$rcp85
+
     if (param == 'tas')
       rcms <- names(stats$tas$ff)
     else if (param == 'pr')
@@ -345,67 +374,67 @@ function(input, output,session) {
   }
   
   rcm.sc.tas.reactive <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.region, period = input$rcm.period,stat = input$rcm.stat))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.region, period = input$rcm.period,stat = input$rcm.stat,rcp = input$rcm.rcp))
   })
   
   rcm.sc.tas.reactive.sc.pu <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.sc.region.pu, period = input$rcm.sc.period.pu,stat = input$rcm.sc.stat.pu))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.sc.region.pu, period = input$rcm.sc.period.pu,stat = input$rcm.sc.stat.pu,rcp = input$rcm.sc.rcp.pu))
   })
   
   rcm.sc.tas.reactive.cc.pu <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.cc.region, period = input$rcm.cc.period,stat = input$rcm.cc.stat))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.cc.region, period = input$rcm.cc.period,stat = input$rcm.cc.stat,rcp = input$rcm.cc.rcp))
   })
   
   rcm.sc.tas.reactive.pu <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.region.pu, period = input$rcm.period.pu,stat = input$rcm.stat.pu))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.region.pu, period = input$rcm.period.pu,stat = input$rcm.stat.pu,rcp = input$rcm.rcp.pu))
   })
   
   rcm.sc.pr.reactive <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.region,  period = input$rcm.period,stat = input$rcm.stat))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.region, period = input$rcm.period,stat = input$rcm.stat,rcp = input$rcm.rcp))
   })
   
   rcm.sc.pr.reactive.pu <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.region.pu,  period = input$rcm.period.pu,stat = input$rcm.stat.pu))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.region.pu, period = input$rcm.period.pu,stat = input$rcm.stat.pu, rcp = input$rcm.rcp.pu))
   })
   
   rcm.sc.pr.reactive.sc.pu <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.sc.region.pu,  period = input$rcm.sc.period.pu,stat = input$rcm.sc.stat.pu))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.sc.region.pu, period = input$rcm.sc.period.pu,stat = input$rcm.sc.stat.pu,rcp = input$rcm.sc.rcp.pu))
   })
   
   rcm.sc.pr.reactive.cc.pu <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.cc.region,  period = input$rcm.cc.period,stat = input$rcm.cc.stat))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.cc.region, period = input$rcm.cc.period,stat = input$rcm.cc.stat,rcp = input$rcm.cc.rcp))
   })
   
   rcm.sc.tas.present <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.region, period = 'Present (1981-2010)',stat = input$rcm.stat,rcp = input$rcm.rcp.pu))
   })
   
   rcm.sc.tas.present.sc.pu <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.sc.region.pu,  period = 'Present (1981-2010)',stat = input$rcm.sc.stat.pu))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.sc.region.pu, period = 'Present (1981-2010)',stat = input$rcm.sc.stat.pu,rcp = input$rcm.sc.rcp.pu))
   })
   
   rcm.sc.tas.present.cc.pu <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.cc.region,  period = 'Present (1981-2010)',stat = input$rcm.cc.stat))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.cc.region, period = 'Present (1981-2010)',stat = input$rcm.cc.stat,rcp = input$rcm.cc.rcp))
   })
   
   rcm.sc.tas.present.pu <- reactive({
-    return(rcm.sc.vals(param = 'tas',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat.pu))
+    return(rcm.sc.vals(param = 'tas',region = input$rcm.region, period = 'Present (1981-2010)',stat = input$rcm.stat.pu,rcp = input$rcm.rcp.pu))
   })
   
   rcm.sc.pr.present <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.region, period = 'Present (1981-2010)',stat = input$rcm.stat,rcp = input$rcm.rcp))
   })
   
   rcm.sc.pr.present.pu <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat.pu))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.region,  period = 'Present (1981-2010)',stat = input$rcm.stat.pu,rcp = input$rcm.rcp.pu))
   })
   
   rcm.sc.pr.present.sc.pu <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.sc.region.pu,  period = 'Present (1981-2010)',stat = input$rcm.sc.stat.pu))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.sc.region.pu,  period = 'Present (1981-2010)',stat = input$rcm.sc.stat.pu,rcp = input$rcm.sc.rcp.pu))
   })
   
   rcm.sc.pr.present.cc.pu <- reactive({
-    return(rcm.sc.vals(param = 'pr',region = input$rcm.cc.region,  period = 'Present (1981-2010)',stat = input$rcm.cc.stat))
+    return(rcm.sc.vals(param = 'pr',region = input$rcm.cc.region,  period = 'Present (1981-2010)',stat = input$rcm.cc.stat,rcp = input$rcm.cc.rcp))
   })
   
   # observe(priority = -1, {
@@ -419,111 +448,167 @@ function(input, output,session) {
   # })
   # 
   
-  sta.meta <- reactive({
-    data(package= 'esd', station.meta)
-    if (input$param7 == 'Temperature')
-      param <- 't2m'
-    else
-      param = 'precip'
-    sta.meta <- select.station(param= param, src = 'ECAD')
-  })
-  
   gcm.meta.tas.reactive <- reactive({
-    if (input$gcm.var == 'Individual'){
-      return(gcm.meta.tas)
+  
+    rcp <- switch(tolower(as.character(input$gcm.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+    
+    if (input$gcm.var == 'Individual') {
+      return(gcm.tas[[rcp]])
     } else 
-      return(gcm.meta.all)
+      return(gcm.all[[rcp]])
   })
   
   gcm.meta.tas.reactive.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$gcm.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     if (input$gcm.var.pu == 'Individual'){
-      return(gcm.meta.tas)
+      return(gcm.tas[[rcp]])
     } else 
-      return(gcm.meta.all)
+      return(gcm.all[[rcp]])
   })
   
   gcm.meta.tas.reactive.sc.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$gcm.sc.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     if (input$gcm.sc.var.pu == 'Individual'){
-      return(gcm.meta.tas)
+      return(gcm.tas[[rcp]])
     } else 
-      return(gcm.meta.all)
+      return(gcm.all[[rcp]])
   })
   
   gcm.meta.tas.reactive.cc.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$gcm.cc.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     if (input$gcm.cc.var == 'Individual'){
-      return(gcm.meta.tas)
+      return(gcm.tas[[rcp]])
     } else 
-      return(gcm.meta.all)
+      return(gcm.all[[rcp]])
   })
   
   gcm.meta.pr.reactive <- reactive({
+    rcp <- switch(tolower(as.character(input$gcm.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     if (input$gcm.var == 'Individual'){
-      return(gcm.meta.pr)
+      return(gcm.pr[[rcp]])
     } else 
-      return(gcm.meta.all)
+      return(gcm.all[[rcp]])
   })
   
   gcm.meta.pr.reactive.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$gcm.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     if (input$gcm.var.pu == 'Individual'){
-      return(gcm.meta.pr)
+      return(gcm.pr[[rcp]])
     } else 
-      return(gcm.meta.all)
+      return(gcm.all[[rcp]])
+  })
+  
+  gcm.meta.pr.reactive.cc.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$gcm.cc.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+    if (input$gcm.cc.var == 'Individual'){
+      return(gcm.pr[[rcp]])
+    } else 
+      return(gcm.all[[rcp]])
   })
   
   rcm.meta.tas.reactive <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+    
     if (input$rcm.var == 'Individual'){
-      return(rcm.meta.tas)
+      return(rcm.tas[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
   })
   
   rcm.meta.tas.reactive.sc.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.sc.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     if (input$rcm.sc.var.pu == 'Individual'){
-      return(rcm.meta.tas)
+      return(rcm.tas[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
   })
   
   rcm.meta.tas.reactive.cc.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.cc.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+    
     if (input$rcm.cc.var == 'Individual'){
-      return(rcm.meta.tas)
+      return(rcm.tas[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
   })
   
   rcm.meta.tas.reactive.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+    
     if (input$rcm.var.pu == 'Individual'){
-      return(rcm.meta.tas)
+      return(rcm.tas[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
   })
   
   rcm.meta.pr.reactive <- reactive({
-    
+    rcp <- switch(tolower(as.character(input$rcm.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+
     if (input$rcm.var == 'Individual'){
-      return(rcm.meta.pr)
+      return(rcm.pr[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
   })
   
   rcm.meta.pr.reactive.sc.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.sc.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     
     if (input$rcm.sc.var.pu == 'Individual'){
-      return(rcm.meta.pr)
+      return(rcm.pr[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
+  })
+  
+  rcm.meta.pr.reactive.cc.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.cc.rcp)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
+    
+    if (input$rcm.cc.var == 'Individual'){
+      return(rcm.pr[[rcp]])
+    } else 
+      return(rcm.all[[rcp]])
   })
   
   rcm.meta.pr.reactive.pu <- reactive({
+    rcp <- switch(tolower(as.character(input$rcm.rcp.pu)),
+                  "intermediate (rcp4.5)"='rcp45',
+                  "high (rcp8.5)"='rcp85')
     
     if (input$rcm.var.pu == 'Individual'){
-      return(rcm.meta.pr)
+      return(rcm.pr[[rcp]])
     } else 
-      return(rcm.meta.all)
+      return(rcm.all[[rcp]])
   })
   
   txttab <- reactive({
-    txt <- paste('Monthly estimates of regional temperature assuming an intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the referance data set (Observation).', sep= ' ')
+    txt <- paste('Monthly estimates of regional temperature assuming the',input$gcm.rcp,' emission scenario for the',tolower(input$gcm.period),'over the ',input$gcm.region,'region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the reference data set (Observation).', sep= ' ')
     return(txt)
   })
   
@@ -599,9 +684,9 @@ function(input, output,session) {
   ## Sectoral communication example 
   spi <- function(freq=1,group='ED',stat='nEvents',period='1981-2010') {
     
-    spi.file <- paste('data/spei_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
+    spi.file <- paste('data/spi_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
     load(spi.file)
-    #browser()
+    #
     spi <- array(NA,dim=c(length(droughtStatistics), dim(droughtStatistics[[1]][[stat]])))
     for (i in 1:length(droughtStatistics))
       spi[i,,] <- droughtStatistics[[i]][[stat]]
@@ -615,9 +700,9 @@ function(input, output,session) {
   })
   spei <- function(freq=1,group='ED',stat='nEvents',period='1981-2010') {
     
-    spi.file <- paste('data/rda_files/spei_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
+    spi.file <- paste('data/spei_statistics_',freq,'_mon_',group,'_',period,'.rda',sep='')
     load(spi.file)
-    #browser()
+    #
     spi <- array(NA,dim=c(length(droughtStatistics), dim(droughtStatistics[[1]][[stat]])))
     for (i in 1:length(droughtStatistics))
       spi[i,,] <- droughtStatistics[[i]][[stat]]
@@ -636,10 +721,11 @@ function(input, output,session) {
     ## Metadata table
     ## data(package= 'DECM', metaextract)
     
-    #
+    
     ## library(dplyr)
     
     output$gcm.meta.tas <- DT::renderDataTable({
+      
       gcm.meta.tas <- gcm.meta.tas.reactive()
       ## Metadata table
       #data(package= 'DECM', metaextract)
@@ -716,8 +802,8 @@ function(input, output,session) {
     
     output$gcm.meta.all <- DT::renderDataTable({
       ## Metadata table
-      DF.pr <- data.frame(N = cbind(1:dim(gcm.meta.all)[1],gcm.meta.all))
-      colnames(DF.pr) <- c('N',colnames(gcm.meta.all))
+      DF.pr <- data.frame(N = cbind(1:dim(gcm.all)[1],gcm.all))
+      colnames(DF.pr) <- c('N',colnames(gcm.all))
       DT::datatable(DF.pr,
                     selection = list(mode = 'multiple',target = 'row'),
                     callback = JS("table.on('click.dt', function() {
@@ -748,7 +834,7 @@ function(input, output,session) {
     ## RCMs tablets 
     
     output$rcm.meta.tas <- DT::renderDataTable({
-      #data(package= 'DECM', metaextract)
+      rcm.meta.tas <- rcm.meta.tas.reactive()
       DF.tas <- data.frame(N = cbind(1:dim(rcm.meta.tas)[1],rcm.meta.tas))
       colnames(DF.tas) <- c('N',colnames(rcm.meta.tas))
       DT::datatable(DF.tas,
@@ -784,8 +870,7 @@ function(input, output,session) {
     })
     
     output$rcm.meta.pr <- DT::renderDataTable({
-      ## Metadata table
-      
+      rcm.meta.pr <- rcm.meta.pr.reactive()
       DF.pr <- data.frame(N = cbind(1:dim(rcm.meta.pr)[1],rcm.meta.pr))
       colnames(DF.pr) <- c('N',colnames(rcm.meta.pr))
       DT::datatable(DF.pr,
@@ -819,9 +904,7 @@ function(input, output,session) {
     })
     
     output$rcm.meta.all <- DT::renderDataTable({
-      ## Metadata table
-      
-      #data(package= 'DECM', metaextract)
+      rcm.meta.all <- rcm.meta.tas.reactive()
       DF.com <- data.frame(N = cbind(1:dim(rcm.meta.all)[1],rcm.meta.all))
       colnames(DF.com) <- c('N',colnames(rcm.meta.all))
       DT::datatable(DF.com,
@@ -969,8 +1052,7 @@ function(input, output,session) {
       if (input$gcm.outputValues == 'Bias')
         df <- df - df[,dim(df)[2]]      
       else if (input$gcm.outputValues == 'Anomaly') {
-        DF <- t(df)
-        df <- as.data.frame(t(DF - rowMeans(DF)))
+        df <- df - mean(df[,dim(df)[2]],na.rm=TRUE) 
       } else if (input$gcm.outputValues == 'Change') {
         df <- gcm.sc.tas.reactive() - gcm.sc.tas.present()
       }
@@ -1170,7 +1252,7 @@ function(input, output,session) {
       if (input$gcm.outputValues == 'Bias')  
         ylab <- "Bias in temperature [deg. C]"
       else if (input$gcm.outputValues == 'Anomaly')
-        ylab <- "Temperature anomalies [deg. C]"
+        ylab <-  "Temperature anomaly [deg. C]"
       else if (input$gcm.outputValues == 'Change')
         ylab <- "Change in temperature [deg. C]"
       else 
@@ -1198,7 +1280,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.region, input$gcm.period,
+                                text=paste(input$gcm.region, input$gcm.period,input$gcm.rcp,
                                            input$gcm.chart.type,
                                            input$gcm.stat,sep=' | '),
                                 showarrow=F,
@@ -1415,7 +1497,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.region.pu, input$gcm.period.pu,
+                                text=paste(input$gcm.region.pu, input$gcm.period.pu,input$gcm.rcp.pu,
                                            input$gcm.chart.type.pu,
                                            input$gcm.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -1615,7 +1697,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.sc.region.pu, input$gcm.sc.period.pu,
+                                text=paste(input$gcm.sc.region.pu, input$gcm.sc.period.pu,input$gcm.sc.rcp.pu,
                                            input$gcm.sc.chart.type.pu,
                                            input$gcm.sc.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -1815,7 +1897,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.cc.region, input$gcm.cc.period,
+                                text=paste(input$gcm.cc.region, input$gcm.cc.period,input$gcm.cc.rcp,
                                                 input$gcm.cc.chart.type,
                                                 input$gcm.cc.stat,sep=' | '),
                                 showarrow=F,
@@ -1842,8 +1924,7 @@ function(input, output,session) {
       if (input$gcm.outputValues == 'Bias')
         df <- ((df - df[,dim(df)[2]])/df[,dim(df)[2]]) * 100
       else if (input$gcm.outputValues == 'Anomaly') {
-        DF <- t(df)
-        df <- as.data.frame(t(DF - rowMeans(DF)))
+        df <- ((df - mean(df[,dim(df)[2]],na.rm=TRUE))/mean(df[,dim(df)[2]],na.rm=TRUE)) * 100
       } else if (input$gcm.outputValues == 'Change') {
         df <- ((gcm.sc.pr.reactive() - gcm.sc.pr.present())/ gcm.sc.pr.present()) * 100
       }
@@ -1990,7 +2071,7 @@ function(input, output,session) {
       if (input$gcm.outputValues == 'Bias')  
         ylab <- "Bias in precipitation [%]"
       else if (input$gcm.outputValues == 'Anomaly') 
-        ylab <- "Precipitation anomalies [mm]"
+        ylab <- "Precipitation anomalies [%]"
       else if (input$gcm.outputValues == 'Change')
         ylab <- "Change in precipitation [%]"
       else 
@@ -2019,7 +2100,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.region, input$gcm.period,
+                                text=paste(input$gcm.region, input$gcm.period,input$gcm.rcp,
                                                 input$gcm.chart.type,
                                                 input$gcm.stat,sep=' | '),
                                 showarrow=F,
@@ -2106,7 +2187,7 @@ function(input, output,session) {
           p.sc <- p.sc %>% add_trace(y = ~ref,type = 'scatter', name = 'REF', text = 'ERAINT', mode = 'lines', 
                                      line = list(color = 'black', width = 2, dash = 'dash', shape ='spline'))
         
-      } else if (grepl('ensemble', tolower(input$gcm.chart.type))) { # Make an enveloppe instead of lines
+      } else if (grepl('ensemble', tolower(input$gcm.chart.type.pu))) { # Make an enveloppe instead of lines
         p.sc <- plot_ly(df.env, x = ~month, y = ~high, type = 'scatter', mode = 'lines',
                         line = list(color = 'transparent'),name = 'High',showlegend = TRUE) %>%
           add_trace(y = ~low, type = 'scatter', mode = 'lines',showlegend = TRUE,
@@ -2123,7 +2204,7 @@ function(input, output,session) {
         if (input$gcm.legend.sc == 'Hide') 
           p.sc <- p.sc %>% layout(showlegend = FALSE)
         
-      } else if (grepl('box',tolower(input$gcm.chart.type))) {
+      } else if (grepl('box',tolower(input$gcm.chart.type.pu))) {
         p.sc <- plot_ly(df, type = 'box')
         
         month.grp <- c(1,1,2,2,2,3,3,3,4,4,4,1)
@@ -2176,7 +2257,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.region.pu, input$gcm.period.pu,
+                                text=paste(input$gcm.region.pu, input$gcm.period.pu, input$gcm.rcp.pu,
                                                 input$gcm.chart.type.pu,
                                                 input$gcm.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -2326,7 +2407,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.sc.region.pu, input$gcm.sc.period.pu,
+                                text=paste(input$gcm.sc.region.pu, input$gcm.sc.period.pu, input$gcm.sc.rcp.pu,
                                            input$gcm.sc.chart.type.pu,
                                            input$gcm.sc.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -2342,9 +2423,8 @@ function(input, output,session) {
     })
     
     output$gcm.cc.pr.pu <- renderPlotly({
-      
+
       gcm.meta.pr <- gcm.meta.pr.reactive.pu()
-      
       df <- ((gcm.sc.pr.reactive.cc.pu() - gcm.sc.pr.present.cc.pu())/ gcm.sc.pr.present.cc.pu()) * 100
       
       df.env <- NULL
@@ -2475,7 +2555,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.cc.region, input$gcm.cc.period,
+                                text=paste(input$gcm.cc.region, input$gcm.cc.period, input$gcm.cc.rcp,
                                            input$gcm.cc.chart.type,
                                            input$gcm.cc.stat,sep=' | '),
                                 showarrow=F,
@@ -2502,22 +2582,20 @@ function(input, output,session) {
       if (input$gcm.outputValues == 'Bias')
         df <- df - df[,dim(df)[2]]      
       else if (input$gcm.outputValues == 'Anomaly')
-        df <- df - colMeans(df)
+        df <- df - mean(df[,dim(df)[2]],na.rm=TRUE) 
       else if (input$gcm.outputValues == 'Change') {
         df <- gcm.sc.tas.reactive() - gcm.sc.tas.present()
       }
-      caption <- paste('Monthly estimates of regional temperature assuming an 
-                       intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+      caption <- paste('Monthly estimates of regional temperature assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                        The climate models and their corresponding runs are listed in the second and third columns, respectively. 
-                       The last row in the table shows the estimated values from the referance data set (Observation).',
+                       The last row in the table shows the estimated values from the reference data set (Observation).',
                        sep= ' ')
       
       if (input$gcm.outputValues == 'Bias') {
         df <- df - df[,dim(df)[2]] 
-        caption <- paste('Bias [Deg. C] in monthly estimates of regional temperature assuming an 
-                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Bias [Deg. C] in monthly estimates of regional temperature assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
-                         The bias is computed as the deviation from the referance data set (Observation).',
+                         The bias is computed as the deviation from the reference data set (Observation).',
                          sep= ' ')
       } 
       df.format <- t(round(df,digits = 1))
@@ -2563,29 +2641,25 @@ function(input, output,session) {
       
       if (input$gcm.outputValues == 'Absolute')
         
-        caption <- paste('Monthly estimates of regional preciptiation assuming an 
-                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Monthly estimates of regional preciptiation assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
-                         The last row in the table shows the estimated values from the referance data set (Observation).',
+                         The last row in the table shows the estimated values from the reference data set (Observation).',
                          sep= ' ')
       else if (input$gcm.outputValues == 'Anomaly') {
         df <- df - colMeans(df)
-        caption <- paste('Monthly anomalies in estimated regional preciptiation assuming an 
-                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Monthly anomalies in estimated regional preciptiation assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
-                         The last row in the table shows the estimated values from the referance data set (Observation).',
+                         The last row in the table shows the estimated values from the reference data set (Observation).',
                          sep= ' ')
       } else if (input$gcm.outputValues == 'Bias') {
         df <- (df - df[,dim(df)[2]])/df[,dim(df)[2]] * 100 
-        caption <- paste('Bias [in %] in monthly estimates of regional preciptiation assuming an 
-                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Bias [in %] in monthly estimates of regional preciptiation assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
-                         The bias is computed as the deviation from the referance data set (Observation).',
+                         The bias is computed as the deviation from the reference data set (Observation).',
                          sep= ' ')
       }  else if (input$gcm.outputValues == 'Change') {
         df <- ((gcm.sc.pr.reactive() - gcm.sc.pr.present())/ gcm.sc.pr.present()) * 100
-        caption <- paste('Change [in %] in monthly estimates of regional preciptiation assuming an 
-                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Change [in %] in monthly estimates of regional preciptiation assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
                          The changes are computed as the deviation from the historical simulations for the present (1981-2010).',
                          sep= ' ')
@@ -2625,7 +2699,11 @@ function(input, output,session) {
     
     ## Seasonal scatter plot DT vs DP 
     output$gcm.scatter <- renderPlotly({
-      #
+      
+      rcp <- switch(tolower(as.character(input$gcm.rcp)),
+                    "intermediate (rcp4.5)"='rcp45',
+                    "high (rcp8.5)"='rcp85')
+      
       gcm.meta.pr <- gcm.meta.pr.reactive()
       dpr <- gcm.sc.pr.reactive()
       gcms <- names(dpr)
@@ -2634,22 +2712,21 @@ function(input, output,session) {
       else if (input$gcm.outputValues == 'RMSE') {
         dpr <- sqrt((((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]))^2) * 100
       } else if (input$gcm.outputValues == 'Anomaly') {
-        DF <- t(dpr)
-        dpr <- as.data.frame(t(DF - rowMeans(DF)))
+        dpr <- ((dpr - mean(dpr[,dim(dpr)[2]],na.rm=TRUE)) / mean(dpr[,dim(dpr)[2]],na.rm=TRUE)) * 100
+        #dpr <- as.data.frame(t(DF - rowMeans(DF)))
       } else if (input$gcm.outputValues == 'Change') {
         dpr <- ((dpr - gcm.sc.pr.present())/ gcm.sc.pr.present()) * 100
       } 
       
       gcm.meta.tas <- gcm.meta.tas.reactive()
-      
       dtas <- gcm.sc.tas.reactive()
       if (input$gcm.outputValues == 'Bias')
         dtas <- dtas - dtas[,dim(dtas)[2]]
       else if (input$gcm.outputValues == 'RMSE') {
         dtas <- sqrt((dtas-dtas[,dim(dtas)[2]])^2)
       } else if (input$gcm.outputValues == 'Anomaly') {
-        DF <- t(dtas)
-        dtas <- as.data.frame(t(DF - rowMeans(DF)))
+        dtas <- dtas - mean(dtas[,dim(dtas)[2]],na.rm=TRUE)
+        #dtas <- as.data.frame(t(DF - rowMeans(DF)))
       } else if (input$gcm.outputValues == 'Change') {
         dtas <- dtas - gcm.sc.tas.present()
       }
@@ -2665,18 +2742,19 @@ function(input, output,session) {
       
       gcm.name <- function(i) {
         gcmi <- gcm.meta.pr[i,c('model_id','parent_experiment_rip','realization')]
-        gcmi[is.na(gcmi)] <- ''
+        #gcmi[is.na(gcmi)] <- ''
         return(paste(as.character(as.matrix(gcmi)),collapse = '_'))
       }
       inst.name <- function(i) {
-        gcmi <- gcm.meta.pr[i,c('model_id')]
-        gcmi[is.na(gcmi)] <- ''
+        gcmi <- gcm.meta.pr[i,c('institute_id')]
+        #gcmi[is.na(gcmi)] <- ''
         return(paste(as.character(as.matrix(gcmi)),collapse = '_'))
       }
+      
       gcmall <- c(sapply(1:dim(gcm.meta.pr)[1],gcm.name),'ERAINT')
       gcm.inst <- c(sapply(1:dim(gcm.meta.pr)[1],inst.name),'ERAINT')
       
-      df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),dpr = as.numeric(round(colMeans(dpr),digits = 2)),
+      df <- data.frame(dtas = as.numeric(colMeans(dtas)),dpr = as.numeric(colMeans(dpr)),
                        gcm.name = gcmall, inst.name = gcm.inst,stringsAsFactors = FALSE)
       
       if (is.element(input$gcm.groupBy,c('None','---'))) {
@@ -2717,7 +2795,6 @@ function(input, output,session) {
       
       ## Create the plot
       p.sc <- plot_ly(df)
-      
       if (length(df$dpr) > 1 | length(df$dtas) > 1) {
         
         dfe.70 <- dataEllipse(x = as.matrix(df[,c('dtas','dpr')]),levels = 0.6827,draw = FALSE)
@@ -2805,19 +2882,19 @@ function(input, output,session) {
       }
       if (input$gcm.outputValues == 'Bias') {
         ylab <- 'Bias in temperature [deg. C]'
-        xlab <- 'Bias in precitation [%]'
+        xlab <- 'Bias in precipitation [%]'
       } else if (input$gcm.outputValues == 'Bias') {
         ylab <- 'RMSE in temperature [deg. C]'
-        xlab <- 'RMSE in precitation [%]'
+        xlab <- 'RMSE in precipitation [%]'
       } else if (input$gcm.outputValues == 'Anomaly') {
         ylab <- 'Temperature anomalies [deg. C]'
-        xlab <- 'Precitation anomalies [%]'
+        xlab <- 'precipitation anomalies [%]'
       } else if (input$gcm.outputValues == 'Change') {
         ylab <- 'Change in temperature [deg. C]'
-        xlab <- 'Change in precitation [%]'
+        xlab <- 'Change in precipitation [%]'
       } else  {
         ylab <- 'Temperature [deg. C]'
-        xlab <- 'Precitation [mm/month]'
+        xlab <- 'precipitation [mm/month]'
       }
       
       
@@ -2845,7 +2922,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.region, input$gcm.period,
+                                text=paste(input$gcm.region, input$gcm.period, input$gcm.rcp,
                                            input$gcm.chart.type,
                                            input$gcm.stat,sep=' | '),
                                 showarrow=F,
@@ -2865,23 +2942,32 @@ function(input, output,session) {
     })
     
     output$gcm.cc.scatter.pu <- renderPlotly({
-      #
-      gcm.meta.pr <- gcm.meta.pr.reactive.pu()
-      dpr <- gcm.sc.pr.reactive.cc.pu()
-      gcms <- names(dpr)
-      dpr <- ((dpr - gcm.sc.pr.present())/ gcm.sc.pr.present()) * 100
+      
+      gcm.meta.pr <- gcm.meta.pr.reactive.cc.pu()
+      dpr <- ((gcm.sc.pr.reactive.cc.pu() - gcm.sc.pr.present.cc.pu())/ gcm.sc.pr.present.cc.pu()) * 100
       
       gcm.meta.tas <- gcm.meta.tas.reactive.cc.pu()
       dtas <- gcm.sc.tas.reactive.cc.pu() - gcm.sc.tas.present.cc.pu()
       
+      rcp <- switch(tolower(as.character(input$gcm.cc.rcp)),
+                           "intermediate (rcp4.5)"='rcp45',
+                           "high (rcp8.5)"='rcp85')
+      
+      # gcm.meta.pr <- gcm.meta.pr.reactive.pu()
+      # dpr <- gcm.sc.pr.reactive.cc.pu()
+      gcms <- names(dpr)
+      # dpr <- ((dpr - gcm.sc.pr.present.cc.pu())/ gcm.sc.pr.present.cc.pu()) * 100
+      
+      # gcm.meta.tas <- gcm.meta.tas.reactive.cc.pu()
+      # dtas <- gcm.sc.tas.reactive.cc.pu() - gcm.sc.tas.present.cc.pu()
       gcm.name <- function(i) {
         gcmi <- gcm.meta.pr[i,c('model_id','parent_experiment_rip','realization')]
-        gcmi[is.na(gcmi)] <- ''
+        #gcmi[is.na(gcmi)] <- ''
         return(paste(as.character(as.matrix(gcmi)),collapse = '_'))
       }
       inst.name <- function(i) {
-        gcmi <- gcm.meta.pr[i,c('model_id')]
-        gcmi[is.na(gcmi)] <- ''
+        gcmi <- gcm.meta.pr[i,c('institute_id')]
+        #gcmi[is.na(gcmi)] <- ''
         return(paste(as.character(as.matrix(gcmi)),collapse = '_'))
       }
       gcmall <- c(sapply(1:dim(gcm.meta.pr)[1],gcm.name),'ERAINT')
@@ -2980,7 +3066,7 @@ function(input, output,session) {
                                    marker = list(color = 'black', symbol = 17,line = list(width = 2,color = '#FFFFFF'), size = 20,opacity=0.7))
       }
       ylab <- 'Change in temperature [deg. C]'
-      xlab <- 'Change in precitation [%]'
+      xlab <- 'Change in precipitation [%]'
       
       
       
@@ -3007,7 +3093,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.cc.region, input$gcm.cc.period,
+                                text=paste(input$gcm.cc.region, input$gcm.cc.period, input$gcm.cc.rcp,
                                            input$gcm.cc.chart.type,
                                            input$gcm.cc.stat,sep=' | '),
                                 showarrow=F,
@@ -3027,6 +3113,11 @@ function(input, output,session) {
     
     output$gcm.scatter.data <- DT::renderDataTable({
       
+      rcp <- switch(tolower(as.character(input$gcm.rcp)),
+                            "intermediate (rcp4.5)"='rcp45',
+                            "high (rcp8.5)"='rcp85')
+      
+      
       gcm.meta.pr <- gcm.meta.pr.reactive()
       dpr <- gcm.sc.pr.reactive()
       gcms <- names(dpr)
@@ -3035,8 +3126,7 @@ function(input, output,session) {
       else if (input$gcm.outputValues == 'RMSE') {
         dpr <- sqrt((((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]))^2) * 100
       } else if (input$gcm.outputValues == 'Anomaly') {
-        DF <- t(dpr)
-        dpr <- as.data.frame(t(DF - rowMeans(DF)))
+        dpr <- ((dpr - mean(dpr[,dim(dpr)[2]],na.rm=TRUE)) / mean(dpr[,dim(dpr)[2]],na.rm=TRUE)) * 100
       } else if (input$gcm.outputValues == 'Change') {
         dpr <- ((dpr - gcm.sc.pr.present())/ gcm.sc.pr.present()) * 100
       } 
@@ -3049,8 +3139,7 @@ function(input, output,session) {
       else if (input$gcm.outputValues == 'RMSE') {
         dtas <- sqrt((dtas-dtas[,dim(dtas)[2]])^2)
       } else if (input$gcm.outputValues == 'Anomaly') {
-        DF <- t(dtas)
-        dtas <- as.data.frame(t(DF - rowMeans(DF)))
+        dtas <- dtas - mean(dtas[,dim(dtas)[2]],na.rm=TRUE)
       } else if (input$gcm.outputValues == 'Change') {
         dtas <- dtas - gcm.sc.tas.present()
       }
@@ -3070,7 +3159,7 @@ function(input, output,session) {
         return(paste(as.character(as.matrix(gcmi)),collapse = '_'))
       }
       inst.name <- function(i) {
-        gcmi <- gcm.meta.pr[i,c('model_id')]
+        gcmi <- gcm.meta.pr[i,c('institute_id')]
         gcmi[is.na(gcmi)] <- ''
         return(paste(as.character(as.matrix(gcmi)),collapse = '_'))
       }
@@ -3080,30 +3169,26 @@ function(input, output,session) {
       df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),dpr = as.numeric(round(colMeans(dpr),digits = 2)),
                        gcm.name = gcmall, inst.name = gcm.inst,stringsAsFactors = FALSE)
       
-      caption <- paste('Annual means of monthly estimates of both regional temperature (deg. C) and precipitation (mm/month) assuming an 
-                       intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+      caption <- paste('Annual means of monthly estimates of both regional temperature (deg. C) and precipitation (mm/month) assuming',input$gcm.rcp,'scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                        The climate models and their corresponding runs are listed in the second and third columns, respectively. 
-                       The last row in the table shows the estimated values from the referance data set (last row).',
+                       The last row in the table shows the estimated values from the reference data set (last row).',
                        sep= ' ')
       
       if (input$gcm.outputValues == 'Bias') {
-        caption <- paste('Annual means of Biases in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
-                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Annual means of Biases in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
-                         The bias is computed as the deviation from the referance data set (last row).',
+                         The bias is computed as the deviation from the reference data set (last row).',
                          sep= ' ')
       } else if (input$gcm.outputValues == 'RMSE'){
-        caption <- paste('Annual means of RMSE in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
-                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Annual means of RMSE in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
-                         The RMSE is computed as the square root mean of deviations from the referance data set (last row).',
+                         The RMSE is computed as the square root mean of deviations from the reference data set (last row).',
                          sep= ' ')
         
       } else if (input$gcm.outputValues == 'Change'){
-        caption <- paste('Annual means of Changes in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
-                         intermediate emission scenarios for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
+        caption <- paste('Annual means of Changes in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming',input$gcm.rcp,'emission scenario for the',tolower(input$gcm.period),'averaged over',input$gcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column, respectively. 
-                         The RMSE is computed as the square root mean of deviations from the referance data set (last row).',
+                         The RMSE is computed as the square root mean of deviations from the reference data set (last row).',
                          sep= ' ')
         
       }
@@ -3156,8 +3241,7 @@ function(input, output,session) {
       if (input$rcm.outputValues == 'Bias')
         df <- df - df[,dim(df)[2]]      
       else if (input$rcm.outputValues == 'Anomaly') {
-        DF <- t(df)
-        df <- as.data.frame(t(DF - rowMeans(DF)))
+        df <- df - mean(df[,dim(df)[2]],na.rm=TRUE)
       } else if (input$rcm.outputValues == 'Change') {
         df <- rcm.sc.tas.reactive() - rcm.sc.tas.present()
       }
@@ -3382,7 +3466,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.region, input$rcm.period,
+                                text=paste(input$rcm.region, input$rcm.period, input$rcm.rcp,
                                            input$rcm.chart.type,
                                            input$rcm.stat,sep=' | '),
                                 showarrow=F,
@@ -3401,6 +3485,7 @@ function(input, output,session) {
     output$hydro.sc.tas <- rcm.sc.tas
     
     output$rcm.sc.bias.tas.pu <- renderPlotly({
+      
       rcm.meta.tas <- rcm.meta.tas.reactive.pu()
       df <- rcm.sc.tas.reactive.pu()
       df <- df - df[,dim(df)[2]]      
@@ -3581,7 +3666,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.region.pu, input$rcm.period.pu,
+                                text=paste(input$rcm.region.pu, input$rcm.period.pu, input$rcm.rcp.pu,
                                            input$rcm.chart.type.pu,
                                            input$rcm.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -3775,7 +3860,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.sc.region.pu, input$rcm.sc.period.pu,
+                                text=paste(input$rcm.sc.region.pu, input$rcm.sc.period.pu, input$rcm.sc.rcp.pu,
                                            input$gcm.sc.chart.type.pu,
                                            input$gcm.sc.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -3788,7 +3873,7 @@ function(input, output,session) {
     })
     
     output$rcm.cc.tas.pu <- renderPlotly({
-      
+      rcm.meta.tas <- rcm.meta.tas.reactive.cc.pu()
       df <- rcm.sc.tas.reactive.cc.pu() - rcm.sc.tas.present.cc.pu()
       
       #df <- df[,-36] # AM Quick fix but has to be removed ... once meta is updated.
@@ -3968,7 +4053,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.cc.region, input$rcm.cc.period,
+                                text=paste(input$rcm.cc.region, input$rcm.cc.period, input$rcm.cc.rcp,
                                            input$rcm.cc.chart.type,
                                            input$rcm.cc.stat,sep=' | '),
                                 showarrow=F,
@@ -3992,8 +4077,7 @@ function(input, output,session) {
       if (input$rcm.outputValues == 'Bias')
         df <- ((df - df[,dim(df)[2]])/df[,dim(df)[2]]) * 100
       else if (input$rcm.outputValues == 'Anomaly') {
-        DF <- t(df)
-        df <- as.data.frame(t(DF - rowMeans(DF)))
+        df <- ((df - mean(df[,dim(df)[2]],na.rm=TRUE))/man(df[,dim(df)[2]],na.rm=TRUE)) * 100
       } else if (input$rcm.outputValues == 'Change') {
         df <- ((rcm.sc.pr.reactive() - rcm.sc.pr.present())/ rcm.sc.pr.present()) * 100
       }
@@ -4139,7 +4223,7 @@ function(input, output,session) {
       if (input$rcm.outputValues == 'Bias')  
         ylab <- "Bias in precipitation [%]"
       else if (input$rcm.outputValues == 'Anomaly') 
-        ylab <- "Precipitation anomalies [mm]"
+        ylab <- "Precipitation anomalies [%]"
       else if (input$rcm.outputValues == 'Change')
         ylab <- "Change in precipitation [%]"
       else 
@@ -4168,7 +4252,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.region.pu, input$rcm.period.pu,
+                                text=paste(input$rcm.region.pu, input$rcm.period.pu, input$rcm.rcp.pu,
                                            input$rcm.chart.type.pu,
                                            input$rcm.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -4321,7 +4405,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$gcm.region.pu, input$rcm.period.pu,
+                                text=paste(input$gcm.region.pu, input$rcm.period.pu, input$rcm.rcp.pu,
                                            input$gcm.chart.type.pu,
                                            input$gcm.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -4472,7 +4556,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.sc.region.pu, input$rcm.sc.period.pu,
+                                text=paste(input$rcm.sc.region.pu, input$rcm.sc.period.pu, input$rcm.sc.rcp.pu,
                                            input$rcm.sc.chart.type.pu,
                                            input$rcm.sc.stat.pu,sep=' | '),
                                 showarrow=F,
@@ -4488,7 +4572,7 @@ function(input, output,session) {
     })
     
     output$rcm.cc.pr.pu <- renderPlotly({
-      rcm.meta.pr <- rcm.meta.pr.reactive.sc.pu()
+      rcm.meta.pr <- rcm.meta.pr.reactive.cc.pu()
       
       df <- (rcm.sc.pr.reactive.cc.pu() - rcm.sc.pr.present.cc.pu()) / rcm.sc.pr.present.cc.pu() * 100
       
@@ -4592,7 +4676,7 @@ function(input, output,session) {
         } 
       }
       
-      ylab <- "Precipitation [mm/month]"
+      ylab <- "Precipitation [%]"
       # Format layout 
       p.sc <- p.sc %>% layout(title = FALSE,
                               paper_bgcolor='rgb(255,255,255)', plot_bgcolor='rgb(229,229,229)',
@@ -4617,7 +4701,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.cc.region, input$rcm.cc.period,
+                                text=paste(input$rcm.cc.region, input$rcm.cc.period, input$rcm.cc.rcp,
                                            input$rcm.cc.chart.type,
                                            input$rcm.cc.stat,sep=' | '),
                                 showarrow=F,
@@ -4645,28 +4729,23 @@ function(input, output,session) {
         rcm.meta.tas <- rcm.meta.tas[input$rowsRcm,]
       }
       
-      caption <- paste('Simulated regional temperature [deg. C] assuming an 
-                       intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+      caption <- paste('Simulated regional temperature [deg. C] assuming',input$rcm.rcp,'emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                        The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
-                       The last row in the table shows the estimated values from the referance data set (Observation).',sep= ' ')
+                       The last row in the table shows the estimated values from the reference data set (Observation).',sep= ' ')
       
       if (input$rcm.outputValues == 'Bias') {
         df <- df - df[,dim(df)[2]]      
-        caption <- paste('Bias in simulated regional temperature [deg. C] assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Bias in simulated regional temperature [deg. C] assuming',input$rcm.rcp,' emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
-                         The last row in the table shows the estimated values from the referance data set (Observation).',sep= ' ')
+                         The last row in the table shows the estimated values from the reference data set (Observation).',sep= ' ')
       } else if (input$rcm.outputValues == 'Anomaly') {
-        DF <- t(df)
-        df <- as.data.frame(t(DF - rowMeans(DF)))
-        caption <- paste('Simulated regional temperature anomalies [deg. C] assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        df <- df - mean(df[,dim(df)[2]],na.rm=TRUE)  
+        caption <- paste('Simulated regional temperature anomalies [deg. C] assuming',input$rcm.rcp,'emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
-                         The last row in the table shows the estimated values from the referance data set (Observation).',sep= ' ')
+                         The last row in the table shows the estimated values from the reference data set (Observation).',sep= ' ')
       } else if (input$rcm.outputValues == 'Change') {
         df <- rcm.sc.tas.reactive() - rcm.sc.tas.present()
-        caption <- paste('Absolute changes in regional temperature [deg. C] assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Absolute changes in regional temperature [deg. C] assuming',input$rcm.rcp,'emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
                          Changes are computed with regards to the reference period 1981-2010.',sep= ' ')
       }
@@ -4711,7 +4790,6 @@ function(input, output,session) {
     })
     
     output$rcm.sc.pr.data <- DT::renderDataTable({
-      
       rcm.meta.pr <- rcm.meta.pr.reactive()
       df <- rcm.sc.pr.reactive()
       
@@ -4719,28 +4797,24 @@ function(input, output,session) {
         rcm.meta.pr <- rcm.meta.pr[input$rowsRcm,]
       }
       
-      caption <- paste('Simulated regional precipitation [mm/month] assuming an 
-                       intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+      caption <- paste('Simulated regional precipitation [mm/month] assuming',input$rcm.rcp,'emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                        The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
-                       The last row in the table shows the estimated values from the referance data set (Observation).',sep= ' ')
+                       The last row in the table shows the estimated values from the reference data set (Observation).',sep= ' ')
       
       if (input$rcm.outputValues == 'Bias') {
         df <- ((df - df[,dim(df)[2]])/df[,dim(df)[2]]) * 100
-        caption <- paste('Bias in simulated regional precipitation [%] assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Bias in simulated regional precipitation [%] assuming',input$rcm.rcp,'  
+                         emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
-                         The last row in the table shows the estimated values from the referance data set (Observation).',sep= ' ')
+                         The last row in the table shows the estimated values from the reference data set (Observation).',sep= ' ')
       } else if (input$rcm.outputValues == 'Anomaly') {
-        DF <- t(df)
-        df <- as.data.frame(t(DF - rowMeans(DF)))
-        caption <- paste('Simulated regional precipitation anomalies [mm/month] assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        df <- ((df - mean(df[,dim(df)[2]],na.rm=TRUE))/mean(df[,dim(df)[2]],na.rm=TRUE)) * 100
+        caption <- paste('Simulated regional precipitation anomalies [%] assuming an',input$rcm.rcp,'emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
-                         The last row in the table shows the estimated values from the referance data set (Observation).',sep= ' ')
+                         The last row in the table shows the estimated values from the reference data set (Observation).',sep= ' ')
       } else if (input$rcm.outputValues == 'Change') {
         df <- ((rcm.sc.pr.reactive() - rcm.sc.pr.present())/ rcm.sc.pr.present()) * 100
-        caption <- paste('Relative changes in regional precipitation [%] assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Relative changes in regional precipitation [%] assuming',input$rcm.rcp,'emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column and third columns, respectively. 
                          Changes are computed with regards to the reference period 1981-2010',sep= ' ')
       }
@@ -4795,8 +4869,7 @@ function(input, output,session) {
       else if (input$rcm.outputValues == 'RMSE') {
         dpr <- sqrt((((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]))^2) * 100
       } else if (input$rcm.outputValues == 'Anomaly') {
-        DF <- t(dpr)
-        dpr <- as.data.frame(t(DF - rowMeans(DF)))
+        dpr <- ((dpr - mean(dpr[,dim(dpr)[2]],na.rm=TRUE)) / mean(dpr[,dim(dpr)[2]],na.rm=TRUE)) * 100
       } else if (input$rcm.outputValues == 'Change') {
         dpr <- ((dpr - rcm.sc.pr.present())/ rcm.sc.pr.present()) * 100
       } 
@@ -4809,8 +4882,7 @@ function(input, output,session) {
       else if (input$rcm.outputValues == 'RMSE') {
         dtas <- sqrt((dtas-dtas[,dim(dtas)[2]])^2)
       } else if (input$rcm.outputValues == 'Anomaly') {
-        DF <- t(dtas)
-        dtas <- as.data.frame(t(DF - rowMeans(DF)))
+        dtas <- dtas - mean(dtas[,dim(dtas)[2]],na.rm=TRUE)
       } else if (input$rcm.outputValues == 'Change') {
         dtas <- dtas - rcm.sc.tas.present()
       }
@@ -4968,18 +5040,18 @@ function(input, output,session) {
       }
       if (input$rcm.outputValues == 'Bias') {
         ylab <- 'Bias in temperature [deg. C]'
-        xlab <- 'Bias in precitation [%]'
+        xlab <- 'Bias in precipitation [%]'
       } else if (input$rcm.outputValues == 'Bias') {
         ylab <- 'RMSE in temperature [deg. C]'
-        xlab <- 'RMSE in precitation [%]'
+        xlab <- 'RMSE in precipitation [%]'
       } else if (input$rcm.outputValues == 'Anomaly') {
         ylab <- 'Temperature anomalies [deg. C]'
-        xlab <- 'Precitation anomalies [%]'
+        xlab <- 'Precipitation anomalies [%]'
       } else if (input$rcm.outputValues == 'Change') {
         ylab <- 'Change in temperature [deg. C]'
-        xlab <- 'Change in precitation [%]'
+        xlab <- 'Change in precipitation [%]'
       } else  {
-        ylab <- 'Precitation [mm/month]'
+        ylab <- 'Precipitation [mm/month]'
         xlab <- 'Temperature [deg. C]'
       }
       
@@ -5006,7 +5078,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.region, input$rcm.period,
+                                text=paste(input$rcm.region, input$rcm.period, input$rcm.rcp,
                                            input$rcm.chart.type,
                                            input$rcm.stat,sep=' | '),
                                 showarrow=F,
@@ -5166,7 +5238,7 @@ function(input, output,session) {
                                 xref="paper",
                                 y=1.07,
                                 x=0,
-                                text=paste(input$rcm.cc.region, input$rcm.cc.period,
+                                text=paste(input$rcm.cc.region, input$rcm.cc.period, input$rcm.cc.rcp,
                                            input$rcm.cc.chart.type,
                                            input$rcm.cc.stat,sep=' | '),
                                 showarrow=F,
@@ -5195,8 +5267,7 @@ function(input, output,session) {
       } else if (input$rcm.outputValues == 'RMSE') {
         dpr <- sqrt((((dpr - dpr[,dim(dpr)[2]]) / dpr[,dim(dpr)[2]]))^2) * 100
       } else if (input$rcm.outputValues == 'Anomaly') {
-        DF <- t(dpr)
-        dpr <- as.data.frame(t(DF - rowMeans(DF)))
+        dpr <- ((dpr - mean(dpr[,dim(dpr)[2]],na.rm=TRUE)) / mean(dpr[,dim(dpr)[2]],na.rm=TRUE)) * 100
       } else if (input$rcm.outputValues == 'Change') {
         dpr <- ((dpr - rcm.sc.pr.present())/ rcm.sc.pr.present()) * 100
       } 
@@ -5209,8 +5280,7 @@ function(input, output,session) {
       } else if (input$rcm.outputValues == 'RMSE') {
         dtas <- sqrt((dtas-dtas[,dim(dtas)[2]])^2)
       } else if (input$rcm.outputValues == 'Anomaly') {
-        DF <- t(dtas)
-        dtas <- as.data.frame(t(DF - rowMeans(DF)))
+        dtas <- dtas - mean(dtas[,dim(dtas)[2]],na.rm=TRUE)
       } else if (input$rcm.outputValues == 'Change') {
         dtas <- dtas - rcm.sc.tas.present()
       }
@@ -5241,30 +5311,26 @@ function(input, output,session) {
       df <- data.frame(dtas = as.numeric(round(colMeans(dtas),digits = 2)),dpr = as.numeric(round(colMeans(dpr),digits = 2)),
                        rcm.name = rcmall, inst.name = rcm.inst,stringsAsFactors = FALSE)
       
-      caption <- paste('Annual means of monthly estimates of both regional temperature (deg. C) and precipitation (mm/month) assuming an 
-                       intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+      caption <- paste('Annual means of monthly estimates of both regional temperature (deg. C) and precipitation (mm/month) assuming ',input$rcm.rcp,' emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                        The climate models and their corresponding runs are listed in the second and third columns, respectively. 
-                       The last row in the table shows the estimated values from the referance data set (last row).',
+                       The last row in the table shows the estimated values from the reference data set (last row).',
                        sep= ' ')
       
       if (input$rcm.outputValues == 'Bias') {
-        caption <- paste('Annual means of Biases in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Annual means of Biases in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming ',input$rcm.rcp,' emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
-                         The bias is computed as the deviation from the referance data set (last row).',
+                         The bias is computed as the deviation from the reference data set (last row).',
                          sep= ' ')
       } else if (input$rcm.outputValues == 'RMSE'){
-        caption <- paste('Annual means of RMSE in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Annual means of RMSE in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming ',input$rcm.rcp,' emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second and third columns, respectively. 
-                         The RMSE is computed as the square root mean of deviations from the referance data set (last row).',
+                         The RMSE is computed as the square root mean of deviations from the reference data set (last row).',
                          sep= ' ')
         
       } else if (input$rcm.outputValues == 'Change'){
-        caption <- paste('Annual means of Changes in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming an 
-                         intermediate emission scenarios for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
+        caption <- paste('Annual means of Changes in monthly estimates of both regional temperature (deg. C) and precipitation (%) assuming  ',input$rcm.rcp,' emission scenario for the',tolower(input$rcm.period),'averaged over',input$rcm.region,'region.
                          The climate models and their corresponding runs are listed in the second column, respectively. 
-                         The RMSE is computed as the square root mean of deviations from the referance data set (last row).',
+                         The RMSE is computed as the square root mean of deviations from the reference data set (last row).',
                          sep= ' ')
         
       }
@@ -5314,7 +5380,7 @@ function(input, output,session) {
       x <- as.numeric(attr(zmap,'longitude'))
       y <- as.numeric(attr(zmap,'latitude'))
       #z <- apply(zmap,c(2,3),mean,na.rm=TRUE)
-      z <- zmap[grep(input$spi.sim,rcm.names),,]
+      z <- zmap[grep(input$spi.sim,rcm.names[["rcp45"]]),,]
       #z[is.na(z)] <- -999
       ## 
       #Create raster object
@@ -5362,7 +5428,7 @@ function(input, output,session) {
       x <- as.numeric(attr(zmap,'longitude'))
       y <- as.numeric(attr(zmap,'latitude'))
       #z <- apply(zmap,c(2,3),mean,na.rm=TRUE)
-      z <- zmap[grep(input$spi.sim,rcm.names),,]
+      z <- zmap[grep(input$spi.sim,rcm.names[["rcp45"]]),,]
       #z[is.na(z)] <- -999
       ##
       #Create raster object
@@ -5405,6 +5471,13 @@ function(input, output,session) {
     output$spei.settings <- renderText({
       paste(input$spi.sim,' | ',input$spi.freq,' | ',input$spi.group,' | ',input$spi.period,' | ',input$spi.stat)
     }) 
+    output$spei.settings <- DT::renderDataTable({
+      DT::datatable(filter = 'none',
+          rbind(c(input$spi.sim,input$spi.freq,input$spi.group,input$spi.period,input$spi.stat)),
+          colnames = c("Simulation","Frequency","Category","Period","Statistic") ,options = list(dom = 't'), 
+          caption='Your selected settings',style="bootstrap") # %>% DT::formatStyle(columns = c(1:5),color ='white',backgroundColor = 'royalblue')
+    }) 
+    
   })
   
   observeEvent(input$gcm.groupBy,{
@@ -5446,32 +5519,31 @@ function(input, output,session) {
                    climate models that are run on different temporal and spatial scales to provide the best representation
                    of the climate signal over a region of interest and for a specific time horizon (past, present, or future). 
                    The climate simulations evaluated here are based on climate model ouptuts 
-                   collected from the Climate Model Intercomparison Project - Phase5 (CMIP5), the Coordinated Regional Climate Downscaling Experiment over Europe (EURO-CORDEX),
-                   and the Empirical-Statistical Downcaling project (ESD) at the Norwegian Meteorolocial Institute to produce the best estimates of 
-                   global/regional/local climate signal that in turn can be used in impact studies.')   
+                   collected from the Climate Model Intercomparison Project - Phase5 (CMIP5) and the Coordinated Regional Climate Downscaling Experiment over Europe (EURO-CORDEX),
+                   to produce the best estimates of global/regional/local climate signal that in turn can be used in impact studies.')   
       infoBox('What Climate Simulations evaluated here !',txt, icon = shiny::icon("table"),color = 'olive')
     })
     
-    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+    txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the ',input$gcm.rcp,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
     
     # GCM info text output
     output$figcaption.gcm.sc.tas = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming  ',input$gcm.rcp,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
     output$figcaption.gcm.tas.pu = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the bias in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the bias in historical and projected surface air temperature assuming ',input$gcm.rcp,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
     output$figcaption.gcm.tas.cc = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the changes in simulated historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the changes in simulated historical and projected surface air temperature assuming  ',input$gcm.rcp,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
     output$figcaption.gcm.sc.tas.pu = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming ',input$gcm.rcp,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
@@ -5509,20 +5581,20 @@ function(input, output,session) {
     
     # RCM info text output
     output$figcaption.rcm.sc.tas = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming ',input$rcm.sc.rcp.pu,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
     output$figcaption.rcm.tas.cc = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the future changes seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the future changes seasonal cycle in historical and projected surface air temperature assuming ',input$rcm.cc.rcp,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     output$figcaption.rcm.tas.pu = renderInfoBox({
-      txt <- tags$h5('Interactive charts  evaluating the bias in seasonal cycle of historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts  evaluating the bias in seasonal cycle of historical and projected surface air temperature assuming ',input$rcm.rcp.pu,' emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     output$figcaption.rcm.sc.tas.pu = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming the intermediate (RCP4.5) emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the seasonal cycle in historical and projected surface air temperature assuming  ',input$rcm.sc.rcp.pu,'  emission scenario. The continuous line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
@@ -5537,7 +5609,7 @@ function(input, output,session) {
     })
     
     output$figcaption.rcm.pr.pu = renderInfoBox({
-      txt <- tags$h5('Interactive charts evaluating the bias in seasonal cycle of historical and projected monthly precipitation totals assuming the intermediate (RCP4.5) emission scenario. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
+      txt <- tags$h5('Interactive charts evaluating the bias in seasonal cycle of historical and projected monthly precipitation totals assuming ',input$rcm.rcp,' emission scenario. The blue line and envelope show the mean and the spread from the multi-model ensemble of simulations. The dashed line shows the seasonal cycle from reanalysis data used as reference.')   
       infoBox(strong('How to read the chart!'),txt, icon = shiny::icon("bar-chart-o"),color = 'olive')
     })
     
@@ -5559,7 +5631,7 @@ function(input, output,session) {
     
     # Text info
     txtTips <- tags$h5('You can modify the type of output from the "Settings & Outputs" box and choose between options of showing individual simulations, envelope of the ensemble model simulations, or box plots. They let you show anomalies and group/colour the results according to the metadata. “Individual Simulations” allow double-click on specific climate models listed in the legend or the metadata table to isolate one or a group of simulations.')
-    txtMoreTips <- tags$h5('Other options include zooming in/out, comparing simulations, and downloading the graphic. The types of evaluation includes the mean seasonal cycle of the mean as well as the spatial standard deviation or spatial correlation, and you can download the data and further details about the simulations by selecting the tabs labelled “Data” or “Metadata”. The evaluation shown here are for multi-model ensemble of CMIP5 RCP4.5 simulations.')
+    txtMoreTips <- tags$h5('Other options include zooming in/out, comparing simulations, and downloading the graphic. The types of evaluation includes the mean seasonal cycle of the mean as well as the spatial standard deviation or spatial correlation, and you can download the data and further details about the simulations by selecting the tabs labelled “Data” or “Metadata”. The evaluation shown here are for multi-model ensemble of CMIP5 (RCP4.5 and RCP8.5) simulations.')
     txtRemember <- tags$h5('These simulations are based on models and data to represent the climate system. Those models are in turn based on coarse resolution, different parameterization schemes and simplifications of physical processes which systematically lead to deviations (biases) from the reference data.')
     
     figTips = renderInfoBox({
@@ -5658,7 +5730,7 @@ function(input, output,session) {
     output$figMoreTips.rcm.cc.scatter <- figMoreTips
     output$figRemember.rcm.cc.scatter <- figRemember
     
-    txtTable <- tags$h5('Monthly estimates of regional temperature assuming an intermediate emission scenarios for the present (1981-2010) averaged over Global region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the referance data set (Observation)')
+    txtTable <- tags$h5('Monthly estimates of regional temperature assuming an emission scenario for the present (1981-2010) averaged over the selected region. The climate models and their corresponding runs are listed in the second and third columns, respectively. The last row in the table shows the estimated values from the reference data set (Observation)')
     
     output$tabcaption = renderInfoBox({
       infoBox('How to read the table!',txtTable, icon = shiny::icon("table"),color = 'orange')

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--generator='jetpack-6.9'-->
+<?xml-stylesheet type="text/xsl" href="//example.com/sitemap-index.xsl"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>http://example.com/sitemap-1.xml</loc><lastmod>2018-11-15T08:55:12Z</lastmod></sitemap><sitemap><loc>http://example.com/image-sitemap-1.xml</loc><lastmod>2018-10-09T08:18:23Z</lastmod></sitemap><sitemap><loc>http://example.com/video-sitemap-1.xml</loc><lastmod>2018-01-31T11:10:00Z</lastmod></sitemap></sitemapindex>

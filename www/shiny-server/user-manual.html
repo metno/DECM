@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+
+<html lang="en-US"><head> <link href='https://fonts.googleapis.com/css?family=Karla' rel='stylesheet'><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=10"><title>Prototype – Data Evaluation for Climate Models</title><script type="text/javascript">
+      WebFontConfig = {"google":{"families":["Ubuntu:500:latin,latin-ext","Ubuntu:r,i,b,bi:latin,latin-ext"]}};
+      (function() {
+      var wf = document.createElement('script');
+      wf.src = 'http://example.com/wp-content/mu-plugins/wpcomsh/vendor/automattic/custom-fonts/js/webfont.js';
+      wf.type = 'text/javascript';
+      wf.async = 'true';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(wf, s);
+      })();
+    </script><style id="jetpack-custom-fonts-css"></style><link rel="dns-prefetch" href="//s0.wp.com"><link rel="dns-prefetch" href="//s.w.org"><link rel="stylesheet" id="usrStyle-css" href="wp-content/plugins/universal-star-rating/css/style.css" type="text/css" media="all"><link rel="stylesheet" id="wp-block-library-css" href="https://c0.wp.com/c/5.0.3/wp-includes/css/dist/block-library/style.min.css" type="text/css" media="all"><link rel="stylesheet" id="jetpack-email-subscribe-css" href="https://c0.wp.com/p/jetpack/6.9/modules/shortcodes/css/jetpack-email-subscribe.css" type="text/css" media="all"><link rel="stylesheet" id="wpcom-text-widget-styles-css" href="wp-content/mu-plugins/wpcomsh/vendor/automattic/text-media-widget-styles/css/widget-text.css" type="text/css" media="all"><link rel="stylesheet" id="thumbs_rating_styles-css" href="wp-content/plugins/thumbs-rating/css/style.css" type="text/css" media="all"><link rel="stylesheet" id="megamenu-css" href="wp-content/uploads/maxmegamenu/style.css" type="text/css" media="all"><link rel="stylesheet" id="dashicons-css" href="https://c0.wp.com/c/5.0.3/wp-includes/css/dashicons.min.css" type="text/css" media="all"><link rel="stylesheet" id="vantage-style-css" href="wp-content/themes/vantage/style.css" type="text/css" media="all"><link rel="stylesheet" id="font-awesome-css" href="wp-content/themes/vantage/fontawesome/css/font-awesome.css" type="text/css" media="all"><link rel="stylesheet" id="recent-posts-widget-with-thumbnails-public-style-css" href="wp-content/plugins/recent-posts-widget-with-thumbnails/public.css" type="text/css" media="all"><link rel="stylesheet" id="meks-author-widget-css" href="wp-content/plugins/meks-smart-author-widget/css/style.css" type="text/css" media="all"><link rel="stylesheet" id="dry_awp_theme_style-css" href="wp-content/plugins/advanced-wp-columns/assets/css/awp-columns.css" type="text/css" media="all"><style id="dry_awp_theme_style-inline-css" type="text/css">
+      @media screen and (max-width: 1028px) {	.csColumn {		clear: both !important;		float: none !important;		text-align: center !important;		margin-left:  10% !important;		margin-right: 10% !important;		width: 80% !important;	}	.csColumnGap {		display: none !important;	}}
+    </style><link rel="stylesheet" id="glossary-hint-css" href="wp-content/plugins/glossary-by-codeat/public/assets/css/tooltip-line.css" type="text/css" media="all"><link rel="stylesheet" id="social-logos-css" href="https://c0.wp.com/p/jetpack/6.9/_inc/social-logos/social-logos.min.css" type="text/css" media="all"><link rel="stylesheet" id="jetpack_css-css" href="https://c0.wp.com/p/jetpack/6.9/css/jetpack.css" type="text/css" media="all"><script type="text/javascript" src="https://c0.wp.com/c/5.0.3/wp-includes/js/jquery/jquery.js"></script><script type="text/javascript" src="https://c0.wp.com/c/5.0.3/wp-includes/js/jquery/jquery-migrate.min.js"></script><script type="text/javascript">
+      /* <![CDATA[ */
+var thumbs_rating_ajax = {"ajax_url":"https:\/\/PLACEHOLDER.wpsho\/wp-admin\/admin-ajax.php","nonce":"f7de2898c0"};
+/* ]]> */
+    </script><script type="text/javascript" src="wp-content/plugins/thumbs-rating/js/general.js"></script><link rel="dns-prefetch" href="//widgets.wp.com"><link rel="dns-prefetch" href="//s0.wp.com"><link rel="dns-prefetch" href="//0.gravatar.com"><link rel="dns-prefetch" href="//1.gravatar.com"><link rel="dns-prefetch" href="//2.gravatar.com"><link rel="dns-prefetch" href="//jetpack.wordpress.com"><link rel="dns-prefetch" href="//s1.wp.com"><link rel="dns-prefetch" href="//s2.wp.com"><link rel="dns-prefetch" href="//public-api.wordpress.com"><link rel="dns-prefetch" href="//i0.wp.com"><link rel="dns-prefetch" href="//i1.wp.com"><link rel="dns-prefetch" href="//i2.wp.com"><link rel="dns-prefetch" href="//c0.wp.com"><style type="text/css">img#wpstats{display:none}</style><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Climate Data Site"><meta property="og:type" content="website"><meta property="og:title" content="DECM App"><meta property="og:description" content="Data Evaluation for Climate Models"><meta property="og:url" content=""><meta property="og:site_name" content="Prototype"><meta property="og:image" content="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=512%2C512&ssl=1"><meta property="og:image:width" content="512"><meta property="og:image:height" content="512"><meta property="og:locale" content="en_US"><meta name="twitter:text:title" content="Home"><meta name="twitter:image" content="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=240%2C240&ssl=1"><meta name="twitter:card" content="summary"><style type="text/css" media="screen">
+      #footer-widgets .widget { width: 100%; }
+      #masthead-widgets .widget { width: 100%; }
+    </style><style type="text/css" id="customizer-css">body,button,input,select,textarea { font-family: "Karla", Verdana, Geneva, sans-serif; font-weight: 400 } #masthead h1 {color:#871010; font-family: "Karla", Verdana, Geneva, sans-serif; font-weight: 400 } h1,h2,h3,h4,h5,h6 {color: #871010 ; font-family: "Karla", Verdana, Geneva, sans-serif; font-weight: 400 } #masthead .hgroup h1, #masthead.masthead-logo-in-menu .logo > h1 {color:#871010; font-size: 18px } .entry-content { font-size: 18px } #masthead .hgroup { padding-top: 10px; padding-bottom: 10px } .entry-content a, .entry-content a:visited, article.post .author-box .box-content .author-posts a:hover, #secondary a, #secondary a:visited, #masthead .hgroup a, #masthead .hgroup a:visited, .comment-form .logged-in-as a, .comment-form .logged-in-as a:visited { color: #6d0624 } .entry-content a:hover, .entry-content a:focus, .entry-content a:active, #secondary a:hover, #masthead .hgroup a:hover, #masthead .hgroup a:focus, #masthead .hgroup a:active, .comment-form .logged-in-as a:hover, .comment-form .logged-in-as a:focus, .comment-form .logged-in-as a:active { color: #941333 } .main-navigation { background-color: #941333 } .main-navigation a { color: #ffffff } .main-navigation ul ul { background-color: #6d0d24 } .main-navigation ul ul a { color: #ffffff } .main-navigation ul li:hover > a, #search-icon #search-icon-icon:hover { background-color: #ac163b } .main-navigation ul ul li:hover > a { background-color: #ac163b } .main-navigation ul li a { padding-top: 10px; padding-bottom: 10px } .main-navigation ul li { font-size: 18px } #header-sidebar .widget_nav_menu ul.menu > li > ul.sub-menu { border-top-color: #6d0300 } a.button, button, html input[type="button"], input[type="reset"], input[type="submit"], .post-navigation a, #image-navigation a, article.post .more-link, article.page .more-link, .paging-navigation a, .woocommerce #page-wrapper .button, .woocommerce a.button, .woocommerce .checkout-button, .woocommerce input.button, #infinite-handle span button { text-shadow: none } a.button, button, html input[type="button"], input[type="reset"], input[type="submit"], .post-navigation a, #image-navigation a, article.post .more-link, article.page .more-link, .paging-navigation a, .woocommerce #page-wrapper .button, .woocommerce a.button, .woocommerce .checkout-button, .woocommerce input.button, .woocommerce #respond input#submit.alt, .woocommerce a.button.alt, .woocommerce button.button.alt, .woocommerce input.button.alt, #infinite-handle span { -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none } #masthead { background-color: #d6d6d6; background-image: url("http://example.com/wp-content/uploads/2018/03/proto_logo_2.png"); background-position: center; background-repeat: no-repeat } .entry-content img { -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.175); -moz-box-shadow: 0 1px 2px rgba(0,0,0,0.175); box-shadow: 0 1px 2px rgba(0,0,0,0.175) } #colophon { background-image: url("http://example.com/wp-content/uploads/2018/03/footer_logo_2.png"); background-position: center; background-repeat: no-repeat }, .column2 {float: left;width: 50%;padding: 10px;}, .row:after {content: "";display: table; clear: both;}, media screen and (max-width: 600px) {.column2 {width: 100%;}</style><link rel="icon" href="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=32%2C32&ssl=1" sizes="32x32"><link rel="icon" href="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=192%2C192&ssl=1" sizes="192x192"><link rel="apple-touch-icon-precomposed" href="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=180%2C180&ssl=1"><meta name="msapplication-TileImage" content="https://i0.wp.com/climatedatasite.net/wp-content/uploads/2018/02/cropped-banner_c3s.png?fit=270%2C270&ssl=1"><script>
+      (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r;
+      i[r] = i[r] || function () {
+      (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date();
+      a = s.createElement(o),
+      m = s.getElementsByTagName(o)[0];
+      a.async = 1;
+      a.src = g;
+      m.parentNode.insertBefore(a, m)
+      })
+      (window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+      ga('create', 'UA-105333318-2', 'auto', {
+      'siteSpeedSampleRate': '1'   });
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script><style type="text/css" id="wp-custom-css">
+      p, ul, ol {color:rgb(53,53,53);font-size:18px;margin-bottom:10px !important;line-height: 1.5;}			</style><style type="text/css">/** Mega Menu CSS: fs **/</style>
+
+    <style>  
+
+      .toc {
+      position: fixed;
+      left:60%; 
+      top: 20em;
+      padding: 1em;
+      line-height: 2;
+      
+      ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+      }
+      
+      ul ul {
+      padding-left: 2em;
+      list-style-type: none;
+      }
+      
+      li a {
+      display: inline-block;
+      color: #871010;
+      font-size:10px;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.230, 1.000, 0.320, 1.000);
+      }
+      
+      li.visible>a {
+      color: #871010;
+      transform: translate( 5px );
+      }
+      }
+
+      .toc-marker {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      
+      path {
+      transition: all 0.3s ease;
+      }
+      }
+
+
+    </style>
+  </head><body class="home page-template page-template-home-panels page-template-home-panels-php page page-id-2 wp-custom-logo mega-menu-primary group-blog responsive layout-full no-js has-sidebar page-layout-full-width-sidebar not-default-page">
+
+
+    <div id="page-wrapper">
+      <header id="masthead" class="site-header" role="banner"><div class="hgroup full-container ">
+	  <a href="" title="DECM app" rel="home" class="logo"><img src="banner_c3s.png" class="logo-no-height-constrain" width="100%" alt="Prototype Logo"></a>
+	  <div class="support-text">
+	  </div>
+	</div>
+
+	<nav role="navigation" class="site-navigation primary use-sticky-menu mobile-navigation"><div class="full-container">
+	    
+	    <div id="mega-menu-wrap-primary" class="mega-menu-wrap"><div class="mega-menu-toggle" tabindex="0"><div class="mega-toggle-blocks-left"></div><div class="mega-toggle-blocks-center"></div><div class="mega-toggle-blocks-right"><div class="mega-toggle-block mega-menu-toggle-block mega-toggle-block-1" id="mega-toggle-block-1"><span class="mega-toggle-label"></span></div></div></div><ul id="mega-menu-primary" class="mega-menu max-mega-menu mega-menu-horizontal mega-no-js" data-event="hover_intent" data-effect="fade_up" data-effect-speed="200" data-effect-mobile="disabled" data-effect-speed-mobile="200" data-mobile-force-width="false" data-second-click="close" data-document-click="collapse" data-vertical-behaviour="standard" data-breakpoint="600" data-unbind="true"><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-menu-item-home mega-current-menu-item mega-page_item mega-page-item-2 mega-current_page_item mega-align-bottom-left mega-menu-flyout mega-menu-item-1790" id="mega-menu-item-1790"><a class="mega-menu-link" href="/index.html" tabindex="0">Home</a></li><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-align-bottom-left mega-menu-flyout mega-menu-item-1787" id="mega-menu-item-1787"><a class="mega-menu-link" href="#" tabindex="0">User Guide</a></li><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-align-bottom-left mega-menu-flyout mega-menu-item-1788" id="mega-menu-item-1788"><a class="mega-menu-link" href="/decmlab.html" tabindex="0">DECM lab</a></li><li class="mega-menu-item mega-menu-item-type-post_type mega-menu-item-object-page mega-align-bottom-left mega-menu-flyout mega-menu-item-1789" id="mega-menu-item-1789"><a class="mega-menu-link" href="https://climate.copernicus.eu/data-evaluation-climate-models" tabindex="0">About</a></li></ul></div>			</div>
+      </nav></header>
+
+      <div id="main" class="site-main">
+
+	<div class="full-container">
+	  
+	  <div id="primary" class="content-area">
+	    <div id="content" class="site-content" role="main">
+	      <div class="entry-content">
+		
+		<h1 style="color:#871010;font-size:32px"> User Guide of the DECM-App </h1>
+
+		<div style="width:100%;text-align:justify;">
+		  <div id ="intro" style="text-align:justify;">
+                    <br> </br>
+		    <h1 style="color:#871010"> Introduction </h1>
+                    <p>  DECM stands for “Data Evaluation for Climate Models” which is a proof-of-concept and a prototype in order to make user-friendly evaluations and quality control (EQC) of climate model framework for users of climate projection data (https://climate.copernicus.eu). DCEM was built from a user requirement perspective, based on climate data and catalogues in order to fill (scientific) gaps in the delivery of climate model data (CMIP and CORDEX). The prototype was part of the Evaluation and Quality Control (EQC) block of the Copernicus Climate Change Service (<a href="http://decm.climate.copernicus.eu)">C3S</a>). </p>
+
+                    <p> This user-manual will guide you on how to use the DECM-App and related functionalities through a set of frequently asked questions.</p>
+		   
+		  </div>
+
+		  <div style="width:100%">
+		   <br></br>
+		    <nav style="margin:left;text-align:left">
+		      <ul style="list-style-type: none">
+			<li><a style="font-size:24px;color:#871010" href="#intro"> > Intro</a></li>
+			<li><a style="font-size:24px;color:#871010" href="#launch"> > How to launch the app?</a></li>
+			<li><a style="font-size:24px;color:#871010" href="#user"> > Which type of user am I?</a></li>
+			<li><a style="font-size:24px;color:#871010" href="#strategy"> > DECM App strategy </a> </li>
+			<li><a style="font-size:24px;color:#871010" href="#structure"> > How is the app structured?</a></li>
+			<li><a style="font-size:24px;color:#871010" href="#readchart"> > Different types of charts?</a></li>
+			<li><a style="font-size:24px;color:#871010" href="#tables"> > Different types of tables?</a></li>
+			<li><a style="font-size:24px;color:#871010" href="#acknow"> > How to acknowledge?</a></li>
+		      </ul>
+		      <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+			<path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+		      </svg>
+		    </nav>
+		  </div>
+
+		  <div >
+		    <div id="launch">
+		      <br> </br>
+		      <h1 style="color:#871010"> How to launch the DECM-App? </h1>
+		      <p> The DECM-App is accessible <a href="https://decm.copernicus-climate.eu/decmapps">here</a> and is hosted at ECMWF. The app works fine on all devices such as Desktops, Tablets, Mobile phones, and is compatible with all web browsers. Nevertheless, the user interface has been optimised for Desktop users, however, some of the figures or tables could be very small or not visible on small screen devices.</p>
+		      <p> </p>
+		    </div>
+		    
+		    <div id="user">
+		      <br> </br>		      
+		      <h1 style="color:#871010"> Which type of user am I? </h1>
+		      <p> Two types of potential users of the developed application have been identified. The first category refers to as “Product-User” oriented group, while, the second category refers to as ‘Data-User’ oriented group. The ‘Product-User’ is often interested in summarising climate information in terms of charts and infographics, while, the Data-User is more interested in exploring the climate model simulations by looking at the data and metadata at the same time. More details on the results from a well-established users' survey can be found <a href= "https://climate.copernicus.eu/users-shaping-new-climate-data-store">here</a>.
+		    </div>
+		    	    
+		    <div id="structure">
+		      <br> </br>
+		      <h1 style="color:#871010"> How is the prototype structured? </h1>
+		      <p> The way the prototype is organised depends on the user category, i.e. Product-User and Data-Users and what you are interested in. Once you choose one of the two categories as described in Q2 (link to this question), you can navigate between various options, maps, charts, and data and meta tables, etc. The selected item from the menu is indicated on top of the page such as Seasonal Cycle, Models’ biases, Changes in Climate, etc. For each item, you can choose between global (A) or regional (B) climate model evaluation. In most cases, there are three main steps to follow. First, you need to select a domain or a region of interest. Second, modify the settings so that they fit your needs. Finally, check the figures along with tips on how to read and extract key messages from the results. </p>
+		    </div>
+		    
+		    <div id="menuitems">
+		      <br> </br>
+		      <h1 style="color:#871010"> What are the different menu items? </h1>
+		      <p> The Menu is organised based on the two main group of users such as Product-User and Data-User. Within the Product-User mode, you can navigate between Explore the simulations, and evaluate the Seasonal Cycle, Models’ biases, and assess Changes (present and future) in climate based on multi-model ensembles of simulations. You can also assess the models’ spread and perform a ranking of the climate models regarding various criteria using the DECMeval external app at https://esdlab.met.no/gcmeval/. The Data-Users category, however, focus directly on raw global and regional climate models’ evaluation. This group uses the same modules as those in the first category but the modules are organised differently. The main focus is to evaluate climate model data sets and to produce data output tables with some skill scores.</p>    
+		    </div>
+		    <div id= "strategy">
+		      <br> </br>
+		      <h1 style="color:#871010"> What strategy is the DECM-App based on? </h1>
+		      <p> The strategy for climate model data evaluation (global and regional climate model outputs) we adopted is very simple and consists of three main steps. 
+			<ol>
+			  <li>
+			    <p> Select a domain or a Region of interest.
+			      The first step consists of selecting a region or a domain of interest from various predefined ones. For GCM data evaluation, we used same reference regions as in the IPCC’s fifth assessment report from 2013 (AR5). These consist of 26 regions defined in the IPCC report on climate extremes from 2012 (SREX), including the Arctic, Antarctic, South Asia, and South-East Asia and three glob
+			      al analysis domains: Land only, sea only (west indian ocean) and all points (Global). <p>
+			  </li>
+			  <li> Modify the Settings. 
+			    In this box, you can modify the settings so that you fit in your needs. The list of settings depends on the type of the user and the selected menu item. Generally, the list of settings is simplified for Product Users (PU) and is more complex for Data-Users. The users can select among various options such as the time Period, the Chart Output type, computed Statistics (e.g. mean, correlation), and synchronized or not climate Variables, which means that the same set of models are selected for both temperature and precipitation. </li>
+			  <li> Visualize the results
+			    The visualisation is automatically updated whenever one (or more) argument(s) in the list of settings changes. There are two types of results depending on the type of users such as Charts (Product-User group) and Tables (Data-User group). The charts include time series, scatter plots, and Box-Plots to display the statistics computed from the grid cells encompassing the selected domain. </li>
+			</ol>
+		   </div>
+
+		    <div id="simulation">
+		      <br> </br>		      
+		      <h1 style="color:#871010"> How can I switch between individual and ensemble of multi-model climate simulations? </h1>
+		      <p> This feature is by far the most important as it is very innovative. You can switch between individual model simulations or the full ensemble of climate model simulations belonging to the same family of models. The individual simulation allows selecting or deselecting few simulations directly from the chart (legend). The multi-model ensemble allows plotting confidence zones (e.g. 5 % confidence level) in order to assess the mean and the spread of all or selected simulations. <p>
+			<hr> </hr>
+		    </div>
+		    <div id="select">
+		      <h1 style="color:#871010"> How to select a specific climate model simulation (regional or global)? </h1>
+		      <p> There are two ways to select a specific or a list of climate models. This can be done in the metadata table (available for Data-Users only) or from the Output Chart (using interactive functions). There is also an additional selection between global and regional climate models’ families that can be done inside the output web-pages as well (e.g. ‘A’ Global and ‘B’ Regional). To select a specific climate model, you first choose between A | Global climate Model Evaluation and B | Regional Climate Model Evaluation on top of each page. The selection can also be done from the chart legend by ‘simple’ clicking. To select or deselect you need to click on the specific simulation. To isolate a specific simulation you need then to double click, and that is it. To come back to the original state showing all simulations, double click one more time on the selected one. You can modify the type of output from the Settings & Outputs box and choose between options of showing individual simulations, envelope of the ensemble model simulations, or box plots. They let you show anomalies and group/colour the results according to the metadata.</p>
+		    </div>
+	            <div id="chartinfo">
+		  <br> </br>
+		      <h1 style="color:#871010"> What information is displayed on the charts? </h1>
+		      <p> The charts display information about the computed statistics over the selected domain or region. There are two ways of displaying information on the charts: Basic chart lines and more advanced charts such as ‘Box-Plots’. The latter shows a simple way of representing results in a box (i.e. rectangle) in which the whiskers represent the first (25 %) and third quartiles (75 %), with a horizontal line inside to indicate the median value (50 %). The minimum and maximum values are shown as horizontal lines laying outside the box. All the charts are interactive. You can display or hide some datasets in the legend, read values on hover, zoom in and out, and download the chart as png. You can also compare data on hover with observations. </p>
+		    </div>
+		    
+		    <div id="mapinfo">
+		      <br> </br>
+		      <h1 style="color:#871010"> What information is displayed on the maps? </h1>
+		      <p> The maps show the delimitation of the selected region or domain. </p>
+		    </div>
+		    
+		    <div id="data">
+		      <br> </br>
+		      <h1 style="color:#871010"> What are the different datasets involved? </h1>
+		      <p> The prototype shows results from raw global and regional climate models and local (obtained via empirically-downscaling model over Norway). The regional climate model output corresponds to the raw datasets and were not subject to any correction e.g. bias-correction. The reason behind this choice is to let you discover the biases and exclude the effect of the bias-correction on the model results being evaluated. </p>
+		    </div>
+
+		    <div id="blog">
+		      <br> </br>
+		      <h1 style="color:#871010"> Does DECM-App have a Blog page? </h1>
+		      <p> Yes, we do have a Blog page which contains some news and responses to feedbacks or requests. You can have a look at the following web-address to find recent news and updates: https://decm.copernicus-climate.eu/blog/index.html. However, the blog page is now static and will not longer be updated. </p>
+		    </div>
+		    
+		    <div id="meta">
+		      <br> </br>		      
+		      <h1 style="color:#871010"> How to get the metadata related to climate model simulations? </h1>
+		      <p> Metadata table presents information about the data (meta) that can additionally be used to help interpreting the results. The metadata table is also helpful for comparing between climate model setups and configurations. It also contains a link to a referenced paper and email address. There are more than 50 elements of meta information that have been collected and combined from data files and metadata tables provided by the IPCC, as it is the case for CMIP5 simulations. It contains additional information derived from the original meta values such as a rough estimation of the horizontal resolution (spatial and temporal) on which the models are compared and their corresponding original resolution used to run driving models. The meta information can be used to group the simulations based on a specific meta values. This is done using the Group-by option in the settings of the Data-User group.</p>
+		    </div>
+		    <div id="readchart">
+		      <br> </br>
+		      <h1 style="color:#871010"> How to read the charts? </h1>
+		      <p> All the charts produced by the app are interactive, i.e. you can interact with the content. The main interaction is based on selecting/deselecting few or all climate model simulations from the list in the legend section of the chart. All the charts have a caption as well as tips on how to modify the chart to meet your needs, and guidance on how to use it,  along with other recommendations. The values displayed on the charts depend on the pre-selection of settings, menu item, and climate model family (i.e. regional or global). By default, the app evaluates the bias in historical and projected surface air temperature, assuming the intermediate (RCP4.5) emission scenario from the CMIP5 multi-model ensemble. Usually, continuous lines refer to statistics of climate model simulations, and dashed lines refer to same statistics for a reference dataset (i.e. reanalyses). The envelopes usually show the mean and the spread from the multi-model ensemble of simulations. However, there are some special cases as for example the box-plot type, which represents a description of the various quartiles estimated from the multi-model ensemble. </p>
+		    </div>
+		    
+		    <div id="climavar">
+		      <h1 style="color:#871010"> Which climate variables are included in DECM evalulation? </h1>
+		      <p> The datasets include projected temperature (air mean 2m-temperature) and precipitation (monthly sums of total precipitation). These projections were taken from the full CMIP5 and un-adjusted EURO-CORDEX climate model simulations. Models’ output were regridded into a common spatial resolution  (e.g. 2.5 deg for GCMs and 0.5 for RCMs) before the statistics were derived. The temporal resolution provided is monthly time steps. The spatio-temporal resolution allows performing quick climate analyses, such as studying the seasonal cycle, changes in climate, and evaluate model biases. The datasets also include metadata which gives additional information about the simulations, such as institutes names, regional climate models names, driven global climate model names, horizontal and vertical resolutions, forcings, physics version, number of vertical levels in the simulations (for GCMs), etc. </p>
+		    </div>
+		    
+		    <div id="chartypes">
+		      <h1 style="color:#871010"> What are the different types of charts? </h1>
+		      <p> There are several chart types depending on your requirements and needs that one can explore. The main ones are ‘Seasonal-Cycle plots’ which are used to evaluate how good the models are in reproducing seasonality when compared to a reference dataset (or pseudo-observations such as reanalyses data sets) of various statistics such as bias, spatial correlation between simulated and reference data. The ‘Scatter-plots’ are generally used to explore simultaneously changes in temperature and precipitation. Then, you can explore the cloud of data points estimated for each individual simulations and the multi-model ensemble spread defined by three confidence levels. This evaluation allows you to identify models simulating high/low extremes from the multi-model ensemble spread of climate model simulations. The spread also gives an indication of how selecting one or a few models may affect the projected outcome. The ‘Box-Plots’ are also powerful visualization to identify average and extreme simulations based on the first (25 %) and third (75 %) quartiles, including the median (50 %) of distribution of model statistics. All charts are downloadable as PNG format so that you can include them in your reports and documents.
+		    </div>
+		    <div id="tables">
+		      <br> </br>
+		      <h1 style="color:#871010"> What are the different types of tables? </h1>
+		      <p> Tere are two types of tables: Input and output tables. The input tables contain information about the meta data, while, the output-tables contain statistics based on your choice of settings. Most of the tables are interactive and searchable, i.e. you can filter the row or columns by some criteria. The tables are exportable and you can copy or download the results as CSV or Excel formats, or send them directly to the printer. With the ‘Column-visibility’ option, you can hide columns that you are not interested in before exporting the results.
+
+
+			Example of metadata table showing the name of the driving project, the name of the global climate model, the name of the experiment, the name of the regional climate model, etc.
+
+
+			Example of data table showing absolute changes in regional temperature [deg. C] assuming an intermediate emission scenarios for the near future (2021-2050) averaged over the European domain. The climate models and their corresponding runs are listed in the second column and third columns, respectively. Changes are computed with regards to the reference period 1981-2010.
+		      </p>
+		    </div>
+		    
+		    <div id="acknow">
+		      <br> </br>
+		      <h1 style="color:#871010"> How do you acknowledge results obtained from DECM-App? </h1>
+		      <p> We acknowledge the COPERNICUS CLIMATE CHANGE Program's Working Group on “Data Evaluation for Climate Models” on making the tool available. We also thank the CMIP5 and EURO-CORDEX climate modelling groups for producing and making available their model output.” </p>
+		    </div>
+
+		  </div>
+		  
+
+		  <footer id="colophon" class="site-footer vertical-footer" role="contentinfo"><div id="footer-widgets" class="full-container">
+		    </div>
+		    
+		    <div id="site-info">
+		      <p style="color:white;font-size:14px"> This service is a part of Copernicus Climate Change Service (C3S)<br> All data and tools are available according to the Framework Agreement for Copernicus services<br></p>		</div>
+		    
+		    <div id="theme-attribution">A <a href="https://siteorigin.com">SiteOrigin</a> Theme</div>
+		</footer></div>
+
+
+
+
+		<script>
+		  jQuery(document).ready(function() {
+
+		  // Get all thumbs containers
+		  jQuery( ".thumbs-rating-container" ).each(function( index ) {
+
+		  // Get data attribute
+		  var content_id = jQuery(this).data('content-id');
+
+		  var itemName = "thumbsrating"+content_id;
+
+		  // Check if this content has localstorage
+		  if (localStorage.getItem(itemName)){
+
+		  // Check if it's Up or Down vote
+		  if ( localStorage.getItem("thumbsrating" + content_id + "-1") ){
+		  jQuery(this).find('.thumbs-rating-up').addClass('thumbs-rating-voted');
+		  }
+		  if ( localStorage.getItem("thumbsrating" + content_id + "-0") ){
+		  jQuery(this).find('.thumbs-rating-down').addClass('thumbs-rating-voted');
+		  }
+		  }
+		  });
+		  });
+		</script><a href="#" id="scroll-to-top" class="" title="Back To Top"><span class="vantage-icon-arrow-up"></span></a>
+		<script type="text/javascript">
+		  window.WPCOM_sharing_counts = {"https:\/\/PLACEHOLDER.wpsho\/":2};
+		</script><script type="text/javascript" src="https://c0.wp.com/p/jetpack/6.9/_inc/build/photon/photon.min.js"></script><script type="text/javascript" src="https://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201905"></script><script type="text/javascript" src="wp-content/themes/vantage/js/jquery.flexslider.min.js"></script><script type="text/javascript" src="wp-content/themes/vantage/js/jquery.touchSwipe.min.js"></script><script type="text/javascript" src="wp-content/themes/vantage/js/jquery.theme-main.min.js"></script><script type="text/javascript" src="https://c0.wp.com/c/5.0.3/wp-includes/js/hoverIntent.min.js"></script><script type="text/javascript">
+		  /* <![CDATA[ */
+var megamenu = {"timeout":"300","interval":"100"};
+/* ]]> */
+		</script><script type="text/javascript" src="wp-content/plugins/megamenu/js/maxmegamenu.js"></script><script type="text/javascript">
+		  /* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1","is_stats_active":"1"};
+/* ]]> */
+		</script><script type="text/javascript" src="https://c0.wp.com/p/jetpack/6.9/_inc/build/sharedaddy/sharing.min.js"></script><script type="text/javascript">
+		  var windowOpen;
+		  jQuery( document.body ).on( 'click', 'a.share-twitter', function() {
+		  // If there's another sharing window open, close it.
+		  if ( 'undefined' !== typeof windowOpen ) {
+		  windowOpen.close();
+		  }
+		  windowOpen = window.open( jQuery( this ).attr( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+		  return false;
+		  });
+		  var windowOpen;
+		  jQuery( document.body ).on( 'click', 'a.share-facebook', function() {
+		  // If there's another sharing window open, close it.
+		  if ( 'undefined' !== typeof windowOpen ) {
+		  windowOpen.close();
+		  }
+		  windowOpen = window.open( jQuery( this ).attr( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+		  return false;
+		  });
+		  var windowOpen;
+		  jQuery( document.body ).on( 'click', 'a.share-google-plus-1', function() {
+		  // If there's another sharing window open, close it.
+		  if ( 'undefined' !== typeof windowOpen ) {
+		  windowOpen.close();
+		  }
+		  windowOpen = window.open( jQuery( this ).attr( 'href' ), 'wpcomgoogle-plus-1', 'menubar=1,resizable=1,width=480,height=550' );
+		  return false;
+		  });
+		</script><script type="text/javascript" src="https://stats.wp.com/e-201905.js" async="async" defer></script><script type="text/javascript">
+		  _stq = window._stq || [];
+		  _stq.push([ 'view', {v:'ext',j:'1:6.9',blog:'129599453',post:'2',tz:'0',srv:'climatedatasite.net'} ]);
+		  _stq.push([ 'clickTrackerInit', '129599453', '2' ]);
+</script></body></html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Welcome to the DECM Shiny Server!</title>
+
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #ffffff;
+}
+</style>
+
+
+  <style type="text/css">
+    body, html {
+      font-family: Helvetica, Arial, sans-serif;
+      background-color: #ffffff;
+      color: #114;
+      margin: 0;
+      padding: 0;
+    }
+    a {
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    #titleBar {
+      height: 80px;
+      background-color: #871010;
+      overflow: hidden;
+      border-bottom: 1px solid #3475b3;
+      -moz-box-shadow:    0px 0px 10px 3px #BBC;
+      -webkit-box-shadow: 0px 0px 10px 3px #BBC;
+      box-shadow:         0px 0px 10px 3px #BBC;
+    }
+    #titleBar #container {
+      margin-top: 14px;
+    }
+    #titleBar h1 {
+      margin: 0 auto .5em auto;
+      padding: .2em;
+      color: #EEE;
+      text-align: center;
+    }
+    #intro {
+      background-color: #DDD;
+      margin: 1em 1em 0 1em;
+      padding: .75em;
+      text-align: center;
+      border: 1px solid #CCC;
+      font-size: 18px;
+    }
+    #intro p {
+      margin: .3em 0 .3em 0;
+    }
+    #outer-content {
+      max-width: 910px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #content {
+      margin: 1em auto 1em auto;
+      float: left;
+    }
+    #main{
+      margin-right: 350px;
+      float: left;
+      line-height: 24px;
+    }
+
+    #shiny{
+      float: left;
+      width: 305px;
+      margin-left: -330px;
+      padding-left: 20px;
+      border-left: 1px solid #AAA;
+    }
+    #shiny iframe {
+      margin-top: 30px;
+    }
+    .caption{
+      font-size: 13px;
+    }
+    code {
+      background-color: #E5E5E5;
+      border: 1px solid #AAA;
+      -webkit-border-radius: 3px;
+      -khtml-border-radius: 3px; 
+      -moz-border-radius: 3px;
+      border-radius: 3px;
+      padding: 0 .5em 0 .5em;
+    }
+  
+      .topnav {
+      overflow: hidden;
+      background-color: #871010;
+      
+    }
+
+    .topnav a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    }
+
+    .topnav a:hover {
+    background-color: #871010;
+    color: black;
+    }
+
+    .topnav a.active {
+    background-color: #871010;
+    color: white;
+    }
+</style>
+
+
+</head>
+<div class="header">
+  <img src="banner_c3s.png" alt="logo" style="width:50%;margin-left:25%;margin-bottom=50px"/>
+</div>
+
+<body>
+  <div id="titleBar">
+    <div id="container">
+      <h1>Welcome to the Data Evaluation for Climate Models (DECM)</h1>
+    </div>
+  </div>
+  
+
+  <div class="topnav">
+    <a class="active" href="./index.html">Home</a>
+    <a href="./esdlab.html">ESD Lab</a>
+    <a href="#demo">Demos</a>
+    <a href="#about">About</a>
+  </div>
+
+  
+  <div id="outer-content">
+    <div id="intro">
+      <p>Beta version of DECM application for visualising and exploring climate model data.</p>
+    </div>
+
+
+    <p>To evaluate climate models on a global and regional scales, we propose a straightforward comparison of climate models' ability to reproduce statistical properties such as the seasonal cycle, based on large multi-model ensembles climate model simulations and the predefined IPCC regions. The displayed figure shows an example with simulated (colored lines) and observed-based (dashed black line) seasonal cycle for the 'Global' domain (default) and all simulations.</p>
+    <p>You can open each window and modify parameters that fit your needs - just have a look at our&nbsp;<a href="https://climatedatasite.net/demo-videos/">demo videos</a>. Finally, you can use the app within this website or open a <a href="https://esdlab.met.no/decmapps/">full-screen version</a>.
+    </p><div class="csRow">
+      <div class="csColumnGap" style="margin: 0px; padding: 0px; float: left; width: 1.56%;"><img src="https://climatedatasite.net/wp-content/plugins/advanced-wp-columns/assets/js/plugins/views/img/1x1-pixel.png"></div>
+      <div class="csColumn" style="margin: 0px; padding: 0px; float: left; width: 31.3%;" data-csstartpoint="14.999998701171876" data-csendpoint="314.9999987011719" data-cswidth="31.3%" data-csid="bfdfcff1-e8a8-46d6-8481-8a6ba7ed281d">
+	<blockquote><p>1. Select your Region of interest</p></blockquote>
+      </div>
+      <div class="csColumnGap" style="margin: 0px; padding: 0px; float: left; width: 1.56%;"><img src="https://climatedatasite.net/wp-content/plugins/advanced-wp-columns/assets/js/plugins/views/img/1x1-pixel.png"></div>
+      <div class="csColumn" style="margin: 0px; padding: 0px; float: left; width: 31.3%;" data-csstartpoint="329.9999987011719" data-csendpoint="630.00002921875" data-cswidth="31.3%" data-csid="d88bf26e-1f31-3491-9ddf-e697acd3712e">
+	<blockquote><p>2. Modify the Settings of the outputs</p></blockquote>
+      </div>
+      <div class="csColumnGap" style="margin: 0px; padding: 0px; float: left; width: 1.56%;"><img src="https://climatedatasite.net/wp-content/plugins/advanced-wp-columns/assets/js/plugins/views/img/1x1-pixel.png"></div>
+      <div class="csColumn" style="margin: 0px; padding: 0px; float: left; width: 31.3%;" data-csstartpoint="645.00002921875" data-csendpoint="945.00002921875" data-cswidth="31.3%" data-csid="777c3ccc-4e3c-f520-a8c5-42410129cc76">
+	<blockquote><p>3. Visualize the results<img src="https://climatedatasite.net/wp-content/plugins/advanced-wp-columns/assets/js/plugins/views/img/1x1-pixel.png"></p></blockquote>
+      </div>
+      <div style="clear: both; float: none; display: block; visibility: hidden; width: 0px; font-size: 0px; line-height: 0;"></div>
+    </div>
+    <div class="csColumn" data-csstartpoint="15" data-csendpoint="315" data-cswidth="31.3%" data-csid="55dc4985-be67-07ac-8d96-41291b422a9c"></div>
+    <p><iframe src="https://decm.copernicus-climate.eu/decmapps/" width="100%" height="1800"></iframe></p>
+    <p><strong>Did you like the functions?</strong></p>
+    <p>[thumbs-rating-buttons]</p>
+    <p><strong>Feedback on the page</strong></p>
+    <p>[contact-form][contact-field label="Email" type="email" required="true" /][contact-field label="Name" type="name" /][contact-field label="Website" type="url" /][contact-field label="Message" type="textarea" /][/contact-form]</p>
+    <p>&nbsp;</p>
+
+    
+<h2>Summary table of available DECM web applications</h2>
+
+<p>The various applications are based on CMIP5 and EURO-CORDEX simulations for climate variables such as precitpiation and temperature assuming the intermediate (RCP4.5) and the high (RCP8.5) emission scenarios. These are listed in the following table.</p>
+
+<table>
+  <tr>
+    <th>App</th>
+    <th>Short description</th>
+    <th>Acess the web app</th>
+  </tr>
+  <tr>
+    <td>DECMapp</td>
+    <td>Contains all-in-one application for Data Evaluation of Climate Models</td>
+    <td><a href="/decmapps" style="color:#b21c1c">Try me</a></td>
+  </tr>
+  <tr>
+    <td>GCMeval</td>
+    <td>Specific app for climate model ensemble evaluation based on ensemble selection and model ranking</td>
+    <td><a href="/gcmeval" style="color:#b21c1c">Try me</a></td>
+  </tr>
+
+  <tr>
+    <td>Taylor Diagram app</td>
+    <td>Specific app for evaluating climate model simulations using taylor diagrams</td>
+    <td><a href="/taylordiagram" style="color:#b21c1c">Try me</a></td>
+  </tr>
+
+  <tr>
+    <td>Climate Model explorer</td>
+    <td>Specific web app which contains tools for exploring meta data of CMIP5 and EURO-CORDEX simulations for climate variables such as precitpiation and temperature assuming both RCP4.5 and RCP8.5</td>
+    <td><a href="/modelexplorer" style="color:#b21c1c">Try me</a></td>
+  </tr>
+</table>
+
+    <div id="content">
+      <div id="main">
+        <h2>Read more about the DECM applications</h2>
+	
+        <ul>
+        <li>Sort through data available from the <a href="https://climexp.knmi.nl" style= "color:#b21c1c"> KNMI climate data explorer </a> and produce simple plots and maps of climate change: <a href="/modelexplorer" style="color:#b21c1c;font-weight:bold">Climate Model Explorer</a>.</li>
+        <li>Evaluate the quality of RCM data by comparison with a reference data set, displayed in a Taylor diagram showing spatial correlation and standard deviation: <a href="/taylordiagram" style="color:#b21c1c;font-weight:bold">RCM evaluation app</a>.</li> 
+        <li>The <a href="/dpdt" style="color:#b21c1c;font-weight:bold">P vs T app</a> shows the regionally averaged projected changes in precipitation and temperature for CMIP5 models. This tool can be used for selecting a smaller but representative ensemble of GCMs out of a large ensemble. The chosen models should cover the full range of projected climate change of all the available models, e.g., one from each quadrant of change (warm-wet, warm-dry, cold-wet, cold-dry) and one from the middle.</li>
+	</li>The <a href="/seasoncycle" style="color:#b21c1c;font-weight:bold">seasonal cycle app</a> shows the seasonal cycle of precipitation and temperature for GCMs (CMIP5) compared to a reference data set (ERAinterim). This tool can be used in ensemble selection to exclude models that are not representing the seasonal cycle well in a particular region.</li>
+        <li>An application for <a href="/gcmeval" style="color:#b21c1c;font-weight:bold">evaluation of CMIP5 climate model simulations</a> with several performance statistics and visual representations of the model ensemble.</li>
+        <li> <a href="/decmapps" style="color:#b21c1c;font-weight:bold"> DECM full applications</a> combines all the different applications into one using a categorised dashboard intended for product users, data users, and sectoral users.</li>
+        </ul>
+      </div>
+
+      <div id="shiny">
+        <iframe src="https://decm.copernicus-climate.eu/decmapps" style="border: 1px solid #AAA; width: 290px; height: 600px"></iframe>
+        <div class="caption">
+          Example of the DECM App, you'll see a Shiny app above.
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

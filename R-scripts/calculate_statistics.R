@@ -2,13 +2,16 @@
 ## The metadata (metaextract.rda) and statistics files (statistics.cmip.era.tas.1981-2010.rda)
 ## should then be moved to the back-end/data folder.
 
-#!/usr/bin/env Rscript
-#setwd(system("find $HOME -name calculate_statistics.R -exec dirname {} \\;",intern=TRUE))
-setwd("/home/kajsamp/git/DECM/R-scripts/")
 ## To install DECM package: 
 ## R CMD INSTALL DECM/back-end 
 ## Requires rgdal, raster, esd (zoo, ncdf4), PCICt, RCurl
 library(DECM)
+
+#!/usr/bin/env Rscript
+dir <- find.file("calculate_statistics.R")
+wd <- dirname(dir[grepl("gcmeval",dir)])
+setwd(wd)
+setwd("/home/kajsamp/git/DECM/R-scripts/")
 
 get.meta <- FALSE
 cmip.rmse <- TRUE
@@ -62,7 +65,6 @@ if(get.meta) {
   }
 }
 
-source("~/git/DECM/back-end/R/calculate.rmse.cmip.R")
 # Calculate regional statistics (mean, sd, spatial corr) for CMIP5
 if(cmip.stats) {
   for (varid in c("pr","tas")) {

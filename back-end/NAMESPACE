@@ -1,6 +1,5 @@
 ## Imports from packages that come with R - functions from other external packages 
 ## are called explicitly when used.
-#importFrom("raster", "raster")
 importFrom("grDevices", "dev.new", "dev.off", "pdf", "adjustcolor", "rainbow")
 importFrom("graphics", "grid", "image", "lines", "par", "plot", "text")
 importFrom("stats", "median")

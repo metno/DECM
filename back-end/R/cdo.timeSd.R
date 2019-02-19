@@ -1,6 +1,6 @@
 ## Calculate the temporal standard deviation with cdo
 cdo.timeSd <- function(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
-                       monthly=FALSE,verbose=FALSE) {
+                       monthly=FALSE,bit=8,verbose=FALSE) {
   if(verbose) print("cdo.timeSd")
   commands <- c("-timstd","-fldmean","-yearmean","-selyear")
   input <- c("","","",paste(period,collapse="/"))
@@ -16,12 +16,12 @@ cdo.timeSd <- function(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
   }
   
   out.file <- "tmp.nc"
-  cdo.command(commands,input,model.file,out.file)
+  cdo.command(commands,input,model.file,out.file,bit=bit)
   
   command <- ("output")
   input <- c("")
   
-  out <- as.numeric(cdo.command(command,input,out.file,NULL,intern=TRUE))
+  out <- as.numeric(cdo.command(command,input,out.file,NULL,bit=bit,intern=TRUE))
   if(monthly) {
     names(out) <- c("jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec")
   } else if(seasonal) {

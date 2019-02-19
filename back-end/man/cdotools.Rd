@@ -12,15 +12,15 @@
   Do operations on netCDF files with CDO. More efficient than doing the calculations directly in R.
 }
 \usage{
-cdo.command(commands,input,infile,outfile,intern=FALSE)
+cdo.command(commands,input,infile,outfile,bit=8,intern=FALSE)
 cdo.mean(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
-         monthly=FALSE,is.temp=TRUE,outfile=NULL,verbose=FALSE)
+         monthly=FALSE,is.temp=TRUE,outfile=NULL,bit=8,verbose=FALSE)
 cdo.spatSd(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
-           monthly=FALSE,verbose=FALSE)
+           monthly=FALSE,bit=8,verbose=FALSE)
 cdo.timeSd(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
-           monthly=FALSE,verbose=FALSE)
+           monthly=FALSE,bit=8,verbose=FALSE)
 cdo.gridcor(model.file,reference.file,period=c(1981,2010),mask=NULL,
-            seasonal=FALSE,monthly=FALSE,verbose=FALSE)
+            seasonal=FALSE,monthly=FALSE,bit=8,verbose=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -28,6 +28,7 @@ cdo.gridcor(model.file,reference.file,period=c(1981,2010),mask=NULL,
   \item{input}{input to the commands}
   \item{infile}{path to input netCDF file}
   \item{outfile}{path to output netCDF file}
+  \item{bit}{number of bits for the output precision (e.g. 8, 16, 32, 64}
   \item{intern}{A logical (not NA) which indicates whether to capture the output of the command as an R character vector.}
   \item{model.file}{path to netCDF file}
   \item{reference.file}{path to netCDF another file}

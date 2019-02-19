@@ -1,6 +1,6 @@
 # Calculate the spatial correlation of two gridded data sets with cdo
 cdo.gridcor <- function(model.file,reference.file,period=c(1981,2010),mask=NULL,
-                        seasonal=FALSE,monthly=FALSE,verbose=FALSE) {
+                        seasonal=FALSE,monthly=FALSE,bit=8,verbose=FALSE) {
   if(verbose) print("cdo.gridcor")
   commands <- c("-timavg","-selyear")
   input <- c("",paste(period,collapse="/"))
@@ -16,16 +16,16 @@ cdo.gridcor <- function(model.file,reference.file,period=c(1981,2010),mask=NULL,
   }
   
   out.file <- "tmp.nc"
-  cdo.command(commands,input,model.file,out.file)
+  cdo.command(commands,input,model.file,out.file,bit=bit)
   
   out.file <- "tmp2.nc"
-  cdo.command(commands,input,reference.file,out.file)
+  cdo.command(commands,input,reference.file,out.file,bit=bit)
   
   commands <- c("fldcor")
   input <- c("")
   in.file <- c("tmp.nc tmp2.nc")
   out.file <- "tmp_cor.nc"
-  cdo.command(commands,input,in.file,out.file)
+  cdo.command(commands,input,in.file,out.file,bit=bit)
   
   command <- ("output")
   input <- c("")

@@ -2,7 +2,7 @@
 # Is this function affected by the error that Abdelkader discovered with -timmean? No.
 
 cdo.mean <- function(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
-                     monthly=FALSE,is.temp=TRUE,outfile=NULL,verbose=FALSE) {
+                     monthly=FALSE,is.temp=TRUE,outfile=NULL,bit=8,verbose=FALSE) {
   
   commands <- c("-fldmean","-timmean","-selyear")
   input <- c("","",paste(period,collapse="/"))
@@ -24,12 +24,12 @@ cdo.mean <- function(model.file,period=c(1981,2010),mask=NULL,seasonal=FALSE,
     save.file <- TRUE
   }
   
-  cdo.command(commands,input,model.file,outfile)
+  cdo.command(commands,input,model.file,outfile,bit=bit)
   
   command <- ("output")
   input <- c("")
   
-  out <- as.numeric(cdo.command(command,input,outfile,NULL,intern=TRUE))
+  out <- as.numeric(cdo.command(command,input,outfile,NULL,bit=bit,intern=TRUE))
   if(monthly) {
     names(out) <- c("jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec")
   } else if(seasonal) {

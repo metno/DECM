@@ -6,7 +6,7 @@ library(DECM)
 
 ## Preparations
 ## source scripts
-data("statistics.cmip.tas.2071-2100")
+data("statistics.cmip.tas.2071-2100", package="DECM")
 gcmnames <- paste(seq(length(store)),names(store),sep=". ")
 
 ## load metadata
@@ -19,17 +19,39 @@ M <- data.frame(list(project_id=meta$project_id, experiment_id=meta$experiment_i
 
 ## load and expand commonEOFs
 #ceof.all <- NULL
-#data("ceof.gcm.tas.annual")
+#data("ceof.gcm.tas.annual", package="DECM")
 #ceof.all$tas$CMIP5 <- ceof
-#data("ceof.gcm.pr.annual")
+#data("ceof.gcm.pr.annual", package="DECM")
 #ceof.all$pr$CMIP5 <- ceof
-#data("ceof.rcm.tas.annual")
+#data("ceof.rcm.tas.annual", package="DECM")
 #ceof.all$tas$CORDEX <- ceof
-#data("ceof.rcm.pr.annual")
+#data("ceof.rcm.pr.annual", package="DECM")
 #ceof.all$pr$CORDEX <- ceof
 #ceof <- ceof.all
 #rm("ceof.all"); gc(reset=TRUE)
 #selectrowindex <- 1
+
+#select.ceof <- function(table_rows_selected=1,varid="Temperature") {
+#  if (length(table_rows_selected)>0) {
+#    selectedrowindex <- table_rows_selected[length(table_rows_selected)]
+#    selectedrowindex <- as.numeric(selectedrowindex)
+#  } else {
+#    selectedrowindex <- 1
+#  }
+#  selectedrow <- (M[selectedrowindex,])
+#  ceof.sel <- NULL
+#  if (grepl("temp",tolower(varid))) {
+#    ceof.sel <- ceof$tas
+#  } else {
+#    ceof.sel <- ceof$pr
+#  }
+#  ceof.sel <- ceof.sel[[selectedrow$project_id]]
+#  im <- which(attr(ceof,"model_id")$rcm==selectedrow$rcm & 
+#              attr(ceof,"model_id")$gcm==selectedrow$gcm & 
+#              attr(ceof,"model_id")$gcm_rip==selectedrow$rip)
+#  attr(ceof.sel,"im") <- im
+#  return(ceof.sel)
+#}
 
 #map.changes <- function(ceof,period="ff",FUN="mean",new=FALSE) {
 #  if(new) dev.new()

@@ -2,28 +2,6 @@
 ## R-shiny app that presents GCM and RCM data.
 source("global.R")
 
-#select.ceof <- function(table_rows_selected=1,varid="Temperature") {
-#  if (length(table_rows_selected)>0) {
-#    selectedrowindex <- table_rows_selected[length(table_rows_selected)]
-#    selectedrowindex <- as.numeric(selectedrowindex)
-#  } else {
-#    selectedrowindex <- 1
-#  }
-#  selectedrow <- (M[selectedrowindex,])
-#  ceof.sel <- NULL
-#  if (grepl("temp",tolower(varid))) {
-#    ceof.sel <- ceof$tas
-#  } else {
-#    ceof.sel <- ceof$pr
-#  }
-#  ceof.sel <- ceof.sel[[selectedrow$project_id]]
-#  im <- which(attr(ceof,"model_id")$rcm==selectedrow$rcm & 
-#              attr(ceof,"model_id")$gcm==selectedrow$gcm & 
-#              attr(ceof,"model_id")$gcm_rip==selectedrow$rip)
-#  attr(ceof.sel,"im") <- im
-#  return(ceof.sel)
-#}
-
 # Define a server for the Shiny app
 shinyServer(function(input, output) {
   
@@ -92,10 +70,9 @@ shinyServer(function(input, output) {
   #   it should write out data to that filename.
   
   #output$plot <- renderPlot({
-  # library(esd)
-  # data(Oslo)
-  # # y <- station(datasetInput())
-  # plot(Oslo,new=FALSE)
+  # data(Oslo, package="esd")
+  # # y <- esd::station(datasetInput())
+  # esd::plot(Oslo,new=FALSE)
   #})
   
   #output$downloadMeta <- downloadHandler(
@@ -103,31 +80,30 @@ shinyServer(function(input, output) {
     # This function returns a string which tells the client
     # browser what name to use when saving the file.
     # filename = function() {
-    #   library(esd)
     #   if (length(input$table_rows_selected)>0) {
     #     selectedrowindex <- input$table_rows_selected[length(input$table_rows_selected)]
     #     selectedrowindex <- as.numeric(selectedrowindex)
     #   } else
     #     selectedrowindex <- 1
     #   #browser()
-    #   param <- ele2param(ele = select.station()[selectedrowindex,7],src=select.station()[selectedrowindex,10])
-    #   loc <- select.station()[selectedrowindex,2]
-    #   src <-  select.station()[selectedrowindex,10]
-    #   cntr <- select.station()[selectedrowindex,3]
+    #   param <- esd::ele2param(ele = esd::select.station()[selectedrowindex,7],
+    #                           src=esd::select.station()[selectedrowindex,10])
+    #   loc <- esd::select.station()[selectedrowindex,2]
+    #   src <- esd::select.station()[selectedrowindex,10]
+    #   cntr <- esd::select.station()[selectedrowindex,3]
     #   paste(gsub(' ','-',param[2]),'_',loc,'-',cntr,'_',src,'meta.csv', sep = "")
     # },
     # 
     # # This function should write data to a file given to it by
     # # the argument 'file'.
     # content = function(file) {
-    #   library(esd)
     #   if (length(input$table_rows_selected)>0) {
     #     selectedrowindex <- input$table_rows_selected[length(input$table_rows_selected)]
     #     selectedrowindex <- as.numeric(selectedrowindex)
     #   } else
     #     selectedrowindex <- 1
     #   # Write to a file specified by the 'file' argument
-    #   write.csv(as.data.frame(select.station()[selectedrowindex,]), file, row.names = FALSE)
+    #   write.csv(as.data.frame(esd::select.station()[selectedrowindex,]), file, row.names = FALSE)
     # }
   #)
   
@@ -136,16 +112,17 @@ shinyServer(function(input, output) {
     # This function returns a string which tells the client
     # browser what name to use when saving the file.
     # filename = function() {
-    #   library(esd)
     #   if (length(input$table_rows_selected)>0) {
     #     selectedrowindex <- input$table_rows_selected[length(input$table_rows_selected)]
     #     selectedrowindex <- as.numeric(selectedrowindex)
     #   } else
     #     selectedrowindex <- 1
-    #   param <- ele2param(ele = select.station()[selectedrowindex,7],src=select.station()[selectedrowindex,10])
-    #   loc <- select.station()[selectedrowindex,2]
-    #   src <-  select.station()[selectedrowindex,10]
-    #   cntr <- select.station()[selectedrowindex,3]
+    #   }
+    #   param <- esd::ele2param(ele = esd::select.station()[selectedrowindex,7],
+    #                           src=esd::select.station()[selectedrowindex,10])
+    #   loc <- esd::select.station()[selectedrowindex,2]
+    #   src <-  esd::select.station()[selectedrowindex,10]
+    #   cntr <- esd::select.station()[selectedrowindex,3]
     #   paste(gsub(' ','-',param[2]),'_',loc,'-',cntr,'_',src,'data.csv', sep = "")
     # },
     # 

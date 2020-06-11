@@ -15,7 +15,6 @@ library(DECM)
 library(shinyBS)
 #library(fields)
 
-
 #if ('RgoogleMaps' %in% installed.packages()) install.packages('RgoogleMaps')
 #library(RgoogleMaps)
 
@@ -72,31 +71,31 @@ varscore <- function(x) {
 ## Load statistics calculated with script 'calculate_statistics.R'
 
 gcms <- NULL
-load("../../back-end/data/statistics.cmip.era.tas.1981-2010.rda")
+data("statistics.cmip.era.tas.1981-2010", package="DECM")
 gcms$rcp45$tas$present <- store
-load("../../back-end/data/statistics.cmip.tas.2021-2050.rda")
+data("statistics.cmip.tas.2021-2050", package="DECM")
 gcms$rcp45$tas$nf <- store
-load("../../back-end/data/statistics.cmip.tas.2071-2100.rda")
+data("statistics.cmip.tas.2071-2100", package="DECM")
 gcms$rcp45$tas$ff <- store
-load("../../back-end/data/statistics.cmip.era.pr.1981-2010.rda")
+data("statistics.cmip.era.pr.1981-2010", package="DECM")
 gcms$rcp45$pr$present <- store
-load("../../back-end/data/statistics.cmip.pr.2021-2050.rda")
+data("statistics.cmip.pr.2021-2050", package="DECM")
 gcms$rcp45$pr$nf <- store
-load("../../back-end/data/statistics.cmip.pr.2071-2100.rda")
+data("statistics.cmip.pr.2071-2100", package="DECM")
 gcms$rcp45$pr$ff <- store
 
 ## GCMs RCP85
-load("../../back-end/data/statistics.cmip.era.tas.1981-2010.rcp85.rda")
+data("statistics.cmip.era.tas.1981-2010.rcp85", package="DECM")
 gcms$rcp85$tas$present <- store
-load("../../back-end/data/statistics.cmip.tas.2021-2050.rcp85.rda")
+data("statistics.cmip.tas.2021-2050.rcp85", package="DECM")
 gcms$rcp85$tas$nf <- store
-load("../../back-end/data/statistics.cmip.tas.2071-2100.rcp85.rda")
+data("statistics.cmip.tas.2071-2100.rcp85", package="DECM")
 gcms$rcp85$tas$ff <- store
-load("../../back-end/data/statistics.cmip.era.pr.1981-2010.rcp85.rda")
+data("statistics.cmip.era.pr.1981-2010.rcp85", package="DECM")
 gcms$rcp85$pr$present <- store
-load("../../back-end/data/statistics.cmip.pr.2021-2050.rcp85.rda")
+data("statistics.cmip.pr.2021-2050.rcp85", package="DECM")
 gcms$rcp85$pr$nf <- store
-load("../../back-end/data/statistics.cmip.pr.2071-2100.rcp85.rda")
+data("statistics.cmip.pr.2071-2100.rcp85", package="DECM")
 gcms$rcp85$pr$ff <- store
 
 ## Help functions for the shiny app "seasoncycle"
@@ -283,37 +282,37 @@ rcm.all$rcp85 <- rcm.pr$rcp85[,-i.var]
 # RCM statistics ...
 # CORDEX RCP45
 rcms <- NULL
-load("../../back-end/data/statistics.cordex.eobs.tas.1981-2010.rcp45.rda")
+data("statistics.cordex.eobs.tas.1981-2010.rcp45", package="DECM")
 store$eobs.tas$corr <- store$eobs.tas$mean
 store$eobs.tas$corr <- rep(1,13)
 rcms$rcp45$tas$present <- store
-load("../../back-end/data/statistics.cordex.tas.2021-2050.rcp45.rda")
+data("statistics.cordex.tas.2021-2050.rcp45", package="DECM")
 rcms$rcp45$tas$nf <- store
-load("../../back-end/data/statistics.cordex.tas.2071-2100.rcp45.rda")
+data("statistics.cordex.tas.2071-2100.rcp45", package="DECM")
 rcms$rcp45$tas$ff <- store
-load("../../back-end/data/statistics.cordex.eobs.pr.1981-2010.rcp45.rda")
+data("statistics.cordex.eobs.pr.1981-2010.rcp45", package="DECM")
 store$eobs.pr$corr <- rep(1,13)
 rcms$rcp45$pr$present <- store
-load("../../back-end/data/statistics.cordex.pr.2021-2050.rcp45.rda")
+data("statistics.cordex.pr.2021-2050.rcp45", package="DECM")
 rcms$rcp45$pr$nf <- store
-load("../../back-end/data/statistics.cordex.pr.2071-2100.rcp45.rda")
+data("statistics.cordex.pr.2071-2100.rcp45", package="DECM")
 rcms$rcp45$pr$ff <- store
 
 ## CORDEX RCP85
-load("../../back-end/data/statistics.cordex.eobs.tas.1981-2010.rcp85.rda")
+data("statistics.cordex.eobs.tas.1981-2010.rcp85", package="DECM")
 store$eobs.tas$corr <- store$eobs.tas$mean
 store$eobs.tas$corr <- rep(1,13)
 rcms$rcp85$tas$present <- store
-load("../../back-end/data/statistics.cordex.tas.2021-2050.rcp85.rda")
+data("statistics.cordex.tas.2021-2050.rcp85", package="DECM")
 rcms$rcp85$tas$nf <- store
-load("../../back-end/data/statistics.cordex.tas.2071-2100.rcp85.rda")
+data("statistics.cordex.tas.2071-2100.rcp85", package="DECM")
 rcms$rcp85$tas$ff <- store
-load("../../back-end/data/statistics.cordex.eobs.pr.1981-2010.rcp85.rda")
+data("statistics.cordex.eobs.pr.1981-2010.rcp85", package="DECM")
 store$eobs.pr$corr <- rep(1,13)
 rcms$rcp85$pr$present <- store
-load("../../back-end/data/statistics.cordex.pr.2021-2050.rcp85.rda")
+data("statistics.cordex.pr.2021-2050.rcp85", package="DECM")
 rcms$rcp85$pr$nf <- store
-load("../../back-end/data/statistics.cordex.pr.2071-2100.rcp85.rda")
+data("statistics.cordex.pr.2071-2100.rcp85", package="DECM")
 rcms$rcp85$pr$ff <- store
 
 
